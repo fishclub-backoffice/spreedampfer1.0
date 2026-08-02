@@ -293,28 +293,28 @@ input,select,textarea{font-family:inherit;font-size:16px}
       <div style="padding-top:4px">
         <p class="label" style="margin-top:4px">Payment Type <span style="font-size:10px;font-weight:400;color:var(--faint)">(select all that apply)</span></p>
         <div class="pay-sel">
-          <button class="pay-btn" data-pay="pauschale">Flat Rate</button>
-          <button class="pay-btn" data-pay="verbrauch">By Consumption</button>
-          <button class="pay-btn" data-pay="direct">Direct Payment</button>
+          <button class="pay-btn" id="pb-pauschale" onclick="togglePayType('pauschale')">Flat Rate</button>
+          <button class="pay-btn" id="pb-verbrauch" onclick="togglePayType('verbrauch')">By Consumption</button>
+          <button class="pay-btn" id="pb-direct" onclick="togglePayType('direct')">Direct Payment</button>
         </div>
         <div id="pauschaleWrap" class="hidden" style="margin-bottom:14px">
           <p class="label">Package</p>
           <div class="pay-sel" style="margin-bottom:10px">
-            <button class="pay-btn pay-sub" data-sub="basic">Open Bar Basic</button>
-            <button class="pay-btn pay-sub" data-sub="advanced">Open Bar Advanced</button>
+            <button class="pay-btn pay-sub" id="pb-basic" onclick="selectSubType('basic')">Open Bar Basic</button>
+            <button class="pay-btn pay-sub" id="pb-advanced" onclick="selectSubType('advanced')">Open Bar Advanced</button>
           </div>
           <div id="basicAddonsWrap" class="hidden">
             <p style="font-size:11.5px;color:var(--faint);margin-bottom:8px;line-height:1.6">Includes: Pilsner · Alkoholfrei Beer · Wines · Non-Alcoholic</p>
             <p class="label">Booked on top</p>
             <div class="tip-row">
-              <button class="tip-opt" data-addon="spritz">+ Aperol / Campari Spritz</button>
+              <button class="tip-opt" id="ao-spritz" onclick="toggleAddon('spritz')">+ Aperol / Campari Spritz</button>
             </div>
           </div>
           <div id="advancedAddonsWrap" class="hidden">
             <p style="font-size:11.5px;color:var(--faint);margin-bottom:8px;line-height:1.6">Includes: Everything</p>
             <p class="label">Booked on top</p>
             <div class="tip-row">
-              <button class="tip-opt" data-addon="shots">+ Free Shots</button>
+              <button class="tip-opt" id="ao-shots" onclick="toggleAddon('shots')">+ Free Shots</button>
             </div>
           </div>
         </div>
@@ -326,8 +326,8 @@ input,select,textarea{font-family:inherit;font-size:16px}
           <p style="font-size:12px;color:var(--faint);margin-bottom:8px">Organizer covers up to this amount — guests pay above it directly.</p>
           <div class="cur-input"><input type="number" id="abrPauschaleFee" inputmode="decimal" placeholder="e.g. 1500" step="1" min="0"/><span class="cur-lbl">€</span></div>
           <div class="tip-row" style="margin-top:8px">
-            <button class="tip-opt" data-pft="netto">Netto (excl. VAT)</button>
-            <button class="tip-opt" data-pft="brutto">Brutto (incl. VAT)</button>
+            <button class="tip-opt" id="pft-netto" onclick="selectPFT('netto')">Netto (excl. VAT)</button>
+            <button class="tip-opt" id="pft-brutto" onclick="selectPFT('brutto')">Brutto (incl. VAT)</button>
           </div>
           <div id="pauschaleFeeCalc" style="font-size:12.5px;color:var(--muted);margin-top:6px;text-align:center"></div>
           <div id="pauschaleVsActual" style="margin-top:10px"></div>
@@ -343,8 +343,8 @@ input,select,textarea{font-family:inherit;font-size:16px}
           <div class="miniform" style="margin-bottom:14px">
             <div class="mf-row" style="align-items:center;margin-bottom:12px"><div class="cur-lbl" style="flex:0 0 90px">Amount</div><div class="cur-input" style="flex:1"><input type="number" id="abrTip" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
             <div class="tip-row">
-              <button class="tip-opt" data-tip="cash">✓ Deducted from cash</button>
-              <button class="tip-opt" data-tip="payout">→ Needs to be paid out</button>
+              <button class="tip-opt" id="tip-cash" onclick="selectTip('cash')">✓ Deducted from cash</button>
+              <button class="tip-opt" id="tip-payout" onclick="selectTip('payout')">→ Needs to be paid out</button>
             </div>
           </div>
         </div>
@@ -908,17 +908,7 @@ function renderAbrechnung(){
   const a=getAbr();
   if(!a.types)a.types=a.type?[a.type]:[];
   // multi-select: button is active if its key is in types array
-  // wire top-level pay buttons (single-select)
-  document.querySelectorAll(".pay-btn:not(.pay-sub)").forEach(b=>{
-    b.classList.toggle("sel",(a.types||[]).includes(b.dataset.pay));
-    b.onclick=function(){
-      const a2=getAbr(),t=b.dataset.pay;
-      a2.types=(a2.types&&a2.types[0]===t)?[]:([t]);
-      a2.type=a2.types[0]||"";
-      if(!a2.types.includes("pauschale"))a2.pauschalenType="";
-      saveAbr();
-    };
-  });
+  [["pb-pauschale","pauschale"],["pb-verbrauch","verbrauch"],["pb-direct","direct"]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.classList.toggle("sel",(a.types||[]).includes(p[1]));});
   // show pauschale fee field only when flat rate is selected
   const hasPauschale=(a.types||[]).includes("pauschale");
   const hasVerbrauch=(a.types||[]).includes("verbrauch");
@@ -929,31 +919,15 @@ function renderAbrechnung(){
   const vw=$("#verbrauchWrap");if(vw)vw.classList.toggle("hidden",!hasVerbrauch);
   const iw=$("#incomeWrap");if(iw)iw.classList.toggle("hidden",!hasDirect);
   // sub-type buttons
-  // wire sub-type buttons
-  document.querySelectorAll(".pay-sub").forEach(b=>{
-    b.classList.toggle("sel",b.dataset.sub===subType);
-    b.onclick=function(){
-      const a2=getAbr();
-      a2.pauschalenType=(a2.pauschalenType===b.dataset.sub?"":b.dataset.sub);
-      saveAbr();
-    };
-  });
+  [["pb-basic","basic"],["pb-advanced","advanced"]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.classList.toggle("sel",p[1]===subType);});
   // add-on sections
   const bw=$("#basicAddonsWrap");if(bw)bw.classList.toggle("hidden",subType!=="basic");
   const aw=$("#advancedAddonsWrap");if(aw)aw.classList.toggle("hidden",subType!=="advanced");
   // add-on buttons
-  // wire add-on buttons
-  document.querySelectorAll("[data-addon]").forEach(b=>{
-    b.classList.toggle("sel",(a.addons||{})[b.dataset.addon]===true);
-    b.onclick=function(){
-      const a2=getAbr();
-      if(!a2.addons)a2.addons={};
-      a2.addons[b.dataset.addon]=!a2.addons[b.dataset.addon];
-      saveAbr();
-    };
-  });
+  [["ao-spritz","spritz"],["ao-shots","shots"]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.classList.toggle("sel",(a.addons||{})[p[1]]===true);});
+  [["pft-netto","netto"],["pft-brutto","brutto"]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.classList.toggle("sel",(a.pauschale_fee_type||"netto")===p[1]);});
+  [["tip-cash","cash"],["tip-payout","payout"]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.classList.toggle("sel",a.tipSource===p[1]);});
   const pfi=$("#abrPauschaleFee");if(pfi&&document.activeElement!==pfi)pfi.value=a.pauschale_fee||"";
-  document.querySelectorAll("[data-pft]").forEach(b=>b.classList.toggle("sel",b.dataset.pft===(a.pauschale_fee_type||"netto")));
   const pFeeVal=parseFloat(a.pauschale_fee)||0,pFT=a.pauschale_fee_type||"netto";
   const pFeeNetto=pFT==="netto"?pFeeVal:pFeeVal/1.19;
   const pFeeBrutto=pFT==="netto"?pFeeVal*1.19:pFeeVal;
@@ -973,7 +947,6 @@ function renderAbrechnung(){
       +`</div>`;
   }else if(vaEl)vaEl.innerHTML="";
   if(activeSheet==="verbrauch")renderOrder();
-  document.querySelectorAll(".tip-opt").forEach(b=>b.classList.toggle("sel",b.dataset.tip===a.tipSource));
   const ci=$("#abrCash");if(ci&&document.activeElement!==ci)ci.value=a.cash||"";
   const si=$("#abrSumup");if(si&&document.activeElement!==si)si.value=a.sumup||"";
   const li=$("#abrLight");if(li&&document.activeElement!==li)li.value=a.light||"";
@@ -1005,16 +978,7 @@ function renderAbrechnung(){
   host.innerHTML=rows.join("")||`<div class="abr-row"><span class="al" style="color:var(--faint)">Enter amounts above to see the summary.</span></div>`;
   renderTabs();renderBar();
 }
-document.querySelectorAll(".pay-btn").forEach(b=>b.onclick=()=>{
-  const a=getAbr();if(!a.types)a.types=[];
-  // single select
-  a.types=[b.dataset.pay];
-  a.type=b.dataset.pay;
-  saveAbr();
-});
-document.querySelectorAll(".tip-opt").forEach(b=>b.onclick=()=>{getAbr().tipSource=b.dataset.tip;saveAbr();});
 $("#abrPauschaleFee").addEventListener("input",()=>{getAbr().pauschale_fee=$("#abrPauschaleFee").value;saveAbr();});
-document.querySelectorAll("[data-pft]").forEach(b=>b.onclick=()=>{getAbr().pauschale_fee_type=b.dataset.pft;saveAbr();});
 ["abrCash","abrSumup","abrLight","abrTip"].forEach(id=>{const el=$("#"+id);if(!el)return;el.addEventListener("input",()=>{const a=getAbr();if(id==="abrCash")a.cash=el.value;if(id==="abrSumup")a.sumup=el.value;if(id==="abrLight")a.light=el.value;if(id==="abrTip")a.tip=el.value;saveAbr();});});
 $("#abrNote").addEventListener("input",()=>{getAbr().notes=$("#abrNote").value;saveAbr();});
 
@@ -1149,6 +1113,16 @@ $("#pinCancel").onclick=()=>{$("#pinModal").classList.add("hidden");pinCallback=
 $("#pinInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("#pinConfirm").click();});
 
 
+/* PAYMENT HELPERS — called via inline onclick, always reliable */
+function togglePayType(t){var a=getAbr();if(!a.types)a.types=[];var i=a.types.indexOf(t);if(i>=0)a.types.splice(i,1);else a.types.push(t);a.type=a.types[0]||"";if(!a.types.includes("pauschale"))a.pauschalenType="";saveAbr();}
+function selectSubType(t){var a=getAbr();a.pauschalenType=(a.pauschalenType===t?"":t);if(a.pauschalenType&&(!a.types||!a.types.includes("pauschale"))){if(!a.types)a.types=[];a.types.push("pauschale");a.type="pauschale";}saveAbr();}
+function toggleAddon(k){var a=getAbr();if(!a.addons)a.addons={};a.addons[k]=!a.addons[k];saveAbr();}
+function selectPFT(t){getAbr().pauschale_fee_type=t;saveAbr();}
+function selectTip(t){getAbr().tipSource=t;saveAbr();}
+// Expose to global scope for inline onclick
+window.togglePayType=togglePayType;window.selectSubType=selectSubType;
+window.toggleAddon=toggleAddon;window.selectPFT=selectPFT;window.selectTip=selectTip;
+
 /* BOTTOM BAR */
 function renderBar(){
   const inner=$("#barInner");
@@ -1188,6 +1162,7 @@ let theme="dark";try{theme=localStorage.getItem(THEME_KEY)||"dark";}catch(e){}
 applyTheme(theme);$("#themeBtn").onclick=()=>{theme=theme==="light"?"dark":"light";applyTheme(theme);};
 
 /* INIT */
+/* PAYMENT BUTTON INIT — wired once at startup, reliable on all browsers */
 loadAll();loadFBConfig();
 (function loadFromUrl(){try{const p=new URLSearchParams(window.location.search).get("s");if(!p)return;const incoming=decSess(p);if(!incoming||typeof incoming!=="object")return;history.replaceState({},"",window.location.pathname);const existing=sessions.find(s=>s.id===incoming.id);if(existing){if(confirm(`Update received for "${incoming.loc||"unknown"}".\nUpdate session?`)){Object.assign(existing,incoming);saveAll();toast("Session updated");}}else{if(!incoming.id)incoming.id=newSessId();sessions.push(incoming);saveAll();toast(`Session "${incoming.loc||"—"}" received and added`);}}catch(e){}})();
 if(fbUrl)startSync();
