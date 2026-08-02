@@ -624,7 +624,9 @@ function renderSessionsList(){
 $("#sessCards").addEventListener("click",e=>{
   const op=e.target.closest(".sc-open"),ex=e.target.closest(".sc-export"),dl=e.target.closest(".sc-del"),re=e.target.closest(".sc-reopen");
   if(re){const se=sessions.find(s=>s.id===re.dataset.reopen);if(se){se.closed=false;saveAll();debouncedSync();renderSessionsList();}return;}
-  if(op){currentId=op.dataset.id;activeSheet="verbrauch";saveAll();go("sheets");setTimeout(()=>{if(screen==="sheets"){renderTabs();renderBar();}},50);return;}
+  if(op){currentId=op.dataset.id;activeSheet="verbrauch";saveAll();go("sheets");
+  let _att=0;const _fix=setInterval(()=>{if(screen!=="sheets"||++_att>10)return clearInterval(_fix);const _t=$("#tabs");if(!_t||_t.children.length<3){renderTabs();renderBar();}else clearInterval(_fix);},100);
+  return;}
   if(ex){currentId=ex.dataset.id;saveAll();go("summary");return;}
   if(ed){currentId=ed.dataset.id;editMode=true;saveAll();go("setup");return;}
   if(dl){
@@ -661,18 +663,31 @@ function renderSetup(){
 
 /* TABS */
 function renderTabs(){
-  const s5=sess();
-  const shObj=s5.stunden&&!Array.isArray(s5.stunden)?s5.stunden:{};
-  const shTot=SH_ROLES.reduce((x,r)=>x+(parseFloat(shObj[r.k])||0),0);
-  const defs=[
-    {k:"verbrauch",n:"Consumption List",b:eur(revTotal())},
-    {k:"personal",n:"Staff Drinks",b:persQty()+"×"},
-    {k:"bruch",n:"Breakage",b:(()=>{const t=poolBC(s5).reduce((r,i)=>r+(s5.bruchCounts?s5.bruchCounts[i.id]||0:0)*i.p,0);return t>0?eur(t):"—";})()} ,
-    {k:"stunden",n:"Hours Sheet",b:shTot>0?shTot+"h":"—"},
-    {k:"abrechnung",n:"Payment",b:(()=>{try{const tp=(s5.abrechnung&&s5.abrechnung.types||[]);if(!tp.length)return"—";return tp.map(t=>({"pauschale":"Flat Rate","verbrauch":"Consump.","direct":"Direct"})[t]||t).join("+")||"—";}catch(e){return"—";}})()} ,
-  ];
-  const t=$("#tabs");if(!t)return;t.innerHTML="";
-  defs.forEach(d=>{const b=document.createElement("button");b.className="tab";b.setAttribute("aria-selected",activeSheet===d.k?"true":"false");b.innerHTML=`<span class="tn">${d.n}</span><span class="tb num">${d.b}</span>`;b.onclick=()=>{activeSheet=d.k;switchPane();};t.appendChild(b);});
+  try{
+    const tabEl=$("#tabs");if(!tabEl)return;
+    const s5=sess();
+    const shObj=s5.stunden&&!Array.isArray(s5.stunden)?s5.stunden:{};
+    const shTot=SH_ROLES.reduce((x,r)=>x+(parseFloat(shObj[r.k])||0),0);
+    const bc=poolBC(s5).reduce((r,i)=>r+(s5.bruchCounts?parseFloat(s5.bruchCounts[i.id])||0:0)*i.p,0);
+    const tp=(s5.abrechnung&&s5.abrechnung.types||[]);
+    const payBadge=tp.length?tp.map(t2=>({"pauschale":"Flat","verbrauch":"Consump.","direct":"Direct"})[t2]||t2).join("+"):"—";
+    const defs=[
+      {k:"verbrauch",n:"Consumption List",b:eur(revTotal())},
+      {k:"personal",n:"Staff Drinks",b:persQty()+"×"},
+      {k:"bruch",n:"Breakage",b:bc>0?eur(bc):"—"},
+      {k:"stunden",n:"Hours Sheet",b:shTot>0?shTot+"h":"—"},
+      {k:"abrechnung",n:"Payment",b:payBadge},
+    ];
+    tabEl.innerHTML="";
+    defs.forEach(d=>{
+      const b=document.createElement("button");
+      b.className="tab";
+      b.setAttribute("aria-selected",activeSheet===d.k?"true":"false");
+      b.innerHTML=`<span class="tn">${d.n}</span><span class="tb num">${d.b}</span>`;
+      b.onclick=()=>{activeSheet=d.k;switchPane();};
+      tabEl.appendChild(b);
+    });
+  }catch(e){console.error("renderTabs:",e);}
 }
 function switchPane(){
   const s=sess();
@@ -1077,7 +1092,7 @@ function renderBar(){
   if(screen==="sessions"){inner.innerHTML=`<button class="cta" id="newSessBtn"><span>+</span> New Session</button>`;$("#newSessBtn").onclick=()=>{currentId=null;editMode=false;go("setup");};}
   else if(screen==="setup"){const ready=!!(sess().loc);inner.innerHTML=`<button class="cta ghost" id="backSetupBtn">←</button><button class="cta" id="startSessBtn" ${ready?"":"disabled"}>${editMode?"Save Changes →":"Start →"}</button>`;$("#backSetupBtn").onclick=()=>{if(editMode){editMode=false;go("sessions");}else{if(currentId&&!revQty()&&!persQty()){sessions=sessions.filter(s=>s.id!==currentId);currentId=null;saveAll();}go("sessions");}};
   $("#startSessBtn").onclick=()=>{if(!sess().loc)return;const s=sess();s.date=$("#fDate").value;s.event=$("#fEvent").value.trim();touchSess();if(editMode){editMode=false;go("sessions");}else{activeSheet="verbrauch";go("sheets");}};}
-  else if(screen==="sheets"){inner.innerHTML=`<button class="cta ghost" id="toSessions">←</button><div class="total-pill"><span class="pl">Verbrauch · ${revQty()}</span><span class="pv num">${eur(revTotal())}</span></div><button class="cta" id="goSum">Close Out →</button>`;$("#toSessions").onclick=()=>go("sessions");$("#goSum").onclick=()=>go("summary");}
+  else if(screen==="sheets"){const _t=$("#tabs");if(_t&&_t.children.length<3)renderTabs();inner.innerHTML=`<button class="cta ghost" id="toSessions">←</button><div class="total-pill"><span class="pl">Verbrauch · ${revQty()}</span><span class="pv num">${eur(revTotal())}</span></div><button class="cta" id="goSum">Close Out →</button>`;$("#toSessions").onclick=()=>go("sessions");$("#goSum").onclick=()=>go("summary");}
   else{inner.innerHTML=`<button class="cta ghost" id="toSheets">←</button><button class="cta" id="backSess2">All Sessions</button>`;$("#toSheets").onclick=()=>go("sheets");$("#backSess2").onclick=()=>go("sessions");}
 }
 
