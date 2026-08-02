@@ -459,12 +459,12 @@ const MENU=[
   {c:"Long Drinks",items:[["LD Aperol","0,30 l",8.00],["LD Campari","0,30 l",8.00],["LD Vermouth","0,30 l",8.00],["LD Vodka","0,30 l",9.00],["LD Gin","0,30 l",9.00],["LD Whisky","0,30 l",9.00],["LD Rum","0,30 l",9.00],["LD Tequila","0,30 l",9.50],["LD Mate / Makava","0,50 l",9.50],["LD Red Bull","0,30 l",10.00],["LD Mezcal","0,30 l",12.00]]},
   {c:"Shots",items:[["Shots (Berliner Luft)","2 cl",2.50],["Shots (other)","2 cl",3.00],["Shots (Tequila, Whisky)","2 cl",3.50],["Shots (Mezcal)","2 cl",5.00]]},
   {c:"Spirits (Bottles)",items:[
-    ["Smirnoff Vodka","1 l",0],["Smirnoff Vodka","0,7 l",0],["Ketel One","0,7 l",0],
-    ["Jägermeister","1 l",0],["Berliner Luft","1 l",0],["Sambuca Molinari","1 l",0],
-    ["Ingwerschnaps","1 l",0],["Tanqueray Gin","1 l",0],["Casamigos Tequila","0,7 l",0],
-    ["Casamigos Mezcal","0,7 l",0],["Pampero Rum","1 l",0],["Captain Morgan","1 l",0],
-    ["Jameson","0,7 l",0],["Bulleit","0,7 l",0],["Aperol","1 l",0],["Campari","1 l",0],
-    ["Belsazar Rosé","0,75 l",0],["Watermelon Liqueur","0,7 l",0],
+    ["Smirnoff Vodka","1 l",150],["Smirnoff Vodka","0,7 l",105],["Ketel One","0,7 l",105],
+    ["Jägermeister","1 l",150],["Berliner Luft","1 l",125],["Sambuca Molinari","1 l",150],
+    ["Ingwerschnaps","1 l",150],["Tanqueray Gin","1 l",150],["Casamigos Tequila","0,7 l",122.50],
+    ["Casamigos Mezcal","0,7 l",175],["Pampero Rum","1 l",150],["Captain Morgan","1 l",150],
+    ["Jameson","0,7 l",122.50],["Bulleit","0,7 l",122.50],["Aperol","1 l",125],["Campari","1 l",125],
+    ["Belsazar Rosé","0,75 l",92.50],["Watermelon Liqueur","0,7 l",0],
     ["Triple Sec","1 l",0],["Lime Juice","0,7 l",0],
   ]},
   {c:"Shots (Spirits)",items:[
@@ -475,6 +475,7 @@ const MENU=[
     ["Casamigos Mezcal Shot","2 cl",5.00],["Pampero Rum Shot","2 cl",3.00],
     ["Captain Morgan Shot","2 cl",3.00],["Jameson Shot","2 cl",3.50],
     ["Bulleit Shot","2 cl",3.50],
+    ["Aperol Shot","2 cl",2.50],["Campari Shot","2 cl",2.50],["Belsazar Rosé Shot","2 cl",2.50],
   ]},
   {c:"Wines & Juices",items:[
     ["Weisswein Silvaner","1 l",0],["Prosecco Casa Gheller","0,7 l",0],["Rotwein Migliarina","0,7 l",0],
@@ -542,7 +543,12 @@ function normalizeSess(s){
   if(!s.abrechnung||typeof s.abrechnung!=="object")s.abrechnung={};
   const a=s.abrechnung;
   if(!Array.isArray(a.types))a.types=a.type?[a.type]:[];
-  a.types=a.types.map(t=>t==="pauschale"?"basic":t==="selbst"?"direct":t);
+  // migrate old type values — "selbst"→"direct", "basic"/"advanced" move to pauschalenType
+  a.types=a.types.map(t=>{
+    if(t==="selbst")return"direct";
+    if(t==="basic"||t==="advanced"){if(!a.pauschalenType)a.pauschalenType=t;return"pauschale";}
+    return t;
+  }).filter((t,i,arr)=>arr.indexOf(t)===i);
   if(!a.addons||typeof a.addons!=="object")a.addons={};
   if(a.light===undefined)a.light=0;
   if(!a.pauschale_fee_type)a.pauschale_fee_type="netto";
@@ -1157,5 +1163,4 @@ go("sessions");
 
 </script>
 </body>
-</html>
 </html>
