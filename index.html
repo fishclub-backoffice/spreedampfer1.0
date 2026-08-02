@@ -294,36 +294,63 @@ input,select,textarea{font-family:inherit;font-size:16px}
         <p class="label" style="margin-top:4px">Payment Type <span style="font-size:10px;font-weight:400;color:var(--faint)">(select all that apply)</span></p>
         <div class="pay-sel">
           <button class="pay-btn" data-pay="pauschale">Flat Rate</button>
-          <button class="pay-btn" data-pay="selbst">Payment on Spot</button>
           <button class="pay-btn" data-pay="verbrauch">By Consumption</button>
+          <button class="pay-btn" data-pay="direct">Direct Payment</button>
         </div>
-        <div id="pauschaleFeeWrap" class="hidden" style="margin-bottom:14px">
-          <p class="label">Pauschale Fee</p>
-          <div class="cur-input"><input type="number" id="abrPauschaleFee" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div>
+        <div id="pauschaleWrap" class="hidden" style="margin-bottom:14px">
+          <p class="label">Package</p>
+          <div class="pay-sel" style="margin-bottom:10px">
+            <button class="pay-btn pay-sub" data-sub="basic">Open Bar Basic</button>
+            <button class="pay-btn pay-sub" data-sub="advanced">Open Bar Advanced</button>
+          </div>
+          <div id="basicAddonsWrap" class="hidden">
+            <p style="font-size:11.5px;color:var(--faint);margin-bottom:8px;line-height:1.6">Includes: Pilsner · Alkoholfrei Beer · Wines · Non-Alcoholic</p>
+            <p class="label">Booked on top</p>
+            <div class="tip-row">
+              <button class="tip-opt" data-addon="aperol">+ Aperol Spritz</button>
+              <button class="tip-opt" data-addon="campari">+ Campari Spritz</button>
+            </div>
+          </div>
+          <div id="advancedAddonsWrap" class="hidden">
+            <p style="font-size:11.5px;color:var(--faint);margin-bottom:8px;line-height:1.6">Includes: Everything</p>
+            <p class="label">Booked on top</p>
+            <div class="tip-row">
+              <button class="tip-opt" data-addon="shots">+ Free Shots</button>
+            </div>
+          </div>
+        </div>
+        <div id="verbrauchWrap" class="hidden" style="margin-bottom:14px">
+          <div class="warn" style="border-color:var(--line2);background:var(--card2);color:var(--muted)">
+            <span>📄</span><span>Invoice (Rechnung) will be sent to the organizer — no cash tracking needed.</span>
+          </div>
+          <p class="label" style="margin-top:10px">Budget Limit <span style="font-size:10px;font-weight:400;color:var(--faint)">(optional)</span></p>
+          <p style="font-size:12px;color:var(--faint);margin-bottom:8px">Organizer covers up to this amount — guests pay above it directly.</p>
+          <div class="cur-input"><input type="number" id="abrPauschaleFee" inputmode="decimal" placeholder="e.g. 1500" step="1" min="0"/><span class="cur-lbl">€</span></div>
           <div class="tip-row" style="margin-top:8px">
             <button class="tip-opt" data-pft="netto">Netto (excl. VAT)</button>
             <button class="tip-opt" data-pft="brutto">Brutto (incl. VAT)</button>
           </div>
           <div id="pauschaleFeeCalc" style="font-size:12.5px;color:var(--muted);margin-top:6px;text-align:center"></div>
+          <div id="pauschaleVsActual" style="margin-top:10px"></div>
         </div>
-        <p class="label">Income</p>
-        <div class="miniform" style="margin-bottom:14px">
-          <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">Cash</div><div class="cur-input" style="flex:1"><input type="number" id="abrCash" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
-          <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">SumUp</div><div class="cur-input" style="flex:1"><input type="number" id="abrSumup" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
-          <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">Lightspeed</div><div class="cur-input" style="flex:1"><input type="number" id="abrLight" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
-        </div>
-        <p class="label">Tips</p>
-        <div class="miniform" style="margin-bottom:14px">
-          <div class="mf-row" style="align-items:center;margin-bottom:12px"><div class="cur-lbl" style="flex:0 0 90px">Amount</div><div class="cur-input" style="flex:1"><input type="number" id="abrTip" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
-          <div class="tip-row">
-            <button class="tip-opt" data-tip="cash">✓ Deducted from cash</button>
-            <button class="tip-opt" data-tip="payout">→ Needs to be paid out</button>
+        <div id="incomeWrap" class="hidden">
+          <p class="label">Income</p>
+          <div class="miniform" style="margin-bottom:14px">
+            <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">Cash</div><div class="cur-input" style="flex:1"><input type="number" id="abrCash" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
+            <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">SumUp</div><div class="cur-input" style="flex:1"><input type="number" id="abrSumup" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
+            <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">Lightspeed</div><div class="cur-input" style="flex:1"><input type="number" id="abrLight" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
+          </div>
+          <p class="label">Tips</p>
+          <div class="miniform" style="margin-bottom:14px">
+            <div class="mf-row" style="align-items:center;margin-bottom:12px"><div class="cur-lbl" style="flex:0 0 90px">Amount</div><div class="cur-input" style="flex:1"><input type="number" id="abrTip" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
+            <div class="tip-row">
+              <button class="tip-opt" data-tip="cash">✓ Deducted from cash</button>
+              <button class="tip-opt" data-tip="payout">→ Needs to be paid out</button>
+            </div>
           </div>
         </div>
         <p class="label">Notes</p>
         <div class="miniform" style="margin-bottom:14px"><textarea id="abrNote" placeholder="Additional notes…" style="width:100%;min-height:64px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:9px 12px;outline:none;resize:none;font-size:15px;line-height:1.4"></textarea></div>
-        <p class="label">Summary</p>
-        <div class="abr-card" id="abrSummary"></div>
       </div>
     </div>
   </section>
@@ -431,7 +458,7 @@ const MENU=[
   {c:"Coffee & Tea",items:[["Pot of Coffee","2 l",12.00],["Espresso","",2.50],["Tea","",2.00]]},
   {c:"Long Drinks",items:[["LD Aperol","0,30 l",8.00],["LD Campari","0,30 l",8.00],["LD Vermouth","0,30 l",8.00],["LD Vodka","0,30 l",9.00],["LD Gin","0,30 l",9.00],["LD Whisky","0,30 l",9.00],["LD Rum","0,30 l",9.00],["LD Tequila","0,30 l",9.50],["LD Mate / Makava","0,50 l",9.50],["LD Red Bull","0,30 l",10.00],["LD Mezcal","0,30 l",12.00]]},
   {c:"Shots",items:[["Shots (Berliner Luft)","2 cl",2.50],["Shots (other)","2 cl",3.00],["Shots (Tequila, Whisky)","2 cl",3.50],["Shots (Mezcal)","2 cl",5.00]]},
-  {c:"Spirits",items:[
+  {c:"Spirits (Bottles)",items:[
     ["Smirnoff Vodka","1 l",0],["Smirnoff Vodka","0,7 l",0],["Ketel One","0,7 l",0],
     ["Jägermeister","1 l",0],["Berliner Luft","1 l",0],["Sambuca Molinari","1 l",0],
     ["Ingwerschnaps","1 l",0],["Tanqueray Gin","1 l",0],["Casamigos Tequila","0,7 l",0],
@@ -440,10 +467,22 @@ const MENU=[
     ["Belsazar Rosé","0,75 l",0],["Watermelon Liqueur","0,7 l",0],
     ["Triple Sec","1 l",0],["Lime Juice","0,7 l",0],
   ]},
+  {c:"Shots (Spirits)",items:[
+    ["Smirnoff Vodka Shot","2 cl",3.00],["Ketel One Shot","2 cl",3.00],
+    ["Jägermeister Shot","2 cl",3.00],["Berliner Luft Shot","2 cl",2.50],
+    ["Sambuca Shot","2 cl",3.00],["Ingwerschnaps Shot","2 cl",3.00],
+    ["Tanqueray Gin Shot","2 cl",3.00],["Casamigos Tequila Shot","2 cl",3.50],
+    ["Casamigos Mezcal Shot","2 cl",5.00],["Pampero Rum Shot","2 cl",3.00],
+    ["Captain Morgan Shot","2 cl",3.00],["Jameson Shot","2 cl",3.50],
+    ["Bulleit Shot","2 cl",3.50],
+  ]},
   {c:"Wines & Juices",items:[
     ["Weisswein Silvaner","1 l",0],["Prosecco Casa Gheller","0,7 l",0],["Rotwein Migliarina","0,7 l",0],
     ["Apfel Saft","1 l",0],["Maracuja Saft","1 l",0],["Mango Saft","1 l",0],
     ["Orange Saft","1 l",0],["Cranberry Saft","1 l",0],["Ananas Saft","1 l",0],
+    ["Zitronen Saft","1 l",0],["Pulco","0,7 l",0],
+    ["Brandenburger Quell","0,75 l",0],["Coca Cola","1 l",0],
+    ["Thomas Henry Pink Grapefruit","1 l",0],["Bitter Lemon","1 l",0],["Ginger Beer","1 l",0],
   ]}
 ];
 const PMENU=[
@@ -490,9 +529,9 @@ function requirePin(label,cb){
   setTimeout(()=>$("#pinInput").focus(),100);
 }
 
-function sess(){return sessions.find(s=>s.id===currentId)||{counts:{},countMode:{},custom:[],personal:{},bruch:[],bruchCounts:{},customPersonal:[],stunden:{},abrechnung:{type:"",types:[],pauschale_fee:0,pauschale_fee_type:"netto",cash:0,sumup:0,light:0,tip:0,tipSource:"",notes:""},countMode:{}};}
+function sess(){return sessions.find(s=>s.id===currentId)||{counts:{},countMode:{},custom:[],personal:{},bruch:[],bruchCounts:{},customPersonal:[],stunden:{},abrechnung:{type:"",types:[],pauschalenType:"",addons:{},pauschale_fee:0,pauschale_fee_type:"netto",cash:0,sumup:0,light:0,tip:0,tipSource:"",notes:""},countMode:{}};}
 function newSessId(){return "s_"+Date.now()+"_"+Math.floor(Math.random()*9999);}
-function newSess(){return {id:newSessId(),loc:null,date:"",event:"",counts:{},countMode:{},custom:[],personal:{},bruch:[],bruchCounts:{},customPersonal:[],stunden:{},abrechnung:{type:"",types:[],pauschale_fee:0,pauschale_fee_type:"netto",cash:0,sumup:0,light:0,tip:0,tipSource:"",notes:""},countMode:{},closed:false,closedAt:null,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};}
+function newSess(){return {id:newSessId(),loc:null,date:"",event:"",counts:{},countMode:{},custom:[],personal:{},bruch:[],bruchCounts:{},customPersonal:[],stunden:{},abrechnung:{type:"",types:[],pauschalenType:"",addons:{},pauschale_fee:0,pauschale_fee_type:"netto",cash:0,sumup:0,light:0,tip:0,tipSource:"",notes:""},countMode:{},closed:false,closedAt:null,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};}
 function saveAll(){try{localStorage.setItem(SESS_KEY,JSON.stringify({sessions,currentId}));}catch(e){}}
 function loadAll(){
   try{
@@ -502,7 +541,8 @@ function loadAll(){
       if(old){const o=JSON.parse(old);if(o&&(o.sessions||o.loc)){sessions=o.sessions||[{...newSess(),...o}];}}}
     sessions.forEach(s=>{if(!s.bruchCounts)s.bruchCounts={};if(!s.countMode)s.countMode={};
     if(!s.customPersonal)s.customPersonal=[];if(!s.stunden||Array.isArray(s.stunden))s.stunden={};if(!s.abrechnung)s.abrechnung={type:"",cash:0,sumup:0,light:0,tip:0,tipSource:"",notes:""};if(s.abrechnung&&s.abrechnung.light===undefined)s.abrechnung.light=0;
-    if(s.abrechnung&&!s.abrechnung.types)s.abrechnung.types=s.abrechnung.type?[s.abrechnung.type]:[];
+    if(s.abrechnung){if(!s.abrechnung.types)s.abrechnung.types=s.abrechnung.type?[s.abrechnung.type]:[];s.abrechnung.types=s.abrechnung.types.map(t=>(t==="basic"||t==="advanced")?"pauschale":t==="selbst"?"direct":t);
+    if(!s.abrechnung.pauschalenType){const old=s.abrechnung.types.find(t=>t==="basic"||t==="advanced");if(old){s.abrechnung.pauschalenType=old;s.abrechnung.types=["pauschale"];}}if(!s.abrechnung.addons)s.abrechnung.addons={};}
     if(s.abrechnung&&!s.abrechnung.pauschale_fee_type)s.abrechnung.pauschale_fee_type="netto";
     if(!s.countMode)s.countMode={};
     if(!s.customPersonal)s.customPersonal=[];});
@@ -530,8 +570,10 @@ function getSH(){const s=sess();if(!s.stunden||Array.isArray(s.stunden))s.stunde
 function shTotal(){const sh=getSH();return SH_ROLES.reduce((t,r)=>t+(parseFloat(sh[r.k])||0),0);}
 function getAbr(){const s=sess();if(!s.abrechnung)s.abrechnung={type:"",cash:0,sumup:0,light:0,tip:0,tipSource:"",notes:""};if(s.abrechnung.light===undefined)s.abrechnung.light=0;return s.abrechnung;}
 const poolBC=s=>ALLV.concat((s||sess()).custom||[]);
-const bruchTotalFor=s=>poolBC(s).reduce((r,i)=>r+(s.bruchCounts[i.id]||0)*i.p,0);
+const bruchTotalFor=s=>poolBC(s).reduce((r,i)=>r+(parseFloat(s.bruchCounts[i.id])||0)*i.p,0);
 const bruchTotal=()=>bruchTotalFor(sess());
+function setBruch(id,val){const s=sess();const v=Math.max(0,parseFloat(String(val).replace(",","."))||0);if(!v)delete s.bruchCounts[id];else s.bruchCounts[id]=Math.round(v*100)/100;touchSess();}
+function bumpBruch(id,d){const s=sess();const cur=parseFloat(s.bruchCounts[id])||0;setBruch(id,Math.max(0,cur+d));}
 const bruchQtyBC=()=>poolBC().reduce((r,i)=>r+(sess().bruchCounts[i.id]||0),0);
 function bumpBC(id,d){const s=sess();let v=Math.max(0,Math.min(9999,Math.round((s.bruchCounts[id]||0)+d)));if(v===0)delete s.bruchCounts[id];else s.bruchCounts[id]=v;touchSess();}
 function setBC(id,val){const s=sess();let v=Math.max(0,Math.min(9999,Math.round(val||0)));if(v===0)delete s.bruchCounts[id];else s.bruchCounts[id]=v;touchSess();}
@@ -679,7 +721,7 @@ function renderOrder(){
   if((s.custom||[]).length)groups.push({c:"Manuell hinzugefügt",items:s.custom,cust:true});
   const host=$("#vOrder");host.innerHTML="";let any=false;
   const abT=(s.abrechnung?.types||[]);
-  const isCombMode=abT.includes("pauschale")&&(abT.includes("selbst")||abT.includes("verbrauch"));
+  const isCombMode=abT.includes("pauschale")&&(abT.includes("verbrauch")||abT.includes("direct"));
   const cm=s.countMode||{};
   groups.forEach(cat=>{const items=cat.items.filter(i=>(s.counts[i.id]||0)>0);if(!items.length)return;any=true;const sec=document.createElement("div");sec.className="cat";const cq=items.reduce((t,i)=>t+s.counts[i.id],0),cs=items.reduce((t,i)=>t+s.counts[i.id]*i.p,0);sec.innerHTML=`<div class="cat-h${cat.cust?" cust":""}"><span>${cat.cust?"⚠ ":""}${cat.c}</span><span class="cc num">${cq} · ${eur(cs)}</span></div>`;items.forEach(it=>{const qty=s.counts[it.id];const row=document.createElement("div");row.className="item has";const mode=cm[it.id]||"p";
       const badge=isCombMode?`<div class="mode-seg"><button class="seg-p${mode==="p"?" on":""}" data-mode="${it.id}" data-val="p">Flat Rate</button><div class="seg-div"></div><button class="seg-nv${mode==="v"?" on":""}" data-mode="${it.id}" data-val="v">Per Drink</button></div>`:"";
@@ -753,10 +795,26 @@ function renderBResults(){
 }
 function renderBOrder(){
   const s=sess();const host=$("#bOrder");host.innerHTML="";
-  const items=MENU.flatMap(c=>c.items).concat(s.custom||[]).filter(i=>(s.bruchCounts[i.id]||0)>0);
+  const items=MENU.flatMap(c=>c.items).concat(s.custom||[]).filter(i=>parseFloat((s.bruchCounts||{})[i.id])>0);
   if(!items.length){host.innerHTML=`<div class="empty">Nothing entered yet.<br>Search for a broken item above.</div>`;return;}
-  items.forEach(it=>{const qty=s.bruchCounts[it.id];const row=document.createElement("div");row.className="item has";row.innerHTML=`<div class="body" data-badd="${it.id}"><div class="nm">${esc(it.n)}${it.s?`<span class="szpill">${it.s}</span>`:""}</div><div class="sub"><span class="num">${eur(it.p)}</span><span class="lt num">${eur(qty*it.p)}</span></div></div><div class="stepper"><button class="minus" data-bsub="${it.id}">−</button><input class="num" inputmode="numeric" data-bqty="${it.id}" value="${qty}"/><button class="plus" data-bplus="${it.id}">+</button></div>`;host.appendChild(row);});
-  const tot=document.createElement("div");tot.style.cssText="display:flex;justify-content:space-between;padding:14px 4px 0;font-size:14px;font-weight:600;color:var(--muted)";tot.innerHTML=`<span>Total Breakage</span><span class="num" style="color:var(--danger)">${eur(bruchTotal())}</span>`;host.appendChild(tot);
+  const card=document.createElement("div");card.className="abr-card";
+  items.forEach(it=>{
+    const val=parseFloat((s.bruchCounts||{})[it.id])||0;
+    const cost=val*it.p;
+    const row=document.createElement("div");row.className="abr-row";
+    row.innerHTML=`<span class="al"><b>${esc(it.n)}</b>${it.s?` <span style="color:var(--faint);font-size:12px">${it.s}</span>`:""}</span>`
+      +`<div style="display:flex;align-items:center;gap:6px">`
+      +`<button style="width:30px;height:30px;border-radius:8px;border:1px solid var(--line2);background:var(--bg2);font-size:17px;display:grid;place-items:center;cursor:pointer" data-bsub="${it.id}">−</button>`
+      +`<input type="text" inputmode="decimal" data-bpct="${it.id}" value="${val}" style="width:62px;height:34px;border-radius:9px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:0 8px;outline:none;font-family:'DM Mono',monospace;font-size:15px;text-align:center"/>`
+      +`<button style="width:30px;height:30px;border-radius:8px;border:1px solid var(--line2);background:var(--bg2);font-size:17px;display:grid;place-items:center;cursor:pointer" data-bplus="${it.id}">+</button>`
+      +`<span style="font-size:12px;color:var(--faint)">btl</span>`
+      +`<span class="num" style="font-size:12.5px;color:var(--danger);min-width:50px;text-align:right">${it.p>0?eur(cost):""}</span>`
+      +`<button data-bdel="${it.id}" style="color:var(--faint);font-size:15px;padding:0 4px;cursor:pointer">✕</button>`
+      +`</div>`;
+    card.appendChild(row);
+  });
+  host.appendChild(card);
+  if(bruchTotal()>0){const tot=document.createElement("div");tot.style.cssText="display:flex;justify-content:space-between;padding:14px 4px 0;font-size:14px;font-weight:600;color:var(--muted)";tot.innerHTML=`<span>Total Breakage Cost</span><span class="num" style="color:var(--danger)">${eur(bruchTotal())}</span>`;host.appendChild(tot);}
 }
 function renderB(){renderBResults();renderBOrder();renderTabs();renderBar();}
 $("#bSearch").addEventListener("input",renderB);
@@ -773,10 +831,18 @@ $("#bnSave").onclick=()=>{
 };
 $("#clrBS").onclick=()=>{$("#bSearch").value="";renderB();};
 $("#bResults").addEventListener("click",e=>{const a=e.target.closest("[data-badd]");if(!a)return;bumpBC(a.dataset.badd,1);renderB();});
-$("#bOrder").addEventListener("click",e=>{const plus=e.target.closest("[data-bplus]"),sub=e.target.closest("[data-bsub]"),add=e.target.closest("[data-badd]");let id=null,d=0;if(plus){id=plus.dataset.bplus;d=1;}else if(sub){id=sub.dataset.bsub;d=-1;}else if(add){id=add.dataset.badd;d=1;}if(!id)return;bumpBC(id,d);renderB();});
-$("#bOrder").addEventListener("change",e=>{const inp=e.target.closest("[data-bqty]");if(!inp)return;setBC(inp.dataset.bqty,parseInt(inp.value,10));renderB();});
-
-/* STUNDEN ZETTEL */
+$("#bOrder").addEventListener("click",e=>{
+  const del=e.target.closest("[data-bdel]");
+  if(del){const s=sess();delete s.bruchCounts[del.dataset.bdel];touchSess();renderB();return;}
+  const plus=e.target.closest("[data-bplus]"),sub=e.target.closest("[data-bsub]");
+  if(plus){bumpBruch(plus.dataset.bplus,1);renderB();return;}
+  if(sub){bumpBruch(sub.dataset.bsub,-1);renderB();return;}
+});
+$("#bOrder").addEventListener("change",e=>{
+  const inp=e.target.closest("[data-bpct]");if(!inp)return;
+  setBruch(inp.dataset.bpct,inp.value);renderB();
+});
+$("#bOrder").addEventListener("focus",e=>{const inp=e.target.closest("[data-bpct]");if(inp)inp.select();},true);
 function renderStunden(){
   const sh=getSH();const host=$("#stundenFields");if(!host)return;
   host.innerHTML=SH_ROLES.map(r=>{const val=(sh[r.k]!=null&&sh[r.k]!=="")?sh[r.k]:"";return '<div class="abr-row"><span class="al" style="font-weight:500">'+r.label+'</span><div class="cur-input" style="gap:6px"><input type="number" inputmode="decimal" min="0" step="0.25" data-shk="'+r.k+'" value="'+val+'" placeholder="\u2014" style="width:72px;height:38px;border-radius:9px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:0 8px;outline:none;font-family:DM Mono,monospace;font-size:15px;text-align:right"/><span style="font-size:13px;color:var(--faint)">h</span></div></div>';}).join("");
@@ -791,14 +857,43 @@ function renderAbrechnung(){
   const a=getAbr();
   if(!a.types)a.types=a.type?[a.type]:[];
   // multi-select: button is active if its key is in types array
-  document.querySelectorAll(".pay-btn").forEach(b=>b.classList.toggle("sel",(a.types||[]).includes(b.dataset.pay)));
+  document.querySelectorAll(".pay-btn:not(.pay-sub)").forEach(b=>b.classList.toggle("sel",(a.types||[]).includes(b.dataset.pay)));
   // show pauschale fee field only when flat rate is selected
   const hasPauschale=(a.types||[]).includes("pauschale");
-  const fw=$("#pauschaleFeeWrap");if(fw)fw.classList.toggle("hidden",!hasPauschale);
+  const hasVerbrauch=(a.types||[]).includes("verbrauch");
+  const hasDirect=(a.types||[]).includes("direct");
+  const subType=a.pauschalenType||"";
+  // show/hide top-level sections
+  const pw=$("#pauschaleWrap");if(pw)pw.classList.toggle("hidden",!hasPauschale);
+  const vw=$("#verbrauchWrap");if(vw)vw.classList.toggle("hidden",!hasVerbrauch);
+  const iw=$("#incomeWrap");if(iw)iw.classList.toggle("hidden",!hasDirect);
+  // sub-type buttons
+  document.querySelectorAll(".pay-sub").forEach(b=>b.classList.toggle("sel",b.dataset.sub===subType));
+  // add-on sections
+  const bw=$("#basicAddonsWrap");if(bw)bw.classList.toggle("hidden",subType!=="basic");
+  const aw=$("#advancedAddonsWrap");if(aw)aw.classList.toggle("hidden",subType!=="advanced");
+  // add-on buttons
+  document.querySelectorAll("[data-addon]").forEach(b=>b.classList.toggle("sel",(a.addons||{})[b.dataset.addon]===true));
   const pfi=$("#abrPauschaleFee");if(pfi&&document.activeElement!==pfi)pfi.value=a.pauschale_fee||"";
   document.querySelectorAll("[data-pft]").forEach(b=>b.classList.toggle("sel",b.dataset.pft===(a.pauschale_fee_type||"netto")));
   const pFeeVal=parseFloat(a.pauschale_fee)||0,pFT=a.pauschale_fee_type||"netto";
-  const calcEl=$("#pauschaleFeeCalc");if(calcEl)calcEl.textContent=pFeeVal>0?(pFT==="netto"?"→ Brutto: "+eur(pFeeVal*1.19):"→ Netto: "+eur(pFeeVal/1.19)):"";
+  const pFeeNetto=pFT==="netto"?pFeeVal:pFeeVal/1.19;
+  const pFeeBrutto=pFT==="netto"?pFeeVal*1.19:pFeeVal;
+  const calcEl=$("#pauschaleFeeCalc");if(calcEl)calcEl.textContent=pFeeVal>0?(pFT==="netto"?"→ Brutto: "+eur(pFeeBrutto):"→ Netto: "+eur(pFeeNetto)):"";
+  // Live budget vs consumption
+  const vaEl=$("#pauschaleVsActual");if(vaEl&&hasVerbrauch&&pFeeVal>0){
+    const se=sess();
+    const isC=(a.types||[]).includes("pauschale")&&((a.types||[]).includes("verbrauch")||(a.types||[]).includes("direct"));
+    const pItems=ALLV.concat(se.custom||[]).filter(i=>(se.counts[i.id]||0)>0);
+    const actualBrutto=pItems.reduce((t,i)=>t+(se.counts[i.id]||0)*i.p,0);
+    const limitBrutto=pFT==="netto"?pFeeVal*1.19:pFeeVal;
+    const diff=actualBrutto-limitBrutto;
+    vaEl.innerHTML=`<div class="abr-card" style="margin-top:0">`
+      +`<div class="abr-row"><span class="al" style="color:var(--muted)">Budget (Brutto)</span><span class="av">${eur(limitBrutto)}</span></div>`
+      +`<div class="abr-row"><span class="al" style="color:var(--muted)">Consumption so far</span><span class="av">${eur(actualBrutto)}</span></div>`
+      +`<div class="abr-row"><span class="al" style="font-weight:600">${diff>0?"Over budget ↑":"Under budget ✓"}</span><span class="av" style="color:${diff>0?"var(--danger)":"var(--good)"};font-weight:600">${diff>0?"+":""}${eur(Math.abs(diff))}</span></div>`
+      +`</div>`;
+  }else if(vaEl)vaEl.innerHTML="";
   if(activeSheet==="verbrauch")renderOrder();
   document.querySelectorAll(".tip-opt").forEach(b=>b.classList.toggle("sel",b.dataset.tip===a.tipSource));
   const ci=$("#abrCash");if(ci&&document.activeElement!==ci)ci.value=a.cash||"";
@@ -810,12 +905,18 @@ function renderAbrechnung(){
   const total=cash+sumup+light;const tipSrc=a.tipSource;
   const host=$("#abrSummary");if(!host)return;
   const rows=[];
-  if((a.types||[]).length)rows.push(`<div class="abr-row"><span class="al">Payment Type</span><span class="av">${(a.types||[]).map(t=>t==="pauschale"?"Flat Rate":t==="selbst"?"Payment on Spot":"By Consumption").join(" + ")}</span></div>`);
+  if((a.types||[]).length)rows.push(`<div class="abr-row"><span class="al">Payment Type</span><span class="av">${(a.types||[]).map(t=>t==="pauschale"?"Flat Rate":t==="verbrauch"?"By Consumption":"Direct Payment").join(" + ")}</span></div>`);
   if((a.types||[]).includes("pauschale")&&parseFloat(a.pauschale_fee)>0){
     const pF=parseFloat(a.pauschale_fee),pFT=a.pauschale_fee_type||"netto";
-    const pFBrutto=pFT==="netto"?pF*1.19:pF,pFNetto=pFT==="netto"?pF:pF/1.19;
-    rows.push(`<div class="abr-row"><span class="al">Pauschale Fee (${pFT==="netto"?"Netto":"Brutto"})</span><span class="av pos">${eur(pF)}</span></div>`);
-    rows.push(`<div class="abr-row"><span class="al" style="color:var(--faint);font-size:12px">${pFT==="netto"?"→ Brutto: "+eur(pFBrutto):"→ Netto: "+eur(pFNetto)}</span></div>`);
+    const limitN=pFT==="netto"?pF:pF/1.19,limitB=pFT==="netto"?pF*1.19:pF;
+    const consTotal=revTotal();
+    const covered=Math.min(consTotal,limitN),overLimit=Math.max(0,consTotal-limitN);
+    rows.push(`<div class="abr-row"><span class="al" style="font-weight:600">Flat Rate Limit</span></div>`);
+    rows.push(`<div class="abr-row"><span class="al">Netto</span><span class="av">${eur(limitN)}</span></div>`);
+    rows.push(`<div class="abr-row"><span class="al">Brutto (incl. 19% VAT)</span><span class="av">${eur(limitB)}</span></div>`);
+    rows.push(`<div class="abr-row"><span class="al">Total Consumption</span><span class="av">${eur(consTotal)}</span></div>`);
+    rows.push(`<div class="abr-row"><span class="al">Covered by Flat Rate</span><span class="av pos">${eur(covered)}</span></div>`);
+    if(overLimit>0)rows.push(`<div class="abr-row"><span class="al" style="color:var(--danger)">Guests pay (over limit)</span><span class="av" style="color:var(--danger)">${eur(overLimit)}</span></div>`);
   }
   rows.push(`<div class="abr-row"><span class="al">Cash</span><span class="av">${eur(cash)}</span></div>`);
   rows.push(`<div class="abr-row"><span class="al">SumUp</span><span class="av">${eur(sumup)}</span></div>`);
@@ -828,14 +929,15 @@ function renderAbrechnung(){
 }
 document.querySelectorAll(".pay-btn").forEach(b=>b.onclick=()=>{
   const a=getAbr();if(!a.types)a.types=[];
-  const idx=a.types.indexOf(b.dataset.pay);
-  if(idx>=0)a.types.splice(idx,1);else a.types.push(b.dataset.pay);
-  a.type=a.types[0]||'';
+  // single select
+  a.types=[b.dataset.pay];
+  a.type=b.dataset.pay;
   saveAbr();
 });
 document.querySelectorAll(".tip-opt").forEach(b=>b.onclick=()=>{getAbr().tipSource=b.dataset.tip;saveAbr();});
 $("#abrPauschaleFee").addEventListener("input",()=>{getAbr().pauschale_fee=$("#abrPauschaleFee").value;saveAbr();});
 document.querySelectorAll("[data-pft]").forEach(b=>b.onclick=()=>{getAbr().pauschale_fee_type=b.dataset.pft;saveAbr();});
+document.querySelectorAll("[data-addon]").forEach(b=>b.onclick=()=>{const a=getAbr();if(!a.addons)a.addons={};a.addons[b.dataset.addon]=!a.addons[b.dataset.addon];saveAbr();});
 ["abrCash","abrSumup","abrLight","abrTip"].forEach(id=>{const el=$("#"+id);if(!el)return;el.addEventListener("input",()=>{const a=getAbr();if(id==="abrCash")a.cash=el.value;if(id==="abrSumup")a.sumup=el.value;if(id==="abrLight")a.light=el.value;if(id==="abrTip")a.tip=el.value;saveAbr();});});
 $("#abrNote").addEventListener("input",()=>{getAbr().notes=$("#abrNote").value;saveAbr();});
 
@@ -852,14 +954,37 @@ function renderSummary(){
   const p=activeP();
   $("#sumPersonalWrap").innerHTML=p.length?`<p class="sum-sec-h">Staff Drinks · ${persQty()}×</p><div class="sum-card">`+p.map(i=>{const q=s.personal[i.id];return`<div class="sum-row"><span class="q num">${q}×</span><span class="n">${esc(i.n)}<small>${i.s||""}</small></span></div>`;}).join("")+`</div>`:"";
   const bruchItems=MENU.flatMap(c=>c.items).concat(s.custom||[]).filter(i=>(s.bruchCounts||{})[i.id]>0);
-  const bruchTot=bruchItems.reduce((t,i)=>t+(s.bruchCounts[i.id]||0)*i.p,0);
-  $("#sumBruchWrap").innerHTML=bruchItems.length?`<p class="sum-sec-h">Breakage · ${eur(bruchTot)}</p><div class="sum-card">`+bruchItems.map(i=>{const q=(s.bruchCounts||{})[i.id]||0;return`<div class="sum-row"><span class="q num d">${q}×</span><span class="n">${esc(i.n)}${i.s?`<small>${i.s}</small>`:""}</span><span class="v num">${eur(q*i.p)}</span></div>`;}).join("")+`<div class="sum-row"><span class="q">∑</span><span class="n" style="font-weight:600">Total Breakage</span><span class="v num" style="color:var(--danger)">${eur(bruchTot)}</span></div></div>`:"";
+  const bruchTot=bruchItems.reduce((t,i)=>t+(parseFloat(s.bruchCounts[i.id])||0)*i.p,0);
+  $("#sumBruchWrap").innerHTML=bruchItems.length?`<p class="sum-sec-h">Breakage · ${eur(bruchTot)}</p><div class="sum-card">`+bruchItems.map(i=>{const bv=parseFloat((s.bruchCounts||{})[i.id])||0;const cost=bv*i.p;return`<div class="sum-row"><span class="q num d" style="min-width:42px">×${bv}</span><span class="n">${esc(i.n)}${i.s?`<small>${i.s}</small>`:""}</span><span class="v num">${i.p>0?eur(cost):""}</span></div>`;}).join("")+`<div class="sum-row"><span class="q">∑</span><span class="n" style="font-weight:600">Total Breakage</span><span class="v num" style="color:var(--danger)">${eur(bruchTot)}</span></div></div>`:"";
   const sh=s.stunden&&!Array.isArray(s.stunden)?s.stunden:{};const shEntries=SH_ROLES.filter(r=>(parseFloat(sh[r.k])||0)>0);const shTot=SH_ROLES.reduce((t,r)=>t+(parseFloat(sh[r.k])||0),0);
   $("#sumStundenWrap").innerHTML=shEntries.length?`<p class="sum-sec-h">Hours Sheet · ${shTot}h gesamt</p><div class="sum-card">`+shEntries.map(r=>`<div class="sum-row"><span class="q num" style="color:var(--muted)">${sh[r.k]}h</span><span class="n">${r.label}</span></div>`).join("")+`</div>`:"";
-  const ab=s.abrechnung||{};const abCash=parseFloat(ab.cash)||0,abSumup=parseFloat(ab.sumup)||0,abLight=parseFloat(ab.light)||0,abTip=parseFloat(ab.tip)||0,abHasData=ab.type||abCash||abSumup||abLight||abTip;
-  $("#sumAbrWrap").innerHTML=abHasData?`<p class="sum-sec-h">Payment</p><div class="sum-card">`+((ab.types||[]).length?`<div class="sum-row"><span class="q" style="color:var(--muted)">Type</span><span class="n">${(ab.types||[]).map(t=>t==="pauschale"?"Flat Rate":t==="selbst"?"Payment on Spot":"By Consumption").join(" + ")}</span></div>`:"")+
-  (parseFloat(ab.pauschale_fee)>0?`<div class="sum-row"><span class="q" style="color:var(--good)">P</span><span class="n" style="font-weight:600">Pauschale Fee</span></div><div class="sum-row"><span class="q"></span><span class="n" style="color:var(--muted)">Netto</span><span class="v num">${(ab.pauschale_fee_type||"netto")==="netto"?eur(parseFloat(ab.pauschale_fee)):eur(parseFloat(ab.pauschale_fee)/1.19)}</span></div><div class="sum-row"><span class="q"></span><span class="n" style="color:var(--muted)">Brutto (incl. 19% VAT)</span><span class="v num" style="color:var(--good)">${(ab.pauschale_fee_type||"netto")==="netto"?eur(parseFloat(ab.pauschale_fee)*1.19):eur(parseFloat(ab.pauschale_fee))}</span></div>`:"")+
-    `<div class="sum-row"><span class="q num" style="color:var(--muted)">€</span><span class="n">Cash</span><span class="v num">${eur(abCash)}</span></div><div class="sum-row"><span class="q num" style="color:var(--muted)">€</span><span class="n">SumUp</span><span class="v num">${eur(abSumup)}</span></div><div class="sum-row"><span class="q num" style="color:var(--muted)">€</span><span class="n">Lightspeed</span><span class="v num">${eur(abLight)}</span></div><div class="sum-row"><span class="q" style="font-weight:700">∑</span><span class="n" style="font-weight:600">Total</span><span class="v num" style="color:var(--good)">${eur(abCash+abSumup+abLight)}</span></div>`+(abTip?`<div class="sum-row"><span class="q num" style="color:var(--accent)">TG</span><span class="n">Tips ${ab.tipSource==="cash"?"(from cash)":ab.tipSource==="payout"?"(pay out)":""}</span><span class="v num" style="color:var(--accent)">${eur(abTip)}</span></div>`:"")+`</div>`:"";
+  const ab=s.abrechnung||{};const abCash=parseFloat(ab.cash)||0,abSumup=parseFloat(ab.sumup)||0,abLight=parseFloat(ab.light)||0,abTip=parseFloat(ab.tip)||0,abHasData=ab.type||ab.types?.length||abCash||abSumup||abLight||abTip||parseFloat(ab.pauschale_fee);
+  let abrHtml="";
+  if(abHasData){
+    abrHtml+='<p class="sum-sec-h">Payment</p><div class="sum-card">';
+    if((ab.types||[]).length)abrHtml+=`<div class="sum-row"><span class="q" style="color:var(--muted)">Type</span><span class="n">${(ab.types||[]).map(t=>t==="basic"?"Open Bar Basic":t==="advanced"?"Open Bar Advanced":t==="verbrauch"?"By Consumption":"Direct Payment").join(" + ")}</span></div>`;
+    if(parseFloat(ab.pauschale_fee)>0&&(ab.types||[]).includes("verbrauch")){
+      const pF=parseFloat(ab.pauschale_fee),isN=(ab.pauschale_fee_type||"netto")==="netto";
+      const lN=isN?pF:pF/1.19,lB=isN?pF*1.19:pF;
+      const isC=(ab.types||[]).includes("pauschale")&&((ab.types||[]).includes("verbrauch")||(ab.types||[]).includes("direct"));
+      const pItems=ALLV.concat(s.custom||[]).filter(i=>(s.counts[i.id]||0)>0&&(!isC||(s.countMode||{})[i.id]!=="v"));
+      const cons=pItems.reduce((t,i)=>t+(s.counts[i.id]||0)*i.p,0);
+      const over=Math.max(0,cons-lB);
+      abrHtml+=`<div class="sum-row"><span class="q" style="color:var(--good)">B</span><span class="n" style="font-weight:600">Budget Limit (By Consumption)</span></div>`;
+      abrHtml+=`<div class="sum-row"><span class="q"></span><span class="n" style="color:var(--muted)">Netto</span><span class="v num">${eur(lN)}</span></div>`;
+      abrHtml+=`<div class="sum-row"><span class="q"></span><span class="n" style="color:var(--muted)">Brutto (incl. VAT)</span><span class="v num" style="color:var(--good)">${eur(lB)}</span></div>`;
+      abrHtml+=`<div class="sum-row"><span class="q"></span><span class="n" style="color:var(--muted)">Consumption (Flat Rate items)</span><span class="v num">${eur(cons)}</span></div>`;
+      if(over>0)abrHtml+=`<div class="sum-row"><span class="q"></span><span class="n" style="color:var(--danger)">Guests pay (over limit)</span><span class="v num" style="color:var(--danger)">${eur(over)}</span></div>`;
+    }
+    abrHtml+=`<div class="sum-row"><span class="q num" style="color:var(--muted)">€</span><span class="n">Cash</span><span class="v num">${eur(abCash)}</span></div>`;
+    abrHtml+=`<div class="sum-row"><span class="q num" style="color:var(--muted)">€</span><span class="n">SumUp</span><span class="v num">${eur(abSumup)}</span></div>`;
+    abrHtml+=`<div class="sum-row"><span class="q num" style="color:var(--muted)">€</span><span class="n">Lightspeed</span><span class="v num">${eur(abLight)}</span></div>`;
+    abrHtml+=`<div class="sum-row"><span class="q" style="font-weight:700">∑</span><span class="n" style="font-weight:600">Total Income</span><span class="v num" style="color:var(--good)">${eur(abCash+abSumup+abLight)}</span></div>`;
+    if(abTip)abrHtml+=`<div class="sum-row"><span class="q num" style="color:var(--accent)">TG</span><span class="n">Tips ${ab.tipSource==="cash"?"(from cash)":ab.tipSource==="payout"?"(pay out)":""}</span><span class="v num" style="color:var(--accent)">${eur(abTip)}</span></div>`;
+    if(ab.notes)abrHtml+=`<div class="sum-row"><span class="n" style="color:var(--faint);font-size:12.5px">${esc(ab.notes)}</span></div>`;
+    abrHtml+='</div>';
+  }
+  $("#sumAbrWrap").innerHTML=abrHtml;
 }
 
 /* PDF */
@@ -878,9 +1003,9 @@ function downloadPDF(){
 <tr class="total-row"><td></td><td>Total Revenue</td><td class="price">${ef(revTotal())} €</td></tr></table>
 ${cs.length?`<div class="warn-box"><b>! Custom-added drinks (prices entered manually):</b><br>${cs.map(i=>`${escH(i.n)}${i.s?" ("+i.s+")":""} — ${ef(i.p)} €`).join(", ")}</div>`:""}
 ${p.length?`<h2>Staff Drinks (${persQty()})</h2><table>${p.map(i=>`<tr><td class="qty">${s.personal[i.id]}×</td><td>${escH(i.n)}${i.s?`<span class="sz">(${i.s})</span>`:""}</td><td></td></tr>`).join("")}</table>`:""}
-${(()=>{const bi=MENU.flatMap(c=>c.items).concat(s.custom||[]).filter(i=>(s.bruchCounts||{})[i.id]>0);const bt=bi.reduce((t,i)=>t+(s.bruchCounts[i.id]||0)*i.p,0);return bi.length?`<h2>Breakage — ${ef(bt)} €</h2><table>${bi.map(i=>`<tr><td class="qty">${s.bruchCounts[i.id]}×</td><td>${escH(i.n)}${i.s?` (${i.s})`:""}</td><td class="price">${ef((s.bruchCounts[i.id]||0)*i.p)} €</td></tr>`).join("")}</table>`:"";})()}
+${(function(){var bi=MENU.flatMap(function(c){return c.items;}).concat(s.custom||[]).filter(function(i){return (s.bruchCounts||{})[i.id]>0;});if(!bi.length)return "";var bt=bi.reduce(function(t,i){return t+((s.bruchCounts[i.id]||0)/100)*i.p;},0);var rows=bi.map(function(i){var pct=s.bruchCounts[i.id]||0;var cost=(pct/100)*i.p;return "<tr><td class=\"qty\">"+pct+"%</td><td>"+escH(i.n)+(i.s?" ("+i.s+")":"")+"</td>"+"<td class=\"price\">"+(i.p>0?ef(cost)+" €":"")+"</td></tr>";}).join("");return "<h2>Breakage — "+ef(bt)+" €</h2><table>"+rows+"</table>";})()} 
 ${shEntries.length?`<h2>Hours Sheet (${SH_ROLES.reduce((t,r)=>t+(parseFloat(sh[r.k])||0),0)}h)</h2><table>${shEntries.map(r=>`<tr><td class="qty">${sh[r.k]}h</td><td>${r.label}</td><td></td></tr>`).join("")}</table>`:""}
-${(ab.type||abCash||abSumup||abLight||abTip)?`<h2>Payment</h2><table>${(ab.types||[]).length?`<tr><td colspan="2">Payment Type: ${(ab.types||[]).map(t=>t==="pauschale"?"Flat Rate":t==="selbst"?"Payment on Spot":"By Consumption").join(" + ")}</td></tr>`:""}${parseFloat(ab.pauschale_fee)>0?`<tr><td style="font-weight:600">Pauschale Fee</td><td></td></tr><tr><td style="padding-left:12pt">Netto</td><td class="price">${(ab.pauschale_fee_type||"netto")==="netto"?ef(parseFloat(ab.pauschale_fee))+" €":ef(parseFloat(ab.pauschale_fee)/1.19)+" €"}</td></tr><tr><td style="padding-left:12pt">Brutto (incl. 19% VAT)</td><td class="price">${(ab.pauschale_fee_type||"netto")==="netto"?ef(parseFloat(ab.pauschale_fee)*1.19)+" €":ef(parseFloat(ab.pauschale_fee))+" €"}</td></tr>`:""}<tr><td>Cash</td><td class="price">${ef(abCash)} €</td></tr><tr><td>SumUp</td><td class="price">${ef(abSumup)} €</td></tr><tr><td>Lightspeed</td><td class="price">${ef(abLight)} €</td></tr><tr class="total-row"><td>Total Income</td><td class="price">${ef(abCash+abSumup+abLight)} €</td></tr>${abTip?`<tr><td>Tips ${ab.tipSource==="cash"?"(from cash)":ab.tipSource==="payout"?"(pay out)":""}</td><td class="price">${ef(abTip)} €</td></tr>`:""}</table>`:""}
+${(ab.type||abCash||abSumup||abLight||abTip)?`<h2>Payment</h2><table>${(ab.types||[]).length?`<tr><td colspan="2">Payment Type: ${(ab.types||[]).map(t=>t==="basic"?"Open Bar Basic":t==="advanced"?"Open Bar Advanced":"By Consumption").join(" + ")}</td></tr>`:""}${(function(){if(!parseFloat(ab.pauschale_fee))return "";var pF=parseFloat(ab.pauschale_fee),isN=(ab.pauschale_fee_type||"netto")==="netto";var lN=isN?pF:pF/1.19,lB=isN?pF*1.19:pF,cons=revTotal();var cov=Math.min(cons,lN),over=Math.max(0,cons-lN);return "<tr><td style=\"font-weight:600\">Flat Rate Limit</td><td></td></tr>"+"<tr><td style=\"padding-left:12pt\">Netto</td><td class=\"price\">"+ef(lN)+" \u20ac</td></tr>"+"<tr><td style=\"padding-left:12pt\">Brutto (incl. 19%)</td><td class=\"price\">"+ef(lB)+" \u20ac</td></tr>"+"<tr><td>Total Consumption</td><td class=\"price\">"+ef(cons)+" \u20ac</td></tr>"+"<tr><td>Covered by Flat Rate</td><td class=\"price\">"+ef(cov)+" \u20ac</td></tr>"+(over>0?"<tr><td style=\"color:red\">Guests pay (over limit)</td><td class=\"price\">"+ef(over)+" \u20ac</td></tr>":"");})()} <tr><td>Cash</td><td class="price">${ef(abCash)} €</td></tr><tr><td>SumUp</td><td class="price">${ef(abSumup)} €</td></tr><tr><td>Lightspeed</td><td class="price">${ef(abLight)} €</td></tr><tr class="total-row"><td>Total Income</td><td class="price">${ef(abCash+abSumup+abLight)} €</td></tr>${abTip?`<tr><td>Tips ${ab.tipSource==="cash"?"(from cash)":ab.tipSource==="payout"?"(pay out)":""}</td><td class="price">${ef(abTip)} €</td></tr>`:""}</table>`:""}
 <div class="footer">Generated: ${new Date().toLocaleString("en-GB")} · Drinks: ${revQty()} · Staff: ${persQty()} · Breakage: ${bruchQty()}</div>
 </body></html>`;
   const win=window.open("","_blank","width=820,height=1000");if(!win){toast("Allow popups to download PDF");return;}
