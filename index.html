@@ -624,7 +624,7 @@ function renderSessionsList(){
 $("#sessCards").addEventListener("click",e=>{
   const op=e.target.closest(".sc-open"),ex=e.target.closest(".sc-export"),dl=e.target.closest(".sc-del"),re=e.target.closest(".sc-reopen");
   if(re){const se=sessions.find(s=>s.id===re.dataset.reopen);if(se){se.closed=false;saveAll();debouncedSync();renderSessionsList();}return;}
-  if(op){currentId=op.dataset.id;activeSheet="verbrauch";saveAll();go("sheets");return;}
+  if(op){currentId=op.dataset.id;activeSheet="verbrauch";saveAll();go("sheets");setTimeout(()=>{if(screen==="sheets"){renderTabs();renderBar();}},50);return;}
   if(ex){currentId=ex.dataset.id;saveAll();go("summary");return;}
   if(ed){currentId=ed.dataset.id;editMode=true;saveAll();go("setup");return;}
   if(dl){
@@ -669,15 +669,15 @@ function renderTabs(){
     {k:"personal",n:"Staff Drinks",b:persQty()+"×"},
     {k:"bruch",n:"Breakage",b:(()=>{const t=poolBC(s5).reduce((r,i)=>r+(s5.bruchCounts?s5.bruchCounts[i.id]||0:0)*i.p,0);return t>0?eur(t):"—";})()} ,
     {k:"stunden",n:"Hours Sheet",b:shTot>0?shTot+"h":"—"},
-    {k:"abrechnung",n:"Payment",b:s5.abrechnung?.type?(s5.abrechnung.types||[]).map(t=>({"pauschale":"Flat","selbst":"Spot","verbrauch":"Verbrauch"})[t]||t).join("+")||"—":"—"},
+    {k:"abrechnung",n:"Payment",b:(()=>{try{const tp=(s5.abrechnung&&s5.abrechnung.types||[]);if(!tp.length)return"—";return tp.map(t=>({"pauschale":"Flat Rate","verbrauch":"Consump.","direct":"Direct"})[t]||t).join("+")||"—";}catch(e){return"—";}})()} ,
   ];
-  const t=$("#tabs");t.innerHTML="";
+  const t=$("#tabs");if(!t)return;t.innerHTML="";
   defs.forEach(d=>{const b=document.createElement("button");b.className="tab";b.setAttribute("aria-selected",activeSheet===d.k?"true":"false");b.innerHTML=`<span class="tn">${d.n}</span><span class="tb num">${d.b}</span>`;b.onclick=()=>{activeSheet=d.k;switchPane();};t.appendChild(b);});
 }
 function switchPane(){
   const s=sess();
   $("#mLoc").textContent=s.loc||"—";$("#mEvent").textContent=s.event||"no name";$("#mDate").textContent=fmtDate(s.date)||"—";
-  ["paneVerbrauch","panePersonal","paneBruch","paneStunden","paneAbrechnung"].forEach(id=>$($("#"+id)?("#"+id):"body").classList.add("hidden"));
+  ["paneVerbrauch","panePersonal","paneBruch","paneStunden","paneAbrechnung"].forEach(id=>{const _el=$("#"+id);if(_el)_el.classList.add("hidden");});
   $("#paneVerbrauch").classList.toggle("hidden",activeSheet!=="verbrauch");
   $("#panePersonal").classList.toggle("hidden",activeSheet!=="personal");
   $("#paneBruch").classList.toggle("hidden",activeSheet!=="bruch");
@@ -1098,7 +1098,7 @@ function go(sc){
   window.scrollTo(0,0);
   if(sc==="sessions")renderSessionsList();
   if(sc==="setup")renderSetup();
-  if(sc==="sheets")switchPane();
+  if(sc==="sheets"){try{switchPane();}catch(e){console.warn("switchPane error:",e);}}
   if(sc==="summary")renderSummary();
   renderBar();
 }
