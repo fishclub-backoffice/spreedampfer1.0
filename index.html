@@ -732,7 +732,7 @@ function switchPane(){
   if(activeSheet==="personal")renderP();
   if(activeSheet==="bruch")renderB();
   if(activeSheet==="stunden")renderStunden();
-  if(activeSheet==="abrechnung")renderAbrechnung();
+  if(activeSheet==="abrechnung"){renderAbrechnung();}
   renderBar();
 }
 
@@ -908,7 +908,17 @@ function renderAbrechnung(){
   const a=getAbr();
   if(!a.types)a.types=a.type?[a.type]:[];
   // multi-select: button is active if its key is in types array
-  document.querySelectorAll(".pay-btn:not(.pay-sub)").forEach(b=>b.classList.toggle("sel",(a.types||[]).includes(b.dataset.pay)));
+  // wire top-level pay buttons (single-select)
+  document.querySelectorAll(".pay-btn:not(.pay-sub)").forEach(b=>{
+    b.classList.toggle("sel",(a.types||[]).includes(b.dataset.pay));
+    b.onclick=function(){
+      const a2=getAbr(),t=b.dataset.pay;
+      a2.types=(a2.types&&a2.types[0]===t)?[]:([t]);
+      a2.type=a2.types[0]||"";
+      if(!a2.types.includes("pauschale"))a2.pauschalenType="";
+      saveAbr();
+    };
+  });
   // show pauschale fee field only when flat rate is selected
   const hasPauschale=(a.types||[]).includes("pauschale");
   const hasVerbrauch=(a.types||[]).includes("verbrauch");
@@ -919,12 +929,29 @@ function renderAbrechnung(){
   const vw=$("#verbrauchWrap");if(vw)vw.classList.toggle("hidden",!hasVerbrauch);
   const iw=$("#incomeWrap");if(iw)iw.classList.toggle("hidden",!hasDirect);
   // sub-type buttons
-  document.querySelectorAll(".pay-sub").forEach(b=>b.classList.toggle("sel",b.dataset.sub===subType));
+  // wire sub-type buttons
+  document.querySelectorAll(".pay-sub").forEach(b=>{
+    b.classList.toggle("sel",b.dataset.sub===subType);
+    b.onclick=function(){
+      const a2=getAbr();
+      a2.pauschalenType=(a2.pauschalenType===b.dataset.sub?"":b.dataset.sub);
+      saveAbr();
+    };
+  });
   // add-on sections
   const bw=$("#basicAddonsWrap");if(bw)bw.classList.toggle("hidden",subType!=="basic");
   const aw=$("#advancedAddonsWrap");if(aw)aw.classList.toggle("hidden",subType!=="advanced");
   // add-on buttons
-  document.querySelectorAll("[data-addon]").forEach(b=>b.classList.toggle("sel",(a.addons||{})[b.dataset.addon]===true));
+  // wire add-on buttons
+  document.querySelectorAll("[data-addon]").forEach(b=>{
+    b.classList.toggle("sel",(a.addons||{})[b.dataset.addon]===true);
+    b.onclick=function(){
+      const a2=getAbr();
+      if(!a2.addons)a2.addons={};
+      a2.addons[b.dataset.addon]=!a2.addons[b.dataset.addon];
+      saveAbr();
+    };
+  });
   const pfi=$("#abrPauschaleFee");if(pfi&&document.activeElement!==pfi)pfi.value=a.pauschale_fee||"";
   document.querySelectorAll("[data-pft]").forEach(b=>b.classList.toggle("sel",b.dataset.pft===(a.pauschale_fee_type||"netto")));
   const pFeeVal=parseFloat(a.pauschale_fee)||0,pFT=a.pauschale_fee_type||"netto";
@@ -1121,25 +1148,6 @@ $("#pinConfirm").onclick=()=>{
 $("#pinCancel").onclick=()=>{$("#pinModal").classList.add("hidden");pinCallback=null;};
 $("#pinInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("#pinConfirm").click();});
 
-/* PAYMENT DELEGATION — handles all payment clicks robustly on iOS */
-$("#paneAbrechnung").addEventListener("click",e=>{
-  // top-level payment type (single-select)
-  const pay=e.target.closest(".pay-btn:not(.pay-sub)");
-  if(pay){
-    const a=getAbr();
-    const t=pay.dataset.pay;
-    a.types=(a.types&&a.types.includes(t))?[]:([t]);
-    a.type=a.types[0]||"";
-    if(!a.types.includes("pauschale"))a.pauschalenType="";
-    saveAbr();return;
-  }
-  // sub-type (Open Bar Basic / Advanced)
-  const sub=e.target.closest("[data-sub]");
-  if(sub){const a=getAbr();a.pauschalenType=(a.pauschalenType===sub.dataset.sub?"":sub.dataset.sub);saveAbr();return;}
-  // add-ons
-  const adn=e.target.closest("[data-addon]");
-  if(adn){const a=getAbr();if(!a.addons)a.addons={};a.addons[adn.dataset.addon]=!a.addons[adn.dataset.addon];saveAbr();return;}
-});
 
 /* BOTTOM BAR */
 function renderBar(){
