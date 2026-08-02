@@ -529,7 +529,31 @@ function requirePin(label,cb){
   setTimeout(()=>$("#pinInput").focus(),100);
 }
 
-function sess(){return sessions.find(s=>s.id===currentId)||{counts:{},countMode:{},custom:[],personal:{},bruch:[],bruchCounts:{},customPersonal:[],stunden:{},abrechnung:{type:"",types:[],pauschalenType:"",addons:{},pauschale_fee:0,pauschale_fee_type:"netto",cash:0,sumup:0,light:0,tip:0,tipSource:"",notes:""},countMode:{}};}
+function normalizeSess(s){
+  if(!s)return s;
+  if(!s.counts||typeof s.counts!=="object"||Array.isArray(s.counts))s.counts={};
+  if(!Array.isArray(s.custom))s.custom=[];
+  if(!s.personal||typeof s.personal!=="object")s.personal={};
+  if(!Array.isArray(s.bruch))s.bruch=[];
+  if(!s.bruchCounts||typeof s.bruchCounts!=="object")s.bruchCounts={};
+  if(!Array.isArray(s.customPersonal))s.customPersonal=[];
+  if(!s.stunden||Array.isArray(s.stunden)||typeof s.stunden!=="object")s.stunden={};
+  if(!s.countMode||typeof s.countMode!=="object")s.countMode={};
+  if(!s.abrechnung||typeof s.abrechnung!=="object")s.abrechnung={};
+  const a=s.abrechnung;
+  if(!Array.isArray(a.types))a.types=a.type?[a.type]:[];
+  a.types=a.types.map(t=>t==="pauschale"?"basic":t==="selbst"?"direct":t);
+  if(!a.addons||typeof a.addons!=="object")a.addons={};
+  if(a.light===undefined)a.light=0;
+  if(!a.pauschale_fee_type)a.pauschale_fee_type="netto";
+  if(!a.pauschalenType)a.pauschalenType="";
+  return s;
+}
+function sess(){
+  const s=sessions.find(s=>s.id===currentId);
+  if(s){normalizeSess(s);return s;}
+  return {counts:{},countMode:{},custom:[],personal:{},bruch:[],bruchCounts:{},customPersonal:[],stunden:{},abrechnung:{type:"",types:[],pauschalenType:"",addons:{},pauschale_fee:0,pauschale_fee_type:"netto",cash:0,sumup:0,light:0,tip:0,tipSource:"",notes:""},countMode:{}};
+}
 function newSessId(){return "s_"+Date.now()+"_"+Math.floor(Math.random()*9999);}
 function newSess(){return {id:newSessId(),loc:null,date:"",event:"",counts:{},countMode:{},custom:[],personal:{},bruch:[],bruchCounts:{},customPersonal:[],stunden:{},abrechnung:{type:"",types:[],pauschalenType:"",addons:{},pauschale_fee:0,pauschale_fee_type:"netto",cash:0,sumup:0,light:0,tip:0,tipSource:"",notes:""},countMode:{},closed:false,closedAt:null,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};}
 function saveAll(){try{localStorage.setItem(SESS_KEY,JSON.stringify({sessions,currentId}));}catch(e){}}
@@ -539,7 +563,7 @@ function loadAll(){
     if(r){const d=JSON.parse(r);sessions=d.sessions||[];currentId=d.currentId||null;}
     else{const old=localStorage.getItem("vbl.sess.v1")||localStorage.getItem("vbl.v3");
       if(old){const o=JSON.parse(old);if(o&&(o.sessions||o.loc)){sessions=o.sessions||[{...newSess(),...o}];}}}
-    sessions.forEach(s=>{if(!s.bruchCounts)s.bruchCounts={};if(!s.countMode)s.countMode={};
+    sessions.forEach(s=>{normalizeSess(s);if(!s.bruchCounts)s.bruchCounts={};if(!s.countMode)s.countMode={};
     if(!s.customPersonal)s.customPersonal=[];if(!s.stunden||Array.isArray(s.stunden))s.stunden={};if(!s.abrechnung)s.abrechnung={type:"",cash:0,sumup:0,light:0,tip:0,tipSource:"",notes:""};if(s.abrechnung&&s.abrechnung.light===undefined)s.abrechnung.light=0;
     if(s.abrechnung){if(!s.abrechnung.types)s.abrechnung.types=s.abrechnung.type?[s.abrechnung.type]:[];s.abrechnung.types=s.abrechnung.types.map(t=>(t==="basic"||t==="advanced")?"pauschale":t==="selbst"?"direct":t);
     if(!s.abrechnung.pauschalenType){const old=s.abrechnung.types.find(t=>t==="basic"||t==="advanced");if(old){s.abrechnung.pauschalenType=old;s.abrechnung.types=["pauschale"];}}if(!s.abrechnung.addons)s.abrechnung.addons={};}
@@ -587,7 +611,7 @@ function saveFBConfig(url){fbUrl=(url||"").trim().replace(/\/+$/,"");try{if(fbUr
 function setSyncDot(st){const d=$("#syncDot");if(!d)return;d.className="sync-dot"+(st==="on"?" on":st==="busy"?" busy":st==="err"?" err":"");const msgs={on:"Synced",busy:"Syncing…",err:"Sync error","":"Not connected"};const el=$("#syncStatusMsg");if(el)el.textContent=msgs[st]||"";}
 async function pushSession(s){if(!fbUrl||!s||!s.id)return;await fetch(`${fbUrl}/sessions/${s.id}.json`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)});}
 async function deleteSessionRemote(id){if(!fbUrl||!id)return;try{await fetch(`${fbUrl}/sessions/${id}.json`,{method:"DELETE"});}catch(e){}}
-async function syncDown(){if(!fbUrl)return;setSyncDot("busy");try{const r=await fetch(`${fbUrl}/sessions.json`);if(!r.ok)throw new Error(r.status);const data=await r.json();let changed=false;if(data&&typeof data==="object"&&!Array.isArray(data)){const remote=Object.values(data).filter(x=>x&&x.id);const remoteIds=new Set(remote.map(r=>r.id));remote.forEach(rs=>{const idx=sessions.findIndex(s=>s.id===rs.id);if(idx<0){sessions.push(rs);changed=true;}else if((rs.updatedAt||"")>(sessions[idx].updatedAt||"")){sessions[idx]=Object.assign({},sessions[idx],rs);changed=true;}});for(const s of sessions){if(!remoteIds.has(s.id)){try{await pushSession(s);}catch(e){}}};}else if(!data){for(const s of sessions){try{await pushSession(s);}catch(e){}}}if(changed){beid=sessions.reduce((m,s)=>(s.bruch||[]).reduce((n,e)=>Math.max(n,e.id||0),m),0);cid=sessions.reduce((m,s)=>(s.custom||[]).reduce((n,c)=>Math.max(n,parseInt((c.id||"c0").slice(1),10)||0),m),0);saveAll();if(screen==="sessions")renderSessionsList();else if(screen==="sheets"&&currentId)switchPane();}setSyncDot("on");}catch(e){console.warn("Sync:",e);setSyncDot("err");}}
+async function syncDown(){if(!fbUrl)return;setSyncDot("busy");try{const r=await fetch(`${fbUrl}/sessions.json`);if(!r.ok)throw new Error(r.status);const data=await r.json();let changed=false;if(data&&typeof data==="object"&&!Array.isArray(data)){const remote=Object.values(data).filter(x=>x&&x.id);const remoteIds=new Set(remote.map(r=>r.id));remote.forEach(rs=>{normalizeSess(rs);const idx=sessions.findIndex(s=>s.id===rs.id);if(idx<0){sessions.push(rs);changed=true;}else if((rs.updatedAt||"")>(sessions[idx].updatedAt||"")){sessions[idx]=Object.assign({},sessions[idx],rs);changed=true;}});for(const s of sessions){if(!remoteIds.has(s.id)){try{await pushSession(s);}catch(e){}}};}else if(!data){for(const s of sessions){try{await pushSession(s);}catch(e){}}}if(changed){beid=sessions.reduce((m,s)=>(s.bruch||[]).reduce((n,e)=>Math.max(n,e.id||0),m),0);cid=sessions.reduce((m,s)=>(s.custom||[]).reduce((n,c)=>Math.max(n,parseInt((c.id||"c0").slice(1),10)||0),m),0);saveAll();if(screen==="sessions")renderSessionsList();else if(screen==="sheets"&&currentId)switchPane();}setSyncDot("on");}catch(e){console.warn("Sync:",e);setSyncDot("err");}}
 function debouncedSync(){if(!fbUrl)return;clearTimeout(syncDebounce);syncDebounce=setTimeout(async()=>{const s=sess();if(!s.id)return;setSyncDot("busy");try{await pushSession(s);setSyncDot("on");}catch(e){setSyncDot("err");}},1500);}
 function startSync(){if(!fbUrl)return;if(syncTimer)clearInterval(syncTimer);syncTimer=setInterval(syncDown,30000);if(sseSource)try{sseSource.close();}catch(e){}try{sseSource=new EventSource(`${fbUrl}/sessions.json?sse=true`);sseSource.addEventListener("put",syncDown);sseSource.addEventListener("patch",syncDown);sseSource.onerror=()=>setSyncDot("err");}catch(e){}syncDown();}
 function stopSync(){if(syncTimer){clearInterval(syncTimer);syncTimer=null;}if(sseSource){try{sseSource.close();}catch(e){}sseSource=null;}setSyncDot("");}
@@ -1133,4 +1157,5 @@ go("sessions");
 
 </script>
 </body>
+</html>
 </html>
