@@ -754,7 +754,7 @@ function renderResults(){
   const ql=q.toLowerCase();
   const matches=poolV().filter(i=>i.n.toLowerCase().includes(ql)||(i.de||"").includes(ql)).slice(0,14);
   let html="";
-  matches.forEach(i=>{const qty=sess().counts[i.id]||0;const szp=i.s?`<span class="szpill">${i.s}</span>`:"";html+=`<div class="res-row" data-add="${i.id}"><div class="body"><div class="nm">${esc(i.n)}${szp}</div><div class="sub num">${eur(i.p)}${i.custom?" · custom":""}</div></div>${qty?`<span class="qb">×${qty}</span>`:""}<button class="padd" data-add="${i.id}" aria-label="add">+</button></div>`;});
+  matches.forEach(i=>{const qty=sess().counts[i.id]||0;const szp=i.s?`<span class="szpill">${i.s}</span>`:"";const qtyCtrl=qty>0?`<div class="stepper" style="flex:0 0 auto"><button class="minus" data-sub="${i.id}">−</button><input class="num" inputmode="numeric" data-qty="${i.id}" value="${qty}" style="width:38px"/><button class="plus" data-plus="${i.id}">+</button></div>`:`<button class="padd" data-add="${i.id}" aria-label="add">+</button>`;html+=`<div class="res-row" data-add="${i.id}"><div class="body"><div class="nm">${esc(i.n)}${szp}</div><div class="sub num">${eur(i.p)}${i.custom?" · custom":""}</div></div>${qtyCtrl}</div>`;});
   const exact=poolV().some(i=>i.n.toLowerCase()===ql);
   if(!exact)html+=`<button class="addnew-trigger" id="anTrigger"><span>+</span> Add "${esc(q)}" as a new drink</button>`;
   box.innerHTML=html;
@@ -778,7 +778,14 @@ $("#searchV").addEventListener("input",renderV);
 $("#clrV").onclick=()=>{$("#searchV").value="";$("#anForm").classList.add("hidden");renderV();};
 $("#anCancel").onclick=()=>$("#anForm").classList.add("hidden");
 $("#anSave").onclick=()=>{const n=$("#anName").value.trim(),s=$("#anSize").value.trim(),p=parsePrice($("#anPrice").value);if(!n){$("#anName").focus();toast("Enter name");return;}if(isNaN(p)||p<0){$("#anPrice").focus();toast("Enter a valid price");return;}const id="c"+(++cid);const se=sess();if(!se.custom)se.custom=[];se.custom.push({id,n,s,p,custom:true});se.counts[id]=1;touchSess();$("#anForm").classList.add("hidden");$("#searchV").value="";renderV();toast(`"${n}" added — check the price!`);};
-$("#vResults").addEventListener("click",e=>{const a=e.target.closest("[data-add]");if(!a)return;bumpV(a.dataset.add,1);renderV();});
+$("#vResults").addEventListener("click",e=>{
+  const plus=e.target.closest("[data-plus]"),sub=e.target.closest("[data-sub]"),add=e.target.closest("[data-add]");
+  if(plus){bumpV(plus.dataset.plus,1);renderResults();return;}
+  if(sub){bumpV(sub.dataset.sub,-1);renderResults();return;}
+  if(add&&!e.target.closest("[data-qty]")){bumpV(add.dataset.add,1);renderResults();return;}
+});
+$("#vResults").addEventListener("change",e=>{const inp=e.target.closest("[data-qty]");if(!inp)return;setV(inp.dataset.qty,parseInt(inp.value)||0);renderResults();});
+$("#vResults").addEventListener("input",e=>{const inp=e.target.closest("[data-qty]");if(!inp)return;const v=parseInt(inp.value);if(!isNaN(v)&&v>=0){setV(inp.dataset.qty,v);}});
 $("#vOrder").addEventListener("click",e=>{
   const tog=e.target.closest("[data-mode]");
   if(tog){const id=tog.dataset.mode,val=tog.dataset.val;if(!val)return;const s=sess();if(!s.countMode)s.countMode={};
@@ -912,22 +919,12 @@ function renderAbrechnung(){
   const vw=$("#verbrauchWrap");if(vw)vw.classList.toggle("hidden",!hasVerbrauch);
   const iw=$("#incomeWrap");if(iw)iw.classList.toggle("hidden",!hasDirect);
   // sub-type buttons
-  document.querySelectorAll(".pay-sub").forEach(b=>{
-    b.classList.toggle("sel",b.dataset.sub===subType);
-    b.onclick=()=>{
-      const a2=getAbr();
-      a2.pauschalenType=(a2.pauschalenType===b.dataset.sub?"":b.dataset.sub);
-      saveAbr();
-    };
-  });
+  document.querySelectorAll(".pay-sub").forEach(b=>b.classList.toggle("sel",b.dataset.sub===subType));
   // add-on sections
   const bw=$("#basicAddonsWrap");if(bw)bw.classList.toggle("hidden",subType!=="basic");
   const aw=$("#advancedAddonsWrap");if(aw)aw.classList.toggle("hidden",subType!=="advanced");
   // add-on buttons
-  document.querySelectorAll("[data-addon]").forEach(b=>{
-    b.classList.toggle("sel",(a.addons||{})[b.dataset.addon]===true);
-    b.onclick=()=>{const a2=getAbr();if(!a2.addons)a2.addons={};a2.addons[b.dataset.addon]=!a2.addons[b.dataset.addon];saveAbr();};
-  });
+  document.querySelectorAll("[data-addon]").forEach(b=>b.classList.toggle("sel",(a.addons||{})[b.dataset.addon]===true));
   const pfi=$("#abrPauschaleFee");if(pfi&&document.activeElement!==pfi)pfi.value=a.pauschale_fee||"";
   document.querySelectorAll("[data-pft]").forEach(b=>b.classList.toggle("sel",b.dataset.pft===(a.pauschale_fee_type||"netto")));
   const pFeeVal=parseFloat(a.pauschale_fee)||0,pFT=a.pauschale_fee_type||"netto";
@@ -1123,6 +1120,26 @@ $("#pinConfirm").onclick=()=>{
 };
 $("#pinCancel").onclick=()=>{$("#pinModal").classList.add("hidden");pinCallback=null;};
 $("#pinInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("#pinConfirm").click();});
+
+/* PAYMENT DELEGATION — handles all payment clicks robustly on iOS */
+$("#paneAbrechnung").addEventListener("click",e=>{
+  // top-level payment type (single-select)
+  const pay=e.target.closest(".pay-btn:not(.pay-sub)");
+  if(pay){
+    const a=getAbr();
+    const t=pay.dataset.pay;
+    a.types=(a.types&&a.types.includes(t))?[]:([t]);
+    a.type=a.types[0]||"";
+    if(!a.types.includes("pauschale"))a.pauschalenType="";
+    saveAbr();return;
+  }
+  // sub-type (Open Bar Basic / Advanced)
+  const sub=e.target.closest("[data-sub]");
+  if(sub){const a=getAbr();a.pauschalenType=(a.pauschalenType===sub.dataset.sub?"":sub.dataset.sub);saveAbr();return;}
+  // add-ons
+  const adn=e.target.closest("[data-addon]");
+  if(adn){const a=getAbr();if(!a.addons)a.addons={};a.addons[adn.dataset.addon]=!a.addons[adn.dataset.addon];saveAbr();return;}
+});
 
 /* BOTTOM BAR */
 function renderBar(){
