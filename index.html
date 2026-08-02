@@ -307,8 +307,7 @@ input,select,textarea{font-family:inherit;font-size:16px}
             <p style="font-size:11.5px;color:var(--faint);margin-bottom:8px;line-height:1.6">Includes: Pilsner · Alkoholfrei Beer · Wines · Non-Alcoholic</p>
             <p class="label">Booked on top</p>
             <div class="tip-row">
-              <button class="tip-opt" data-addon="aperol">+ Aperol Spritz</button>
-              <button class="tip-opt" data-addon="campari">+ Campari Spritz</button>
+              <button class="tip-opt" data-addon="spritz">+ Aperol / Campari Spritz</button>
             </div>
           </div>
           <div id="advancedAddonsWrap" class="hidden">
@@ -913,12 +912,22 @@ function renderAbrechnung(){
   const vw=$("#verbrauchWrap");if(vw)vw.classList.toggle("hidden",!hasVerbrauch);
   const iw=$("#incomeWrap");if(iw)iw.classList.toggle("hidden",!hasDirect);
   // sub-type buttons
-  document.querySelectorAll(".pay-sub").forEach(b=>b.classList.toggle("sel",b.dataset.sub===subType));
+  document.querySelectorAll(".pay-sub").forEach(b=>{
+    b.classList.toggle("sel",b.dataset.sub===subType);
+    b.onclick=()=>{
+      const a2=getAbr();
+      a2.pauschalenType=(a2.pauschalenType===b.dataset.sub?"":b.dataset.sub);
+      saveAbr();
+    };
+  });
   // add-on sections
   const bw=$("#basicAddonsWrap");if(bw)bw.classList.toggle("hidden",subType!=="basic");
   const aw=$("#advancedAddonsWrap");if(aw)aw.classList.toggle("hidden",subType!=="advanced");
   // add-on buttons
-  document.querySelectorAll("[data-addon]").forEach(b=>b.classList.toggle("sel",(a.addons||{})[b.dataset.addon]===true));
+  document.querySelectorAll("[data-addon]").forEach(b=>{
+    b.classList.toggle("sel",(a.addons||{})[b.dataset.addon]===true);
+    b.onclick=()=>{const a2=getAbr();if(!a2.addons)a2.addons={};a2.addons[b.dataset.addon]=!a2.addons[b.dataset.addon];saveAbr();};
+  });
   const pfi=$("#abrPauschaleFee");if(pfi&&document.activeElement!==pfi)pfi.value=a.pauschale_fee||"";
   document.querySelectorAll("[data-pft]").forEach(b=>b.classList.toggle("sel",b.dataset.pft===(a.pauschale_fee_type||"netto")));
   const pFeeVal=parseFloat(a.pauschale_fee)||0,pFT=a.pauschale_fee_type||"netto";
@@ -982,7 +991,6 @@ document.querySelectorAll(".pay-btn").forEach(b=>b.onclick=()=>{
 document.querySelectorAll(".tip-opt").forEach(b=>b.onclick=()=>{getAbr().tipSource=b.dataset.tip;saveAbr();});
 $("#abrPauschaleFee").addEventListener("input",()=>{getAbr().pauschale_fee=$("#abrPauschaleFee").value;saveAbr();});
 document.querySelectorAll("[data-pft]").forEach(b=>b.onclick=()=>{getAbr().pauschale_fee_type=b.dataset.pft;saveAbr();});
-document.querySelectorAll("[data-addon]").forEach(b=>b.onclick=()=>{const a=getAbr();if(!a.addons)a.addons={};a.addons[b.dataset.addon]=!a.addons[b.dataset.addon];saveAbr();});
 ["abrCash","abrSumup","abrLight","abrTip"].forEach(id=>{const el=$("#"+id);if(!el)return;el.addEventListener("input",()=>{const a=getAbr();if(id==="abrCash")a.cash=el.value;if(id==="abrSumup")a.sumup=el.value;if(id==="abrLight")a.light=el.value;if(id==="abrTip")a.tip=el.value;saveAbr();});});
 $("#abrNote").addEventListener("input",()=>{getAbr().notes=$("#abrNote").value;saveAbr();});
 
