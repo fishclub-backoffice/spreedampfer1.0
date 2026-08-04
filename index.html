@@ -247,10 +247,21 @@ input,select,textarea{font-family:inherit;font-size:16px}
       <span class="chip strong" id="mLoc">—</span>
       <span class="chip" id="mEvent">—</span>
       <span class="chip" id="mDate">—</span>
+      <span class="chip" id="mGuests" style="color:var(--muted)"></span>
     </div>
     <div class="tabs" id="tabs"></div>
     <div id="paneVerbrauch">
       <div class="search"><span class="si">⌕</span><input type="text" id="searchV" placeholder="Search drink or bottle…" autocomplete="off"/><button class="clr hidden" id="clrV">✕</button></div>
+      <!-- DJ Tickets quick panel -->
+      <div id="djPanel" style="background:var(--card2);border-radius:13px;padding:12px 14px;margin-bottom:10px">
+        <p class="label" style="margin-bottom:8px">DJ Tickets</p>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div style="flex:1"><p style="font-size:11px;color:var(--muted);margin-bottom:4px">Ordered</p>
+            <input type="number" id="djOrdered" inputmode="numeric" placeholder="—" min="0" style="width:100%;border-radius:9px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:8px;font-size:16px;font-weight:600;outline:none;text-align:center"/></div>
+          <div style="flex:1"><p style="font-size:11px;color:var(--muted);margin-bottom:4px">Redeemed</p>
+            <input type="number" id="djUsed" inputmode="numeric" placeholder="—" min="0" style="width:100%;border-radius:9px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:8px;font-size:16px;font-weight:600;outline:none;text-align:center"/></div>
+        </div>
+      </div>
       <div id="vResults" class="results"></div>
       <div class="miniform hidden" id="anForm">
         <p class="fl">Add New Drink</p>
@@ -320,7 +331,7 @@ input,select,textarea{font-family:inherit;font-size:16px}
         </div>
         <div id="verbrauchWrap" class="hidden" style="margin-bottom:14px">
           <div class="warn" style="border-color:var(--line2);background:var(--card2);color:var(--muted)">
-            <span style="flex:0 0 auto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span><span>Invoice (Rechnung) will be sent to the organizer — no cash tracking needed.</span>
+            <span style="flex:0 0 auto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span><span>Invoice will be sent to the organizer — no cash tracking needed.</span>
           </div>
           <p class="label" style="margin-top:10px">Budget Limit <span style="font-size:10px;font-weight:400;color:var(--faint)">(optional)</span></p>
           <p style="font-size:12px;color:var(--faint);margin-bottom:8px">Organizer covers up to this amount — guests pay above it directly.</p>
@@ -348,6 +359,13 @@ input,select,textarea{font-family:inherit;font-size:16px}
             </div>
           </div>
         </div>
+        <p class="label">Total Guests</p>
+        <div class="miniform" style="margin-bottom:14px">
+          <div class="mf-row" style="align-items:center">
+            <div class="cur-lbl" style="flex:0 0 90px">Guests</div>
+            <div class="cur-input" style="flex:1"><input type="number" id="abrGuests" inputmode="numeric" placeholder="e.g. 200" min="0" style="border:none;background:transparent;width:100%;font-size:18px;font-weight:600;color:var(--txt);outline:none"/></div>
+          </div>
+        </div>
         <p class="label">Notes</p>
         <div class="miniform" style="margin-bottom:14px"><textarea id="abrNote" placeholder="Additional notes…" style="width:100%;min-height:64px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:9px 12px;outline:none;resize:none;font-size:15px;line-height:1.4"></textarea></div>
       </div>
@@ -359,7 +377,7 @@ input,select,textarea{font-family:inherit;font-size:16px}
     <div class="stat-grid">
       <div class="stat"><div class="sl">Revenue</div><div class="sv num" id="statRev">0,00 €</div></div>
       <div class="stat"><div class="sl">Drinks</div><div class="sv num" id="statQty">0</div></div>
-      <div class="stat"><div class="sl">Staff</div><div class="sv num" id="statPers">0</div></div>
+      <div class="stat"><div class="sl">Staff</div><div class="sv num" id="statPers">0,00 €</div></div>
       <div class="stat"><div class="sl">Breakage</div><div class="sv num" id="statBruch">0,00 €</div></div>
     </div>
     <div id="sumWarn"></div>
@@ -369,11 +387,12 @@ input,select,textarea{font-family:inherit;font-size:16px}
     <div id="sumBruchWrap"></div>
     <div id="sumStundenWrap"></div>
     <div id="sumAbrWrap"></div>
-    <button class="dl-primary" id="dlPdf"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download PDF</button>
-    <button id="closeSession" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--good);background:var(--good-dim);color:var(--good);font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Close Session</button>
-    <button id="editSession" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line2);background:var(--card);color:var(--txt);font-weight:500;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit Details</button>
-    <button id="deleteSession" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--danger-dim);background:transparent;color:var(--danger);font-weight:500;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px">✕ Delete Session</button>
-    <div class="actions">
+    <!-- Action buttons -->
+    <button id="closeSession" style="width:100%;height:46px;border-radius:13px;background:var(--accent);color:var(--accent-txt);font-weight:600;font-size:15px;margin-bottom:10px;border:none">Close Session →</button>
+    <button id="editSession" style="width:100%;height:46px;border-radius:13px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-weight:500;font-size:15px;margin-bottom:10px">Edit Session</button>
+    <button id="deleteSession" style="width:100%;height:46px;border-radius:13px;border:1px solid var(--danger);background:transparent;color:var(--danger);font-weight:500;font-size:15px;margin-bottom:16px">Delete Session</button>
+    <button class="dl-primary" id="dlXlsx" style="background:var(--good);color:#06241c;margin-bottom:10px"><span style="display:inline-flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Download Excel</span></button>
+    <div class="dl-row" style="display:flex;gap:8px;margin-bottom:8px">
       <button id="dlCsv"><span>▤</span> CSV</button>
       <button id="copyText"><span>⧉</span> Text</button>
       <button id="copyJson"><span>{ }</span> JSON</button>
@@ -436,15 +455,16 @@ input,select,textarea{font-family:inherit;font-size:16px}
   <div class="pin-modal">
     <div style="margin-bottom:8px;color:var(--txt)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
     <h3>Admin PIN</h3>
-    <p class="psub">Enter the admin PIN to delete this session.</p>
+    <p class="psub" id="pinSub">Enter PIN to continue.</p>
     <input class="pin-input" id="pinInput" type="password" inputmode="numeric" maxlength="8" placeholder="••••" autocomplete="off"/>
     <div class="mrow">
       <button id="pinCancel">Cancel</button>
-      <button class="primary" id="pinConfirm">Delete</button>
+      <button class="primary" id="pinConfirm">Confirm</button>
     </div>
   </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 <script>
 (function(){
 "use strict";
@@ -497,6 +517,27 @@ MENU.forEach(c=>c.items=c.items.map(([n,s,p])=>({id:"v"+(idc++),n,s,p,ek:0})));
 PMENU.forEach(c=>c.items=c.items.map(([n,s])=>({id:"p"+(idc++),n,s})));
 const ALLV=MENU.flatMap(c=>c.items),ALLP=PMENU.flatMap(c=>c.items);
 const ALLV_MAP=Object.fromEntries(ALLV.map(i=>[i.id,i]));
+/* EK PRICES from Einkauf_Verkauf_Kreuzberg.xlsx */
+const EK={
+  "Water":0.62,"Coca Cola / Zero":0.64,"Saftschorle":0.26,"Juice":0.40,
+  "Soft (Tonic, Ginger Beer etc.)":0.32,"Club Mate":0.65,"Voelkel / BioZisch":0.81,
+  "LemonAid / ChariTea":1.14,"Makava":1.04,"Red Bull":0.88,
+  "Berliner Pilsner":0.55,"Augustiner Helles":0.82,"Berliner Radler":0.60,
+  "Clausthaler (N/A)":0.79,
+  "White Wine":0.96,"White Wine Spritz":0.54,"Red Wine":1.11,"Rosé":1.65,
+  "Prosecco":0.56,"Prosecco on Ice":1.11,"Crémant":1.11,
+  "Fl. White Wine (Weißburg.)":4.80,"Fl. Red Wine (Pinot Noir)":3.90,
+  "Fl. Rosé (Lieubeau)":5.78,"Fl. Prosecco (Casa Gheller)":4.17,
+  "Fl. Crémant (Les Graimen.)":9.70,
+  "Pot of Coffee":2.50,"Espresso":0,"Tea":0,
+  "LD Aperol":1.15,"LD Campari":1.25,"LD Vermouth":1.32,
+  "LD Vodka":0.74,"LD Gin":1.00,"LD Whisky":1.18,"LD Rum":0.80,
+  "LD Tequila":2.12,"LD Mate / Makava":1.80,"LD Red Bull":1.39,"LD Mezcal":2.66,
+  "Shots (Berliner Luft)":0.21,"Shots (other)":0.33,
+  "Shots (Tequila, Whisky)":0.62,"Shots (Mezcal)":1.21,
+};
+function getEK(name){return EK[name]||0;}
+
 const DE_ALIAS={
   "Water":"Wasser","Saftschorle":"Saft Schorle juice spritz","Juice":"Saft",
   "Soft (Tonic, Ginger Beer etc.)":"Softdrink","White Wine":"Weißwein Wein",
@@ -514,15 +555,15 @@ const DE_ALIAS={
 
 const SESS_KEY="vbl.sess.v2",FB_KEY="vbl.firebase",THEME_KEY="vbl.theme";
 let sessions=[],currentId=null,screen="sessions",activeSheet="verbrauch";
-let beid=0,cid=0,bDrinkSelected="",sessFilter="month",editMode=false;
+let beid=0,cid=0,bDrinkSelected="",sessFilter="month",editMode=false,pendingPinAction=null;
 let fbUrl="",syncTimer=null,sseSource=null,syncDebounce=null;
 const PIN_KEY="vbl.pin";
-function getPin(){try{return localStorage.getItem(PIN_KEY)||"1234";}catch(e){return"1234";}}
+function getPin(){try{return localStorage.getItem(PIN_KEY)||"1111";}catch(e){return"1111";}}
 function setPin(p){try{localStorage.setItem(PIN_KEY,p);}catch(e){}}
 let pinCallback=null;
 function requirePin(label,cb){
   pinCallback=cb;
-  $("#pinModal .psub").textContent="Enter the admin PIN to "+label+".";
+  $("#pinModal .psub").textContent="Enter PIN to "+label+".";
   $("#pinInput").value="";
   $("#pinInput").classList.remove("err");
   $("#pinModal").classList.remove("hidden");
@@ -539,6 +580,9 @@ function normalizeSess(s){
   if(!Array.isArray(s.customPersonal))s.customPersonal=[];
   if(!s.stunden||Array.isArray(s.stunden)||typeof s.stunden!=="object")s.stunden={};
   if(!s.countMode||typeof s.countMode!=="object")s.countMode={};
+  if(s.guests===undefined)s.guests=0;
+  if(s.djOrdered===undefined)s.djOrdered=0;
+  if(s.djUsed===undefined)s.djUsed=0;
   if(!s.abrechnung||typeof s.abrechnung!=="object")s.abrechnung={};
   const a=s.abrechnung;
   if(!Array.isArray(a.types))a.types=a.type?[a.type]:[];
@@ -557,7 +601,7 @@ function normalizeSess(s){
 function sess(){
   const s=sessions.find(s=>s.id===currentId);
   if(s){normalizeSess(s);return s;}
-  return {counts:{},countMode:{},custom:[],personal:{},bruch:[],bruchCounts:{},customPersonal:[],stunden:{},abrechnung:{type:"",types:[],pauschalenType:"",addons:{},pauschale_fee:0,pauschale_fee_type:"netto",cash:0,sumup:0,light:0,tip:0,tipSource:"",notes:""},countMode:{}};
+  return {counts:{},countMode:{},custom:[],personal:{},bruch:[],bruchCounts:{},customPersonal:[],stunden:{},guests:0,djOrdered:0,djUsed:0,abrechnung:{type:"",types:[],pauschalenType:"",addons:{},pauschale_fee:0,pauschale_fee_type:"netto",cash:0,sumup:0,light:0,tip:0,tipSource:"",notes:""}};
 }
 function newSessId(){return "s_"+Date.now()+"_"+Math.floor(Math.random()*9999);}
 function newSess(){return {id:newSessId(),loc:null,date:"",event:"",counts:{},countMode:{},custom:[],personal:{},bruch:[],bruchCounts:{},customPersonal:[],stunden:{},abrechnung:{type:"",types:[],pauschalenType:"",addons:{},pauschale_fee:0,pauschale_fee_type:"netto",cash:0,sumup:0,light:0,tip:0,tipSource:"",notes:""},countMode:{},closed:false,closedAt:null,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};}
@@ -599,6 +643,9 @@ function getSH(){const s=sess();if(!s.stunden||Array.isArray(s.stunden))s.stunde
 function shTotal(){const sh=getSH();return SH_ROLES.reduce((t,r)=>t+(parseFloat(sh[r.k])||0),0);}
 function getAbr(){const s=sess();if(!s.abrechnung)s.abrechnung={type:"",cash:0,sumup:0,light:0,tip:0,tipSource:"",notes:""};if(s.abrechnung.light===undefined)s.abrechnung.light=0;return s.abrechnung;}
 const poolBC=s=>ALLV.concat((s||sess()).custom||[]);
+function getPersPrice(item){const v=ALLV.find(i=>i.n===item.n&&(!item.s||i.s===item.s))||ALLV.find(i=>i.n===item.n);return v?v.p:0;}
+const persTotal=()=>ALLP.concat(sess().customPersonal||[]).reduce((t,i)=>{const qty=sess().personal[i.id]||0;return t+qty*getPersPrice(i);},0);
+const persTotalFor=s=>ALLP.concat(s.customPersonal||[]).reduce((t,i)=>{const qty=s.personal[i.id]||0;return t+qty*getPersPrice(i);},0);
 const bruchTotalFor=s=>poolBC(s).reduce((r,i)=>r+(parseFloat(s.bruchCounts[i.id])||0)*i.p,0);
 const bruchTotal=()=>bruchTotalFor(sess());
 function setBruch(id,val){const s=sess();const v=Math.max(0,parseFloat(String(val).replace(",","."))||0);if(!v)delete s.bruchCounts[id];else s.bruchCounts[id]=Math.round(v*100)/100;touchSess();}
@@ -671,6 +718,8 @@ $("#sessCards").addEventListener("click",e=>{
 
 /* SETUP */
 function renderSetup(){
+  const _s=editMode&&currentId?sess():null;
+  if(_s){const _f=id=>document.getElementById(id);_f("fDate")&&(_f("fDate").value=_s.date||"");_f("fEvent")&&(_f("fEvent").value=_s.event||"");}
   $("#setupHero").innerHTML=editMode?"Edit<br>Session <span class=\"accent\">·</span>":"New<br>Session <span class=\"accent\">·</span>";
   const g=$("#locGrid");g.innerHTML="";
   const curLoc=sess().loc||null;
@@ -701,8 +750,8 @@ function renderTabs(){
     const tp=(s5.abrechnung&&s5.abrechnung.types||[]);
     const payBadge=tp.length?tp.map(t2=>({"pauschale":"Flat","verbrauch":"Consump.","direct":"Direct"})[t2]||t2).join("+"):"—";
     const defs=[
-      {k:"verbrauch",n:"Consumption List",b:eur(revTotal())},
-      {k:"personal",n:"Staff Drinks",b:persQty()+"×"},
+      {k:"verbrauch",n:"Consumption List",b:(()=>{const dj=(sess().djUsed||0)+(sess().djOrdered||0);return eur(revTotal())+(dj?" · DJ "+(sess().djUsed||0)+"/"+(sess().djOrdered||0):"");})()},
+      {k:"personal",n:"Staff Drinks",b:(()=>{const t=persTotal();return t>0?eur(t):persQty()+"×";})()},
       {k:"bruch",n:"Breakage",b:bc>0?eur(bc):"—"},
       {k:"stunden",n:"Hours Sheet",b:shTot>0?shTot+"h":"—"},
       {k:"abrechnung",n:"Payment",b:payBadge},
@@ -720,7 +769,7 @@ function renderTabs(){
 }
 function switchPane(){
   const s=sess();
-  $("#mLoc").textContent=s.loc||"—";$("#mEvent").textContent=s.event||"no name";$("#mDate").textContent=fmtDate(s.date)||"—";
+  $("#mLoc").textContent=s.loc||"—";$("#mEvent").textContent=s.event||"no name";$("#mDate").textContent=fmtDate(s.date)||"—";const mg=$("#mGuests");if(mg)mg.textContent=s.guests?(s.guests+"  guests"):"";
   ["paneVerbrauch","panePersonal","paneBruch","paneStunden","paneAbrechnung"].forEach(id=>{const _el=$("#"+id);if(_el)_el.classList.add("hidden");});
   $("#paneVerbrauch").classList.toggle("hidden",activeSheet!=="verbrauch");
   $("#panePersonal").classList.toggle("hidden",activeSheet!=="personal");
@@ -773,7 +822,11 @@ function renderOrder(){
   if(!any)host.innerHTML=`<div class="empty">Nothing entered yet.<br>Search for a drink above.</div>`;
 }
 function renderWarn(){const cs=activeCustom();$("#vWarn").innerHTML=cs.length?`<div class="warn"><span>⚠</span><span><b>${cs.length} custom-added drink${cs.length>1?"s":""}.</b> Custom prices — flagged in PDF/export.</span></div>`:""; }
-function renderV(){renderResults();renderWarn();renderOrder();renderTabs();renderBar();}
+function renderV(){
+  const s5=sess();const od=$("#djOrdered"),ud=$("#djUsed");
+  if(od&&document.activeElement!==od)od.value=s5.djOrdered||"";
+  if(ud&&document.activeElement!==ud)ud.value=s5.djUsed||"";
+renderResults();renderWarn();renderOrder();renderTabs();renderBar();}
 $("#searchV").addEventListener("input",renderV);
 $("#clrV").onclick=()=>{$("#searchV").value="";$("#anForm").classList.add("hidden");renderV();};
 $("#anCancel").onclick=()=>$("#anForm").classList.add("hidden");
@@ -811,7 +864,8 @@ function renderPOrder(){
   const cpItems=(s.customPersonal||[]).filter(i=>(s.personal[i.id]||0)>0);
   const any=ALLP.some(i=>(s.personal[i.id]||0)>0)||cpItems.length>0;
   if(!any){host.innerHTML=`<div class="empty">Nothing entered yet.<br>Search for a drink above.</div>`;return;}
-  PMENU.forEach(cat=>{const items=cat.items.filter(i=>(s.personal[i.id]||0)>0);if(!items.length)return;const sec=document.createElement("div");sec.className="cat";const cq=items.reduce((t,i)=>t+s.personal[i.id],0);sec.innerHTML=`<div class="cat-h"><span>${cat.c}</span><span class="cc num">${cq}×</span></div>`;items.forEach(it=>{const qty=s.personal[it.id];const row=document.createElement("div");row.className="item has";row.innerHTML=`<div class="body" data-padd="${it.id}"><div class="nm">${esc(it.n)}${it.s?`<span class="szpill">${it.s}</span>`:""}</div></div><div class="stepper"><button class="minus" data-psub="${it.id}">−</button><input class="num" inputmode="numeric" data-pqty="${it.id}" value="${qty}"/><button class="plus" data-pplus="${it.id}">+</button></div>`;sec.appendChild(row);});host.appendChild(sec);});
+  PMENU.forEach(cat=>{const items=cat.items.filter(i=>(s.personal[i.id]||0)>0);if(!items.length)return;const sec=document.createElement("div");sec.className="cat";const cq=items.reduce((t,i)=>t+s.personal[i.id],0);sec.innerHTML=`<div class="cat-h"><span>${cat.c}</span><span class="cc num">${cq}×</span></div>`;items.forEach(it=>{const qty=s.personal[it.id];const row=document.createElement("div");row.className="item has";const pp=getPersPrice(it);
+      row.innerHTML=`<div class="body" data-padd="${it.id}"><div class="nm">${esc(it.n)}${it.s?`<span class="szpill">${it.s}</span>`:""}</div>${pp>0?`<div class="sub"><span class="num">${eur(pp)}</span><span class="lt num">${eur(qty*pp)}</span></div>`:""}</div><div class="stepper"><button class="minus" data-psub="${it.id}">−</button><input class="num" inputmode="numeric" data-pqty="${it.id}" value="${qty}"/><button class="plus" data-pplus="${it.id}">+</button></div>`;sec.appendChild(row);});host.appendChild(sec);});
 }
 function renderP(){renderPResults();renderPOrder();renderTabs();renderBar();}
 $("#searchP").addEventListener("input",renderP);
@@ -947,6 +1001,7 @@ function renderAbrechnung(){
       +`</div>`;
   }else if(vaEl)vaEl.innerHTML="";
   if(activeSheet==="verbrauch")renderOrder();
+  const gi=$("#abrGuests");if(gi&&document.activeElement!==gi)gi.value=s.guests||"";
   const ci=$("#abrCash");if(ci&&document.activeElement!==ci)ci.value=a.cash||"";
   const si=$("#abrSumup");if(si&&document.activeElement!==si)si.value=a.sumup||"";
   const li=$("#abrLight");if(li&&document.activeElement!==li)li.value=a.light||"";
@@ -986,23 +1041,25 @@ $("#abrNote").addEventListener("input",()=>{getAbr().notes=$("#abrNote").value;s
 function renderSummary(){
   const s=sess();
   $("#sumSub").textContent=`${s.loc||"—"} · ${s.event||"no name"} · ${fmtDate(s.date)||"—"}`;
-  $("#statRev").textContent=eur(revTotal());$("#statQty").textContent=revQty();$("#statPers").textContent=persQty();$("#statBruch").textContent=eur(bruchTotal());
+  $("#statRev").textContent=eur(revTotal());$("#statQty").textContent=revQty();$("#statPers").textContent=eur(persTotal());$("#statBruch").textContent=eur(bruchTotal());
   $("#sumTotal").textContent=eur(revTotal());
   const cs=activeCustom();
   $("#sumWarn").innerHTML=cs.length?`<div class="warn"><span>⚠</span><span><b>Custom added:</b> ${cs.map(i=>esc(i.n)+" ("+eur(i.p)+")").join(", ")}. Custom prices — flagged in PDF.</span></div>`:"";
   const v=activeV();
   $("#sumVerbrauch").innerHTML=v.length?`<div class="sum-card">`+v.map(i=>{const q=s.counts[i.id];return`<div class="sum-row"><span class="q num">${q}×</span><span class="n">${esc(i.n)}${i.custom?'<span class="bdg">custom</span>':""}<small>${i.s?i.s+" · ":""}${eur(i.p)}</small></span><span class="v num">${eur(q*i.p)}</span></div>`;}).join("")+`</div>`:`<div class="empty">Nothing entered yet.</div>`;
   const p=activeP();
-  $("#sumPersonalWrap").innerHTML=p.length?`<p class="sum-sec-h">Staff Drinks · ${persQty()}×</p><div class="sum-card">`+p.map(i=>{const q=s.personal[i.id];return`<div class="sum-row"><span class="q num">${q}×</span><span class="n">${esc(i.n)}<small>${i.s||""}</small></span></div>`;}).join("")+`</div>`:"";
+  const pTotal=persTotalFor(s);
+  $("#sumPersonalWrap").innerHTML=p.length?`<p class="sum-sec-h">Staff Drinks · ${persQty()}× · ${eur(pTotal)}</p><div class="sum-card">`+p.map(i=>{const q=s.personal[i.id];const pp=getPersPrice(i);return`<div class="sum-row"><span class="q num">${q}×</span><span class="n">${esc(i.n)}<small>${i.s||""}</small></span><span class="v num">${pp>0?eur(q*pp):""}</span></div>`;}).join("")+(pTotal>0?`<div class="sum-row"><span class="q">∑</span><span class="n" style="font-weight:600">Total Staff Drinks</span><span class="v num" style="color:var(--accent)">${eur(pTotal)}</span></div>`:"")+`</div>`:"";
   const bruchItems=MENU.flatMap(c=>c.items).concat(s.custom||[]).filter(i=>(s.bruchCounts||{})[i.id]>0);
   const bruchTot=bruchItems.reduce((t,i)=>t+(parseFloat(s.bruchCounts[i.id])||0)*i.p,0);
   $("#sumBruchWrap").innerHTML=bruchItems.length?`<p class="sum-sec-h">Breakage · ${eur(bruchTot)}</p><div class="sum-card">`+bruchItems.map(i=>{const bv=parseFloat((s.bruchCounts||{})[i.id])||0;const cost=bv*i.p;const label=bv===Math.round(bv)?bv+"×":bv+" btl";return`<div class="sum-row"><span class="q num d" style="min-width:48px">${label}</span><span class="n">${esc(i.n)}${i.s?`<small>${i.s}</small>`:""}</span><span class="v num">${i.p>0?eur(cost):""}</span></div>`;}).join("")+`<div class="sum-row"><span class="q">∑</span><span class="n" style="font-weight:600">Total Breakage</span><span class="v num" style="color:var(--danger)">${eur(bruchTot)}</span></div></div>`:"";
   const sh=s.stunden&&!Array.isArray(s.stunden)?s.stunden:{};const shEntries=SH_ROLES.filter(r=>(parseFloat(sh[r.k])||0)>0);const shTot=SH_ROLES.reduce((t,r)=>t+(parseFloat(sh[r.k])||0),0);
-  $("#sumStundenWrap").innerHTML=shEntries.length?`<p class="sum-sec-h">Hours Sheet · ${shTot}h gesamt</p><div class="sum-card">`+shEntries.map(r=>`<div class="sum-row"><span class="q num" style="color:var(--muted)">${sh[r.k]}h</span><span class="n">${r.label}</span></div>`).join("")+`</div>`:"";
+  $("#sumStundenWrap").innerHTML=shEntries.length?`<p class="sum-sec-h">Hours Sheet · ${shTot}h total</p><div class="sum-card">`+shEntries.map(r=>`<div class="sum-row"><span class="q num" style="color:var(--muted)">${sh[r.k]}h</span><span class="n">${r.label}</span></div>`).join("")+`</div>`:"";
     const ab=s.abrechnung||{};const abCash=parseFloat(ab.cash)||0,abSumup=parseFloat(ab.sumup)||0,abLight=parseFloat(ab.light)||0,abTip=parseFloat(ab.tip)||0;
   const abHasData=(ab.types&&ab.types.length)||abCash||abSumup||abLight||abTip||parseFloat(ab.pauschale_fee);
   let abrHtml="";
   if(abHasData){
+    if(s.guests)abrHtml+=`<div class="sum-row"><span class="q" style="color:var(--muted)">Guests</span><span class="n" style="font-weight:600">${s.guests} people</span></div>`;
     abrHtml+='<p class="sum-sec-h">Payment</p><div class="sum-card">';
     // Payment type + sub-type
     if((ab.types||[]).length){
@@ -1039,29 +1096,6 @@ function renderSummary(){
 
 /* PDF */
 function fileBase(){const s=sess();return("Spreedampfer_Events_"+(s.loc||"Event")+"_"+(s.date||"")).replace(/[^\w.\-]+/g,"_");}
-function downloadPDF(){
-  const s=sess();if(!s.loc){toast("No active session");return;}
-  const v=activeV(),p=activeP(),cs=activeCustom(),ab=s.abrechnung||{};
-  const escH=t=>(t||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-  const ef=n=>n.toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:2});
-  const abCash=parseFloat(ab.cash)||0,abSumup=parseFloat(ab.sumup)||0,abLight=parseFloat(ab.light)||0,abTip=parseFloat(ab.tip)||0;
-  const sh=s.stunden&&!Array.isArray(s.stunden)?s.stunden:{};const shEntries=SH_ROLES.filter(r=>(parseFloat(sh[r.k])||0)>0);
-  const html=`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>Spreedampfer Events — ${escH(s.loc)}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:10pt;color:#1a1a1a;padding:16mm 18mm}h1{font-size:20pt;font-weight:700;margin-bottom:3pt}h1 span{font-size:11pt;font-weight:400;color:#666;margin-left:8pt}.meta{font-size:9.5pt;color:#666;margin-bottom:14pt}hr{border:none;border-top:1px solid #d0ccc0;margin:10pt 0}h2{font-size:9pt;text-transform:uppercase;letter-spacing:1.5px;color:#8a6012;margin:14pt 0 5pt;font-weight:700}table{width:100%;border-collapse:collapse;margin-bottom:4pt}td{font-size:9.5pt;padding:3.5pt 0;border-bottom:1px solid #f0ece0;vertical-align:top}td.qty{width:28pt;color:#8a6012;font-weight:700}td.price{text-align:right;font-family:monospace;width:60pt}td.none{color:#aaa;font-style:italic}.total-row td{font-size:11pt;font-weight:700;border-top:1.5px solid #888;border-bottom:none;padding-top:7pt}.sz{font-size:8.5pt;color:#999;margin-left:4pt}.cust{font-size:7.5pt;background:#fef0cc;color:#8a6012;border:1px solid #e8b04b;border-radius:3pt;padding:1pt 4pt;margin-left:4pt}.warn-box{background:#fff8e6;border:1px solid #e8b04b;border-radius:4pt;padding:7pt 9pt;margin:8pt 0;font-size:8.5pt;color:#7a5a08;line-height:1.5}.footer{font-size:7.5pt;color:#aaa;margin-top:16pt;padding-top:8pt;border-top:1px solid #e8e4d8}@page{margin:16mm 18mm}@media print{body{padding:0}}</style></head><body>
-<h1>Spreedampfer Events <span>${escH(s.loc)}</span></h1>
-<div class="meta">${fmtDate(s.date)||"—"} &nbsp;|&nbsp; ${escH(s.event||"no name")}</div><hr>
-<h2>Consumption List</h2><table>${v.length?v.map(i=>{const q=s.counts[i.id];return`<tr><td class="qty">${q}×</td><td>${escH(i.n)}${i.s?`<span class="sz">(${i.s})</span>`:""}${i.custom?`<span class="cust">custom</span>`:""}</td><td class="price">${ef(q*i.p)} €</td></tr>`;}).join(""):`<tr><td colspan="3" class="none">(nothing entered)</td></tr>`}
-<tr class="total-row"><td></td><td>Total Revenue</td><td class="price">${ef(revTotal())} €</td></tr></table>
-${cs.length?`<div class="warn-box"><b>! Custom-added drinks (prices entered manually):</b><br>${cs.map(i=>`${escH(i.n)}${i.s?" ("+i.s+")":""} — ${ef(i.p)} €`).join(", ")}</div>`:""}
-${p.length?`<h2>Staff Drinks (${persQty()})</h2><table>${p.map(i=>`<tr><td class="qty">${s.personal[i.id]}×</td><td>${escH(i.n)}${i.s?`<span class="sz">(${i.s})</span>`:""}</td><td></td></tr>`).join("")}</table>`:""}
-${(function(){var bi=MENU.flatMap(function(c){return c.items;}).concat(s.custom||[]).filter(function(i){return (s.bruchCounts||{})[i.id]>0;});if(!bi.length)return "";var bt=bi.reduce(function(t,i){return t+((s.bruchCounts[i.id]||0)/100)*i.p;},0);var rows=bi.map(function(i){var pct=s.bruchCounts[i.id]||0;var cost=(pct/100)*i.p;return "<tr><td class=\"qty\">"+pct+"%</td><td>"+escH(i.n)+(i.s?" ("+i.s+")":"")+"</td>"+"<td class=\"price\">"+(i.p>0?ef(cost)+" €":"")+"</td></tr>";}).join("");return "<h2>Breakage — "+ef(bt)+" €</h2><table>"+rows+"</table>";})()} 
-${shEntries.length?`<h2>Hours Sheet (${SH_ROLES.reduce((t,r)=>t+(parseFloat(sh[r.k])||0),0)}h)</h2><table>${shEntries.map(r=>`<tr><td class="qty">${sh[r.k]}h</td><td>${r.label}</td><td></td></tr>`).join("")}</table>`:""}
-${(ab.type||abCash||abSumup||abLight||abTip)?`<h2>Payment</h2><table>${(ab.types||[]).length?`<tr><td colspan="2">Payment Type: ${(ab.types||[]).map(t=>t==="basic"?"Open Bar Basic":t==="advanced"?"Open Bar Advanced":"By Consumption").join(" + ")}</td></tr>`:""}${(function(){if(!parseFloat(ab.pauschale_fee))return "";var pF=parseFloat(ab.pauschale_fee),isN=(ab.pauschale_fee_type||"netto")==="netto";var lN=isN?pF:pF/1.19,lB=isN?pF*1.19:pF,cons=revTotal();var cov=Math.min(cons,lN),over=Math.max(0,cons-lN);return "<tr><td style=\"font-weight:600\">Flat Rate Limit</td><td></td></tr>"+"<tr><td style=\"padding-left:12pt\">Netto</td><td class=\"price\">"+ef(lN)+" \u20ac</td></tr>"+"<tr><td style=\"padding-left:12pt\">Brutto (incl. 19%)</td><td class=\"price\">"+ef(lB)+" \u20ac</td></tr>"+"<tr><td>Total Consumption</td><td class=\"price\">"+ef(cons)+" \u20ac</td></tr>"+"<tr><td>Covered by Flat Rate</td><td class=\"price\">"+ef(cov)+" \u20ac</td></tr>"+(over>0?"<tr><td style=\"color:red\">Guests pay (over limit)</td><td class=\"price\">"+ef(over)+" \u20ac</td></tr>":"");})()} <tr><td>Cash</td><td class="price">${ef(abCash)} €</td></tr><tr><td>SumUp</td><td class="price">${ef(abSumup)} €</td></tr><tr><td>Lightspeed</td><td class="price">${ef(abLight)} €</td></tr><tr class="total-row"><td>Total Income</td><td class="price">${ef(abCash+abSumup+abLight)} €</td></tr>${abTip?`<tr><td>Tips ${ab.tipSource==="cash"?"(from cash)":ab.tipSource==="payout"?"(pay out)":""}</td><td class="price">${ef(abTip)} €</td></tr>`:""}</table>`:""}
-<div class="footer">Generated: ${new Date().toLocaleString("en-GB")} · Drinks: ${revQty()} · Staff: ${persQty()} · Breakage: ${bruchQty()}</div>
-</body></html>`;
-  const win=window.open("","_blank","width=820,height=1000");if(!win){toast("Allow popups to download PDF");return;}
-  win.document.write(html);win.document.close();setTimeout(()=>{win.focus();win.print();},400);
-  toast("Opening print dialog — choose Save as PDF");
-}
 
 /* CSV EXPORTS */
 function summaryText(){const s=sess();const ln="-".repeat(34);let o=`SPREEDAMPFER EVENTS\nLocation: ${s.loc||"-"}\nDate: ${fmtDate(s.date)||"-"}\nEvent: ${s.event||"-"}\n${ln}\nCONSUMPTION LIST\n`;const v=activeV();if(v.length)v.forEach(i=>{const q=s.counts[i.id];o+=`${String(q).padStart(3," ")}x  ${i.n}${i.s?" ("+i.s+")":""}${i.custom?" [custom]":""}  =  ${eur(q*i.p)}\n`;});else o+="  (nothing)\n";o+=`${ln}\nDrinks: ${revQty()}\nREVENUE: ${eur(revTotal())}\n`;const p=activeP();if(p.length){o+=`${ln}\nSTAFF DRINKS (${persQty()})\n`;p.forEach(i=>{o+=`${String(s.personal[i.id]).padStart(3," ")}x  ${i.n}${i.s?" ("+i.s+")":""}\n`;});}if((s.bruch||[]).length){o+=`${ln}\nBREAKAGE (${bruchQty()})\n`;s.bruch.forEach(e=>{o+=`${String(e.qty).padStart(3," ")}x  ${e.drink} — ${e.reason}${e.ma?" ("+e.ma+")":""}${e.note?" / "+e.note:""}\n`;});}return o;}
@@ -1069,8 +1103,287 @@ function summaryJson(){const s=sess();return JSON.stringify({location:s.loc,date
 function downloadCSV(){const s=sess();const sep=";";const head=["Date","Location","Event","Type","Qty","Name","Size","Unit Price","Total","Custom","Staff","Reason","Note"];const q=v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"';const meta=[fmtDate(s.date),s.loc||"",s.event||""];const rows=[head.map(q).join(sep)];activeV().forEach(i=>{const qt=s.counts[i.id];rows.push([...meta,"Verbrauch",qt,i.n,i.s||"",eurp(i.p),eurp(qt*i.p),i.custom?"YES":"","","",""].map(q).join(sep));});activeP().forEach(i=>{const qt=s.personal[i.id];rows.push([...meta,"Personal",qt,i.n,i.s||"","","","","","",""].map(q).join(sep));});MENU.flatMap(c=>c.items).concat(s.custom||[]).filter(i=>(s.bruchCounts||{})[i.id]>0).forEach(i=>{const qt=(s.bruchCounts||{})[i.id]||0;rows.push([...meta,"Bruch",qt,i.n,i.s||"",eurp(i.p),eurp(qt*i.p),"","","",""].map(q).join(sep));});try{const blob=new Blob(["\uFEFF"+rows.join("\r\n")],{type:"text/csv;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=fileBase()+".csv";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}catch(e){toast("Download not possible");}toast("CSV downloaded");}
 function exportAllCSV(){const list=filterSessions(sessFilter);if(!list.length){toast("No sessions to export");return;}const sep=";";const head=["Date","Location","Event","Type","Qty","Name","Size","Unit Price","Total","Custom","Staff","Reason","Note"];const q=v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"';const rows=[head.map(q).join(sep)];list.forEach(s=>{const meta=[fmtDate(s.date),s.loc||"",s.event||""];poolV(s).filter(i=>(s.counts[i.id]||0)>0).forEach(i=>{const qt=s.counts[i.id];rows.push([...meta,"Verbrauch",qt,i.n,i.s||"",eurp(i.p),eurp(qt*i.p),i.custom?"YES":"","","",""].map(q).join(sep));});ALLP.filter(i=>(s.personal[i.id]||0)>0).forEach(i=>{const qt=s.personal[i.id];rows.push([...meta,"Personal",qt,i.n,i.s||"","","","","","",""].map(q).join(sep));});MENU.flatMap(c=>c.items).concat(s.custom||[]).filter(i=>(s.bruchCounts||{})[i.id]>0).forEach(i=>{const qt=(s.bruchCounts||{})[i.id]||0;rows.push([...meta,"Bruch",qt,i.n,i.s||"",eurp(i.p),eurp(qt*i.p),"","","",""].map(q).join(sep));});});const fname="Spreedampfer_Events_"+periodLabel(sessFilter).replace(/ /g,"_")+"_"+new Date().toISOString().slice(0,10)+".csv";try{const blob=new Blob(["\uFEFF"+rows.join("\r\n")],{type:"text/csv;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=fname;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}catch(e){toast("Download not possible");return;}toast(`${list.length} session${list.length>1?"s":""} exported`);}
 
+
+function downloadExcel(){
+  if(!window.XLSX){toast("Excel library loading — try again");return;}
+  const s=sess(),XLSX=window.XLSX,ab=s.abrechnung||{};
+
+  // ── Color palette ──────────────────────────────────────────────────────────
+  const C={
+    gold:"8A6012",goldBg:"FDF3DC",green:"1A6B3C",greenBg:"E8F5EE",
+    red:"C0392B",redBg:"FDECEA",blue:"0000BB",dark:"1A1A1A",
+    grey:"555555",greyBg:"EBEBEB",inputBg:"FFFF99",faint:"999999",
+    orangeBg:"FEF0E0",orange:"BF5C00",white:"FFFFFF",
+  };
+
+  // ── Style builder ──────────────────────────────────────────────────────────
+  function st(bold,color,bg,align,fmt,sz,italic){
+    const s={font:{name:"Arial",bold:!!bold,sz:sz||10,color:{rgb:color||C.dark},italic:!!italic},
+             alignment:{horizontal:align||"left",vertical:"center",wrapText:false}};
+    if(bg)s.fill={fgColor:{rgb:bg},bgColor:{rgb:bg},patternType:"solid"};
+    if(fmt)s.numFmt=fmt;
+    return s;
+  }
+  function bord(bottom,color){return{bottom:{style:bottom||"thin",color:{rgb:color||"CCCCCC"}}};}
+
+  const M='#,##0.00', M2='#,##0.00', H='#,##0';
+
+  // ── Cell builders ──────────────────────────────────────────────────────────
+  function tv(v,s){return{t:typeof v==="number"?"n":typeof v==="boolean"?"b":"s",v:v,s:s};}
+  function tf(f,s){return{t:"n",f:f,s:s};}
+  function empty(s){return{t:"s",v:"",s:s};}
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  const ef=n=>isNaN(parseFloat(n))?0:Math.round(parseFloat(n)*100)/100;
+  const fmtD=d=>{try{return new Date(d+"T12:00:00").toLocaleDateString("de-DE");}catch{return d||"";}};
+  const payTypes=(ab.types||[]).map(t=>{
+    if(t==="pauschale")return ab.pauschalenType==="basic"?"Open Bar Basic":ab.pauschalenType==="advanced"?"Open Bar Advanced":"Flat Rate";
+    return t==="verbrauch"?"Nach Verbrauch":"Direct Payment";
+  });
+  const addonLabels=Object.entries(ab.addons||{}).filter(([k,v])=>v).map(([k])=>k==="spritz"?"Aperol/Campari Spritz":"Free Shots");
+  const payLabel=[...payTypes,...addonLabels].join(" + ")||"—";
+
+  const cash=ef(ab.cash),sumup=ef(ab.sumup),light=ef(ab.light),tip=ef(ab.tip);
+  const rechnung=parseFloat(ab.pauschale_fee)||0;
+  const allItems=ALLV.concat(s.custom||[]);
+  const persItems=ALLP.concat(s.customPersonal||[]);
+
+  // ── Drink list (Kreuzberg prices) ──────────────────────────────────────────
+  const ALL=[
+    ["Wasser","0,50 l",3.00,0.62],["Coca Cola / Zero","0,33 l",3.50,0.64],
+    ["Saftschorle","0,20 l",3.50,0.26],["Saft","0,20 l",3.50,0.40],
+    ["Soft (Tonic, Ginger Beer etc.)","0,20 l",3.00,0.32],
+    ["Club Mate","0,50 l",4.00,0.65],["Voelkel / BioZisch","0,50 l",3.50,0.81],
+    ["LemonAid / ChariTea","0,33 l",3.50,1.14],["Makava","0,33 l",4.00,1.04],
+    ["Red Bull","0,20 l",4.00,0.88],
+    ["Berliner Pilsner","0,33 l",4.00,0.55],["Augustiner Helles","0,5 l",4.50,0.82],
+    ["Berliner Radler","0,33 l",3.50,0.60],["Clausthaler (N/A)","0,33 l",3.50,0.79],
+    ["Weißwein","0,20 l",6.00,0.96],["Weißweinschorle","0,20 l",5.00,0.54],
+    ["Rotwein","0,20 l",7.00,1.11],["Rosé","0,20 l",7.00,null],
+    ["Prosecco","0,10 l",3.50,0.56],["Prosecco auf Eis","0,30 l",7.00,1.11],
+    ["Crémant","0,10 l",7.00,null],
+    ["Fl. Weißwein","0,75 l",23.00,4.80],["Fl. Rotwein","0,75 l",23.00,3.90],
+    ["Fl. Rosé","0,75 l",23.00,null],["Fl. Prosecco","0,75 l",21.00,4.17],
+    ["Fl. Crémant","0,75 l",49.00,null],["Fl. Saft","1 l",18.00,1.73],
+    ["Tee","",2.00,null],["Kanne Kaffee","2 l",12.00,null],
+    ["Espresso / Nespresso","",2.50,null],
+    ["LD Aperol Spritz","0,30 l",8.00,1.15],["LD Campari","0,30 l",8.00,1.25],
+    ["LD Vermouth","0,30 l",8.00,1.32],["LD Vodka","0,30 l",9.00,0.74],
+    ["LD Gin","0,30 l",9.00,1.00],["LD Whisky","0,30 l",9.00,1.18],
+    ["LD Rum","0,30 l",9.00,0.80],["LD Tequila","0,30 l",9.50,2.12],
+    ["LD Mate / Makava","0,50 l",9.50,1.80],["LD Red Bull","0,30 l",10.00,1.39],
+    ["LD Mezcal","0,30 l",12.00,2.66],
+    ["Shots (3,00 €)","2 cl",3.00,0.33],
+    ["Shots (Berliner Luft 2,50 €)","2 cl",2.50,0.21],
+    ["Shots (Mezcal 5,00 €)","2 cl",5.00,1.21],
+    ["Shots (Jameson/Bulleit/Tequila 3,50 €)","2 cl",3.50,0.62],
+    ["Cocktails","",10.00,1.20],
+  ];
+
+  function matchQty(name,source,counts){
+    const i=source.find(x=>x.n===name);return i?counts[i.id]||0:0;
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // HELPER: build a formatted item sheet (Verbrauchsliste / Personal / Bruch)
+  // ══════════════════════════════════════════════════════════════════════════
+  function buildItemSheet(ws,sheetTitle,subtitle,getQty,isBruch){
+    const DATA_START=6; // first data row (title=1,subtitle=2,info=3,blank=4,header=5)
+    const N=ALL.length;
+    const TOTAL_ROW=DATA_START+N; // SUMME row
+
+    // Col widths
+    ws["!cols"]=[{wch:4},{wch:34},{wch:9},{wch:12},{wch:14},{wch:15},{wch:15}];
+
+    // Rows 1-3: header
+    ws["B1"]=tv(sheetTitle,st(true,C.gold,null,"left",null,14));
+    ws["B2"]=tv(subtitle,st(false,C.grey,null,"left",null,9));
+    ws["B3"]=tv((s.loc||"")+" · "+(fmtD(s.date)||""),st(false,C.grey,null,"left",null,9));
+
+    // Row 2: session info  
+
+    // Row 4: column headers
+    const hdrs=["Nr","Artikel",isBruch?"Menge (Fl.)":"Menge","VK-Preis / Stk (€)","Wareneinsatz / Stk (€)","VK-Wert gesamt (€)","Wareneinsatz gesamt (€)"];
+    ["A","B","C","D","E","F","G"].forEach((col,i)=>{
+      ws[col+"5"]=tv(hdrs[i],{...st(true,C.grey,C.greyBg,i>2?"right":"left",null,9),border:bord("medium","999999")});
+    });
+
+    // Data rows
+    ALL.forEach(([name,sz,vk,ek],idx)=>{
+      const rowN=DATA_START+idx;
+      const qty=getQty(name);
+      const bg=idx%2===0?null:"FAFAF8";
+      const label=name+(sz?" ("+sz+")":"");
+      const hasQty=qty>0;
+      ws["A"+rowN]=tv(idx+1,st(false,C.faint,bg,"center",H,9));
+      ws["B"+rowN]=tv(label,st(false,hasQty?C.dark:C.faint,bg,"left",null,9));
+      // Menge — yellow if has value, else light
+      if(qty)ws["C"+rowN]=tv(qty,st(true,C.blue,C.inputBg,"center",H));
+      ws["D"+rowN]=tv(vk,st(true,C.blue,bg,"right",M2));
+      if(ek)ws["E"+rowN]=tv(ek,st(false,C.grey,bg,"right",M2));
+      // Formulas
+      ws["F"+rowN]=tf("=C"+rowN+"*D"+rowN,"n",st(false,hasQty?C.gold:C.faint,bg,"right",M));
+      ws["G"+rowN]=tf("=C"+rowN+"*E"+rowN,"n",st(false,C.grey,bg,"right",M));
+    });
+
+    // SUMME row
+    ws["B"+TOTAL_ROW]=tv("SUMME (€)",st(true,C.dark,C.goldBg));
+    ws["F"+TOTAL_ROW]=tf("=SUM(F"+DATA_START+":F"+(TOTAL_ROW-1)+")","n",st(true,C.gold,C.goldBg,"right",M));
+    ws["G"+TOTAL_ROW]=tf("=SUM(G"+DATA_START+":G"+(TOTAL_ROW-1)+")","n",st(true,C.gold,C.goldBg,"right",M));
+
+    // Netto row
+    const NETTO=TOTAL_ROW+1;
+    ws["B"+NETTO]=tv("davon Netto (÷1,19)",st(false,C.grey,null,"right",null,8,true));
+    ws["F"+NETTO]=tf("=F"+TOTAL_ROW+"/1.19","n",st(false,C.grey,null,"right",M));
+    ws["G"+NETTO]=tf("=G"+TOTAL_ROW+"/1.19","n",st(false,C.grey,null,"right",M));
+
+    return {totalRow:TOTAL_ROW,vkCol:"F",ekCol:"G"};
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ÜBERSICHT sheet
+  // ══════════════════════════════════════════════════════════════════════════
+  const ovWs={};
+  ovWs["!cols"]=[{wch:3},{wch:38},{wch:15},{wch:15},{wch:16},{wch:3}];
+
+  function band(row,text,tc,bg,sz){
+    ovWs["B"+row]=tv(text,st(true,tc||C.gold,bg||C.goldBg,"left",null,sz||11));
+    ["B","C","D","E"].forEach(c=>{if(!ovWs[c+row])ovWs[c+row]=empty(st(false,tc,bg));});
+  }
+  function dataRow(row,label,val,fmt,bold,color,bg,note){
+    ovWs["B"+row]=tv(label,st(bold,color||C.dark,bg));
+    if(note)ovWs["C"+row]=tv(note,st(false,C.faint,bg,"left",null,8,true));
+    if(val!==undefined&&val!==null)
+      ovWs["E"+row]=(typeof val==="string"&&val[0]==="=")?tf(val,"n",st(bold,color||C.dark,bg,"right",fmt||M)):
+                    tv(val,st(bold,color||C.dark,bg,"right",fmt||M));
+  }
+  function inputRow(row,label,val,note){
+    ovWs["B"+row]=tv(label,st(false,C.dark,null));
+    if(note)ovWs["C"+row]=tv(note,st(false,C.faint,null,"left",null,8,true));
+    ovWs["E"+row]=tv(ef(val),st(true,C.blue,C.inputBg,"right",M));
+  }
+
+  // Title
+  ovWs["B1"]=tv("Getränke-Abrechnung — Spreedampfer Events",st(true,C.dark,null,"left",null,14));
+  ovWs["B2"]=tv((s.loc||"")+" · "+(fmtD(s.date)||"")+" · "+(s.event||""),st(false,C.grey,null,"left",null,10));
+  ovWs["B3"]=tv("Zahlungsart: "+payLabel,st(false,C.gold,null,"left",null,10));
+  if(s.guests)ovWs["B4"]=tv("Gäste: "+s.guests+(s.djUsed?" · DJ Tickets: "+s.djUsed+"/"+(s.djOrdered||"?"):""),st(false,C.grey,null,"left",null,9));
+  ovWs["B9"]=tv("Position",st(true,C.grey,C.greyBg,"left",null,9));
+  ovWs["E9"]=tv("Betrag",st(true,C.grey,C.greyBg,"right",null,9));
+  const R={rech:10,sumu:11,lspe:12,cash:13,djtk:14,tip:15,sumA:16};
+  inputRow(R.rech,"Einnahmen Getränke-Rechnung  (Pauschale / Flatrate-Rechnung)",rechnung);
+  inputRow(R.sumu,"SumUp-Umsatz",sumup);
+  inputRow(R.lspe,"Lightspeed-Umsatz",light);
+  inputRow(R.cash,"Cash-Umsatz",cash);
+  inputRow(R.djtk,"DJ-Tickets  (→ Tab: Nachverbrauch DJ-Tickets)",s.djTickets||0);
+  inputRow(R.tip,"Trinkgeld via SumUp / Lightspeed  (aus Kasse auszahlen!)",tip,"⚠ Kartentrinkgeld");
+  dataRow(R.sumA,"Summe Einnahmen  (A)","=SUM(E"+R.rech+":E"+(R.sumA-1)+")",M,true,C.green,C.greenBg);
+
+  // ── B: KOSTEN ─────────────────────────────────────────────────────────────
+  const CONS_TOTAL=ALL.length+6; // SUMME row = DATA_START(6) + N items
+  const PERS_TOTAL=ALL.length+6; // same for Personal Getränke
+  band(18,"B.  KOSTEN  (Wareneinsatz)",C.gold,C.goldBg);
+  for(const [c,t,al] of [["B","Position","left"],["C","VK-Wert (€)","right"],["D","VK-Wert Brutto (€)","right"],["E","Wareneinsatz / EK (€)","right"]])
+    ovWs[c+"19"]=tv(t,st(true,C.grey,C.greyBg,al,null,9));
+  const RB={pers:20,bruc:21,cons:22,nach:23,sumB:24,vkg:25};
+  dataRow(RB.pers,"Personal-Getränke  (→ Tab: Personal Getränke)");
+  ovWs["C"+RB.pers]=tf("=IFERROR('Personal Getränke'!F"+PERS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
+  ovWs["E"+RB.pers]=tf("=IFERROR('Personal Getränke'!G"+PERS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
+  dataRow(RB.bruc,"Bruch  (→ Tab: Bruch)");
+  ovWs["C"+RB.bruc]=tf("=IFERROR('Bruch'!F"+PERS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
+  ovWs["E"+RB.bruc]=tf("=IFERROR('Bruch'!G"+PERS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
+  dataRow(RB.cons,"Verbrauchte Getränke  (→ Tab: Verbrauchsliste)");
+  ovWs["C"+RB.cons]=tf("=IFERROR('Verbrauchsliste'!F"+CONS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
+  ovWs["D"+RB.cons]=tf("=IFERROR('Verbrauchsliste'!F"+CONS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
+  ovWs["E"+RB.cons]=tf("=IFERROR('Verbrauchsliste'!G"+CONS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
+  dataRow(RB.nach,"Nachverbrauch / DJ-Tickets  (→ Tab: Nachverbrauch DJ-Tickets)");
+  ovWs["C"+RB.nach]=tf("=IFERROR('Nachverbrauch DJ-Tickets'!F"+CONS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
+  ovWs["E"+RB.nach]=tf("=IFERROR('Nachverbrauch DJ-Tickets'!G"+CONS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
+  dataRow(RB.sumB,"Summe Wareneinsatz  (B)","=E"+RB.pers+"+E"+RB.bruc+"+E"+RB.cons+"+E"+RB.nach,M,true,C.gold,C.goldBg);
+  dataRow(RB.vkg,"Verkaufswert gesamt an Kunden  (inkl. Personal & Bruch)");
+  ovWs["C"+RB.vkg]=tf("=C"+RB.pers+"+C"+RB.bruc+"+C"+RB.cons+"+C"+RB.nach,"n",st(false,C.grey,null,"right",M));
+
+  // ── C: GEWINN/VERLUST ─────────────────────────────────────────────────────
+  band(27,"C.  GEWINN / VERLUST",C.red,"FDECEA");
+  dataRow(28,"Summe Einnahmen  (A)","=E"+R.sumA,M,false,C.green);
+  dataRow(29,"abzgl. Summe Wareneinsatz  (B)","=-E"+RB.sumB,M,false,C.red);
+  dataRow(30,"GEWINN / VERLUST","=E28+E29",M,true,C.green,C.greenBg);
+
+  // ── Cash reconciliation ────────────────────────────────────────────────────
+  band(32,"Kassen-Abrechnung: Trinkgeld",C.orange,C.orangeBg,10);
+  dataRow(33,"Kartentrinkgeld aus Kasse auszahlen:","=E"+R.tip,M,true,C.orange);
+  dataRow(34,"Effektiver Kassenbestand nach Auszahlung:","=E"+R.cash+"-E"+R.tip,M,true,C.green);
+
+  // Hours
+  const sh=s.stunden&&!Array.isArray(s.stunden)?s.stunden:{};
+  const shEntries=SH_ROLES.filter(r=>parseFloat(sh[r.k])||0);
+  if(shEntries.length){
+    let hr=36;band(hr,"Stunden Zettel",C.dark,"F5F5F5",11);hr++;
+    ovWs["B"+hr]=tv("Rolle",st(true,C.grey,C.greyBg,"left",null,9));
+    ovWs["E"+hr]=tv("Stunden",st(true,C.grey,C.greyBg,"right",null,9));hr++;
+    shEntries.forEach(r=>{
+      ovWs["B"+hr]=tv(r.label,st(false,C.dark));
+      ovWs["E"+hr]=tv(parseFloat(sh[r.k])||0,st(true,C.gold,null,"right",'#,##0.00"h"'));hr++;
+    });
+    const shTot=SH_ROLES.reduce((t,r)=>t+(parseFloat(sh[r.k])||0),0);
+    ovWs["B"+hr]=tv("Gesamt",st(true,C.dark,C.goldBg));
+    ovWs["E"+hr]=tv(shTot,st(true,C.gold,C.goldBg,"right",'#,##0.00"h"'));
+  }
+  // !ref set dynamically below
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // BUILD ALL SHEETS
+  // ══════════════════════════════════════════════════════════════════════════
+  const verbrWs={},persWs={},nvWs={},bruchWs={};
+
+  buildItemSheet(verbrWs,"Verbrauchsliste",payLabel,
+    name=>matchQty(name,allItems,s.counts));
+  buildItemSheet(persWs,"Personal Getränke","Personalgetränke — "+fmtD(s.date),
+    name=>matchQty(name,persItems,s.personal));
+  buildItemSheet(nvWs,"Nachverbrauch DJ-Tickets","Eingelöste Getränke (DJ-Ticket-Inhaber)",()=>0);
+  buildItemSheet(bruchWs,"Bruch","Beschädigte / Verdorbene Ware",
+    name=>{const i=allItems.find(x=>x.n===name);return i?parseFloat((s.bruchCounts||{})[i.id])||0:0;},true);
+
+  // DJ ticket info at top of NV sheet
+  nvWs["B2"]=tv("Vereinbarte Tickets: "+(s.djOrdered||"—")+"  |  Eingelöst: "+(s.djUsed||"—"),st(false,C.gold,null,"left",null,10));
+
+  // Set !ref dynamically based on actual written cells
+  function setRef(ws){
+    const cells=Object.keys(ws).filter(k=>!k.startsWith("!"));
+    if(!cells.length){ws["!ref"]="A1:A1";return;}
+    let maxR=0,maxC=0;
+    cells.forEach(addr=>{
+      const m=addr.match(/([A-Z]+)(\d+)/);
+      if(!m)return;
+      const c=m[1].split("").reduce((n,ch)=>n*26+ch.charCodeAt(0)-64,0);
+      const r=parseInt(m[2]);
+      maxR=Math.max(maxR,r);maxC=Math.max(maxC,c);
+    });
+    const col=n=>{let s="";while(n>0){s=String.fromCharCode(64+n%26||26)+s;n=Math.floor((n-1)/26);}return s;};
+    ws["!ref"]="A1:"+col(maxC)+maxR;
+  }
+  setRef(ovWs);setRef(verbrWs);setRef(persWs);setRef(nvWs);setRef(bruchWs);
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ASSEMBLE WORKBOOK
+  // ══════════════════════════════════════════════════════════════════════════
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ovWs,"Übersicht");
+  XLSX.utils.book_append_sheet(wb,verbrWs,"Verbrauchsliste");
+  XLSX.utils.book_append_sheet(wb,persWs,"Personal Getränke");
+  XLSX.utils.book_append_sheet(wb,nvWs,"Nachverbrauch DJ-Tickets");
+  XLSX.utils.book_append_sheet(wb,bruchWs,"Bruch");
+
+  const fn="Abrechnung_"+(s.loc||"Event").replace(/[^a-zA-Z0-9]/g,"_")+"_"+(s.date||"").replace(/-/g,"_")+".xlsx";
+  XLSX.writeFile(wb,fn);
+  toast("Excel downloaded ✓");
+}
+window.downloadExcel=downloadExcel;
+$("#dlXlsx")&&($("#dlXlsx").onclick=()=>requirePin("download Excel",downloadExcel,"Download"));
+
+
+
 async function copyStr(text,btn,msg){try{await navigator.clipboard.writeText(text);}catch(e){const ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(_){}ta.remove();}if(btn){btn.classList.add("copied");setTimeout(()=>btn.classList.remove("copied"),1400);}toast(msg);}
-$("#dlPdf").onclick=downloadPDF;
 $("#dlCsv").onclick=downloadCSV;
 $("#copyText").onclick=e=>copyStr(summaryText(),e.currentTarget,"Summary copied");
 $("#copyJson").onclick=e=>copyStr(summaryJson(),e.currentTarget,"JSON copied");
@@ -1138,7 +1451,7 @@ function renderBar(){
   if(screen==="sessions"){inner.innerHTML=`<button class="cta" id="newSessBtn"><span>+</span> New Session</button>`;$("#newSessBtn").onclick=()=>{currentId=null;editMode=false;go("setup");};}
   else if(screen==="setup"){const ready=!!(sess().loc);inner.innerHTML=`<button class="cta ghost" id="backSetupBtn">←</button><button class="cta" id="startSessBtn" ${ready?"":"disabled"}>${editMode?"Save Changes →":"Start →"}</button>`;$("#backSetupBtn").onclick=()=>{if(editMode){editMode=false;go("sessions");}else{if(currentId&&!revQty()&&!persQty()){sessions=sessions.filter(s=>s.id!==currentId);currentId=null;saveAll();}go("sessions");}};
   $("#startSessBtn").onclick=()=>{if(!sess().loc)return;const s=sess();s.date=$("#fDate").value;s.event=$("#fEvent").value.trim();touchSess();if(editMode){editMode=false;go("sessions");}else{activeSheet="verbrauch";go("sheets");}};}
-  else if(screen==="sheets"){const _t=$("#tabs");if(_t&&_t.children.length<3)renderTabs();inner.innerHTML=`<button class="cta ghost" id="toSessions">←</button><div class="total-pill"><span class="pl">Verbrauch · ${revQty()}</span><span class="pv num">${eur(revTotal())}</span></div><button class="cta" id="goSum">Close Out →</button>`;$("#toSessions").onclick=()=>go("sessions");$("#goSum").onclick=()=>go("summary");}
+  else if(screen==="sheets"){const _t=$("#tabs");if(_t&&_t.children.length<3)renderTabs();inner.innerHTML=`<button class="cta ghost" id="toSessions">←</button><div class="total-pill"><span class="pl">Revenue · ${revQty()}</span><span class="pv num">${eur(revTotal())}</span></div><button class="cta" id="goSum">Close Out →</button>`;$("#toSessions").onclick=()=>go("sessions");$("#goSum").onclick=()=>go("summary");}
   else{inner.innerHTML=`<button class="cta ghost" id="toSheets">←</button><button class="cta" id="backSess2">All Sessions</button>`;$("#toSheets").onclick=()=>go("sheets");$("#backSess2").onclick=()=>go("sessions");}
 }
 
@@ -1179,5 +1492,8 @@ go("sessions");
 })();
 
 </script>
+
+  </div>
+</div>
 </body>
 </html>
