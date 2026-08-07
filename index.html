@@ -226,7 +226,8 @@ input,select,textarea{font-family:inherit;font-size:16px}
   <div class="brand"><div class="k">Spreedampfer Events</div><div class="s" id="brandSub">Sessions</div></div>
   <div class="spacer"></div>
   <button class="icon-btn hidden" id="shareBtn" aria-label="Hand Off"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
-  <button class="icon-btn" id="syncBtn" aria-label="Cloud Sync" title="Cloud Sync"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></button>
+  <button class="cta ghost" id="reportBtn" style="height:40px;padding:0 14px;font-size:13px;font-weight:600;border-radius:11px;margin-right:6px">Report</button>
+    <button class="icon-btn" id="syncBtn" aria-label="Cloud Sync" title="Cloud Sync"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></button>
   <button class="icon-btn" id="themeBtn" aria-label="Theme"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
 </div>
 <div class="app">
@@ -234,7 +235,7 @@ input,select,textarea{font-family:inherit;font-size:16px}
     <h2 class="hero">Active<br>Sessions <span class="accent">·</span></h2>
     <div class="ftabs" id="filterTabs"></div>
     <div id="sessCards"></div>
-  </section>
+</section>
   <section id="scrSetup" class="setup hidden">
     <h2 class="hero" id="setupHero">New<br>Session <span class="accent">·</span></h2>
     <p class="label">Location</p>
@@ -252,14 +253,20 @@ input,select,textarea{font-family:inherit;font-size:16px}
     <div class="tabs" id="tabs"></div>
     <div id="paneVerbrauch">
       <div class="search"><span class="si">⌕</span><input type="text" id="searchV" placeholder="Search drink or bottle…" autocomplete="off"/><button class="clr hidden" id="clrV">✕</button></div>
+      <div id="djModeBar" style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
+        <button id="btnModeEvent" onclick="setDJMode(false)" style="flex:1;height:36px;border-radius:10px;font-size:13px;font-weight:600;border:2px solid var(--accent);background:var(--accent);color:var(--accent-txt)">Event</button>
+        <button id="btnModeDJ" onclick="setDJMode(true)" style="flex:1;height:36px;border-radius:10px;font-size:13px;font-weight:600;border:2px solid var(--line2);background:transparent;color:var(--muted)">DJ Tickets</button>
+        <span id="djModeQty" style="font-size:12px;color:var(--muted);white-space:nowrap"></span>
+      </div>
       <!-- DJ Tickets quick panel -->
-      <div id="djPanel" style="background:var(--card2);border-radius:13px;padding:12px 14px;margin-bottom:10px">
+      <div id="locRulesBanner" style="display:none;background:var(--card2);border-radius:10px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--muted);font-weight:500"></div>
+      <div id="djPanel" style="background:var(--card2);border-radius:13px;padding:12px 14px;margin-bottom:10px;display:none">
         <p class="label" style="margin-bottom:8px">DJ Tickets</p>
         <div style="display:flex;gap:10px;align-items:center">
-          <div style="flex:1"><p style="font-size:11px;color:var(--muted);margin-bottom:4px">Ordered</p>
-            <input type="number" id="djOrdered" inputmode="numeric" placeholder="—" min="0" style="width:100%;border-radius:9px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:8px;font-size:16px;font-weight:600;outline:none;text-align:center"/></div>
+          <div style="flex:1"><p style="font-size:11px;color:var(--muted);margin-bottom:4px">Given out</p>
+            <input type="text" inputmode="decimal" id="djOrdered" placeholder="—" min="0" style="width:100%;border-radius:9px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:8px;font-size:16px;font-weight:600;outline:none;text-align:center"/></div>
           <div style="flex:1"><p style="font-size:11px;color:var(--muted);margin-bottom:4px">Redeemed</p>
-            <input type="number" id="djUsed" inputmode="numeric" placeholder="—" min="0" style="width:100%;border-radius:9px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:8px;font-size:16px;font-weight:600;outline:none;text-align:center"/></div>
+            <input type="text" inputmode="decimal" id="djUsed" placeholder="—" min="0" style="width:100%;border-radius:9px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:8px;font-size:16px;font-weight:600;outline:none;text-align:center"/></div>
         </div>
       </div>
       <div id="vResults" class="results"></div>
@@ -319,6 +326,7 @@ input,select,textarea{font-family:inherit;font-size:16px}
             <p class="label">Booked on top</p>
             <div class="tip-row">
               <button class="tip-opt" id="ao-spritz" onclick="toggleAddon('spritz')">+ Aperol / Campari Spritz</button>
+              <button class="tip-opt" id="ao-cremant" onclick="toggleAddon('cremant')">+ Crémant</button>
             </div>
           </div>
           <div id="advancedAddonsWrap" class="hidden">
@@ -335,7 +343,7 @@ input,select,textarea{font-family:inherit;font-size:16px}
           </div>
           <p class="label" style="margin-top:10px">Budget Limit <span style="font-size:10px;font-weight:400;color:var(--faint)">(optional)</span></p>
           <p style="font-size:12px;color:var(--faint);margin-bottom:8px">Organizer covers up to this amount — guests pay above it directly.</p>
-          <div class="cur-input"><input type="number" id="abrPauschaleFee" inputmode="decimal" placeholder="e.g. 1500" step="1" min="0"/><span class="cur-lbl">€</span></div>
+          <div class="cur-input"><input type="text" inputmode="decimal" id="abrPauschaleFee" inputmode="decimal" placeholder="e.g. 1500" step="1" min="0"/><span class="cur-lbl">€</span></div>
           <div class="tip-row" style="margin-top:8px">
             <button class="tip-opt" id="pft-netto" onclick="selectPFT('netto')">Netto (excl. VAT)</button>
             <button class="tip-opt" id="pft-brutto" onclick="selectPFT('brutto')">Brutto (incl. VAT)</button>
@@ -346,13 +354,13 @@ input,select,textarea{font-family:inherit;font-size:16px}
         <div id="incomeWrap" class="hidden">
           <p class="label">Income</p>
           <div class="miniform" style="margin-bottom:14px">
-            <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">Cash</div><div class="cur-input" style="flex:1"><input type="number" id="abrCash" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
-            <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">SumUp</div><div class="cur-input" style="flex:1"><input type="number" id="abrSumup" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
-            <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">Lightspeed</div><div class="cur-input" style="flex:1"><input type="number" id="abrLight" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
+            <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">Cash</div><div class="cur-input" style="flex:1"><input type="text" inputmode="decimal" id="abrCash" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
+            <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">SumUp</div><div class="cur-input" style="flex:1"><input type="text" inputmode="decimal" id="abrSumup" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
+            <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">Lightspeed</div><div class="cur-input" style="flex:1"><input type="text" inputmode="decimal" id="abrLight" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
           </div>
           <p class="label">Tips</p>
           <div class="miniform" style="margin-bottom:14px">
-            <div class="mf-row" style="align-items:center;margin-bottom:12px"><div class="cur-lbl" style="flex:0 0 90px">Amount</div><div class="cur-input" style="flex:1"><input type="number" id="abrTip" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
+            <div class="mf-row" style="align-items:center;margin-bottom:12px"><div class="cur-lbl" style="flex:0 0 90px">Amount</div><div class="cur-input" style="flex:1"><input type="text" inputmode="decimal" id="abrTip" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
             <div class="tip-row">
               <button class="tip-opt" id="tip-cash" onclick="selectTip('cash')">✓ Deducted from cash</button>
               <button class="tip-opt" id="tip-payout" onclick="selectTip('payout')">→ Needs to be paid out</button>
@@ -366,6 +374,7 @@ input,select,textarea{font-family:inherit;font-size:16px}
             <div class="cur-input" style="flex:1"><input type="number" id="abrGuests" inputmode="numeric" placeholder="e.g. 200" min="0" style="border:none;background:transparent;width:100%;font-size:18px;font-weight:600;color:var(--txt);outline:none"/></div>
           </div>
         </div>
+        <div id="abrSummary" style="margin-bottom:14px"></div>
         <p class="label">Notes</p>
         <div class="miniform" style="margin-bottom:14px"><textarea id="abrNote" placeholder="Additional notes…" style="width:100%;min-height:64px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:9px 12px;outline:none;resize:none;font-size:15px;line-height:1.4"></textarea></div>
       </div>
@@ -453,34 +462,54 @@ input,select,textarea{font-family:inherit;font-size:16px}
 <div class="toast" id="toast"></div>
 <div class="pin-modal-bg hidden" id="pinModal">
   <div class="pin-modal">
-    <div style="margin-bottom:8px;color:var(--txt)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-    <h3>Admin PIN</h3>
-    <p class="psub" id="pinSub">Enter PIN to continue.</p>
-    <input class="pin-input" id="pinInput" type="password" inputmode="numeric" maxlength="8" placeholder="••••" autocomplete="off"/>
-    <div class="mrow">
-      <button id="pinCancel">Cancel</button>
-      <button class="primary" id="pinConfirm">Confirm</button>
+    <div style="margin-bottom:8px">
+      <h3>Admin PIN</h3>
+      <p class="psub" id="pinSub">Enter PIN to continue.</p>
+    </div>
+    <input type="password" id="pinInput" inputmode="numeric" maxlength="8" placeholder="PIN" autocomplete="off"/>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="cta ghost" id="pinCancel" style="flex:1">Cancel</button>
+      <button class="cta" id="pinConfirm" style="flex:2">Confirm</button>
     </div>
   </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" onerror="window.QRCode=null"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js" onerror="window.XLSX=null"></script>
 <script>
 (function(){
 "use strict";
+const FB_NS="sp_v2_k7x9m3q2";
+// Location-based rules: preferred item sizes per venue
+const LOCATION_RULES={
+  "MS Rhein":    [{n:"Club Mate",s:"0,33 l",note:"Club Mate 0,33 l at this venue"}],
+  "Bootshaus":   [{n:"Club Mate",s:"0,33 l",note:"Club Mate 0,33 l at this venue"}],
+  "Sir Peter":   [{n:"Club Mate",s:"0,33 l",note:"Club Mate 0,33 l at this venue"}],
+};
+function getLocRules(){return LOCATION_RULES[sess().loc||""]||[];}
+function getPreferredItem(n){
+  const rule=getLocRules().find(r=>r.n===n);
+  return rule?rule:null;
+}
+function parseNum(v){return parseFloat(String(v||"").replace(",","."))||0;}
 const LOCATIONS=["MS Rhein","Sir Peter","Bootshaus","Hoppetosse","Anhalt","Rosengarten","Haus der Visionäre","Sonnenraum"];
 const MENU=[
-  {c:"Non-Alcoholic",items:[["Water","0,50 l",3.00],["Coca Cola / Zero","0,33 l",3.50],["Saftschorle","0,20 l",3.50],["Juice","0,20 l",3.50],["Soft (Tonic, Ginger Beer etc.)","0,20 l",3.00],["Club Mate","0,50 l",3.50],["Voelkel / BioZisch","0,50 l",3.50],["LemonAid / ChariTea","0,33 l",3.50],["Makava","0,33 l",4.00],["Red Bull","0,20 l",4.00]]},
+  {c:"Non-Alcoholic",items:[["Water","0,50 l",3.00],["Coca Cola / Zero","0,33 l",3.50],["Saftschorle","0,20 l",3.50],["Juice","0,20 l",3.50],["Soft (Tonic, Ginger Beer etc.)","0,20 l",3.00],["Club Mate","0,50 l",4.00],["Club Mate","0,33 l",3.50],["Voelkel / BioZisch","0,50 l",3.50],["LemonAid / ChariTea","0,33 l",3.50],["Makava","0,33 l",4.00],["Red Bull","0,20 l",4.00]]},
   {c:"Beer",items:[["Berliner Pilsner","0,33 l",3.50],["Augustiner Helles","0,5 l",4.50],["Augustiner Helles","0,33 l",3.50],["Berliner Radler","0,33 l",3.50],["Clausthaler (N/A)","0,33 l",3.50]]},
-  {c:"Wine & Sparkling (Glass)",items:[["White Wine","0,20 l",6.00],["White Wine Spritz","0,20 l",5.00],["Red Wine","0,20 l",7.00],["Rosé","0,20 l",7.00],["Prosecco","0,10 l",3.50],["Prosecco on Ice","0,30 l",7.00],["Crémant","0,10 l",7.00]]},
-  {c:"Bottles",items:[["Fl. White Wine (Weißburg.)","1 l",23.00],["Fl. Red Wine (Pinot Noir)","0,75 l",23.00],["Fl. Rosé (Lieubeau)","0,75 l",23.00],["Fl. Prosecco (Casa Gheller)","0,75 l",21.00],["Fl. Crémant (Les Graimen.)","0,75 l",49.00]]},
+  {c:"Wine & Sparkling (Glass)",items:[["Weißburgunder, Trautwein","0,20 l",6.00],["Weinschorle","0,20 l",5.00],["Pinot Noir, Trautwein","0,20 l",7.00],["Lieubeau Rosé, Lieubeau","0,20 l",7.00],["Prosecco Casa Gheller","0,10 l",3.50],["Prosecco auf Eis","0,30 l",7.00],["Crémant","0,10 l",7.00]]},
+  {c:"Bottles",items:[["Fl. Weißburgunder, Trautwein","1 l",23.00],["Fl. Pinot Noir, Trautwein","0,75 l",23.00],["Fl. Lieubeau Rosé","0,75 l",23.00],["Fl. Prosecco Casa Gheller","0,75 l",21.00],["Fl. Crémant de Limoux","0,75 l",49.00],
+    ["Fl. Nero D'Avola, Vitese","0,75 l",24.00],
+    ["Fl. Bronzinelle, Chateau Saint Martin","0,75 l",32.00],
+    ["Fl. Riesling, Martin Korrell","1,00 l",27.50],
+    ["Fl. Grüner Veltliner, Allram","0,75 l",36.00],
+    ["Fl. Vinho Verde, Obra Prima","0,75 l",30.00],
+    ["Fl. Spätburgunder Rosé, Barth","0,75 l",29.00]]},
   {c:"Coffee & Tea",items:[["Pot of Coffee","2 l",12.00],["Espresso","",2.50],["Tea","",2.00]]},
   {c:"Long Drinks",items:[["LD Aperol","0,30 l",8.00],["LD Campari","0,30 l",8.00],["LD Vermouth","0,30 l",8.00],["LD Vodka","0,30 l",9.00],["LD Gin","0,30 l",9.00],["LD Whisky","0,30 l",9.00],["LD Rum","0,30 l",9.00],["LD Tequila","0,30 l",9.50],["LD Mate / Makava","0,50 l",9.50],["LD Red Bull","0,30 l",10.00],["LD Mezcal","0,30 l",12.00]]},
   {c:"Shots",items:[["Shots (Berliner Luft)","2 cl",2.50],["Shots (other)","2 cl",3.00],["Shots (Tequila, Whisky)","2 cl",3.50],["Shots (Mezcal)","2 cl",5.00]]},
   {c:"Spirits (Bottles)",items:[
     ["Smirnoff Vodka","1 l",150],["Smirnoff Vodka","0,7 l",105],["Ketel One","0,7 l",105],
     ["Jägermeister","1 l",150],["Berliner Luft","1 l",125],["Sambuca Molinari","1 l",150],
-    ["Ingwerschnaps","1 l",150],["Tanqueray Gin","1 l",150],["Casamigos Tequila","0,7 l",122.50],
+    ["INGAVA","1 l",150],["Tanqueray Gin","1 l",150],["Casamigos Tequila","0,7 l",122.50],
     ["Casamigos Mezcal","0,7 l",175],["Pampero Rum","1 l",150],["Captain Morgan","1 l",150],
     ["Jameson","0,7 l",122.50],["Bulleit","0,7 l",122.50],["Aperol","1 l",125],["Campari","1 l",125],
     ["Belsazar Rosé","0,75 l",92.50],["Watermelon Liqueur","0,7 l",0],
@@ -489,7 +518,7 @@ const MENU=[
   {c:"Shots (Spirits)",items:[
     ["Smirnoff Vodka Shot","2 cl",3.00],["Ketel One Shot","2 cl",3.00],
     ["Jägermeister Shot","2 cl",3.00],["Berliner Luft Shot","2 cl",2.50],
-    ["Sambuca Shot","2 cl",3.00],["Ingwerschnaps Shot","2 cl",3.00],
+    ["Sambuca Shot","2 cl",3.00],["INGAVA Shot","2 cl",3.00],
     ["Tanqueray Gin Shot","2 cl",3.00],["Casamigos Tequila Shot","2 cl",3.50],
     ["Casamigos Mezcal Shot","2 cl",5.00],["Pampero Rum Shot","2 cl",3.00],
     ["Captain Morgan Shot","2 cl",3.00],["Jameson Shot","2 cl",3.50],
@@ -498,9 +527,9 @@ const MENU=[
   ]},
   {c:"Wines & Juices",items:[
     ["Weisswein Silvaner","1 l",0],["Prosecco Casa Gheller","0,7 l",0],["Rotwein Migliarina","0,7 l",0],
-    ["Apfel Saft","1 l",0],["Maracuja Saft","1 l",0],["Mango Saft","1 l",0],
-    ["Orange Saft","1 l",0],["Cranberry Saft","1 l",0],["Ananas Saft","1 l",0],
-    ["Zitronen Saft","1 l",0],["Pulco","0,7 l",0],
+    ["Apfel Saft","1 l",17.50],["Maracuja Saft","1 l",17.50],["Mango Saft","1 l",17.50],
+    ["Orange Saft","1 l",17.50],["Cranberry Saft","1 l",17.50],["Ananas Saft","1 l",17.50],
+    ["Zitronen Saft","1 l",17.50],["Pulco","0,7 l",0],
     ["Brandenburger Quell","0,75 l",0],["Coca Cola","1 l",0],
     ["Thomas Henry Pink Grapefruit","1 l",0],["Bitter Lemon","1 l",0],["Ginger Beer","1 l",0],
   ]}
@@ -524,11 +553,11 @@ const EK={
   "LemonAid / ChariTea":1.14,"Makava":1.04,"Red Bull":0.88,
   "Berliner Pilsner":0.55,"Augustiner Helles":0.82,"Berliner Radler":0.60,
   "Clausthaler (N/A)":0.79,
-  "White Wine":0.96,"White Wine Spritz":0.54,"Red Wine":1.11,"Rosé":1.65,
+  "Weißburgunder, Trautwein":0.96,"White Wine":0.96,"White Wine Spritz":0.54,"Pinot Noir, Trautwein":1.11,"Red Wine":1.11,"Rosé":1.65,
   "Prosecco":0.56,"Prosecco on Ice":1.11,"Crémant":1.11,
-  "Fl. White Wine (Weißburg.)":4.80,"Fl. Red Wine (Pinot Noir)":3.90,
-  "Fl. Rosé (Lieubeau)":5.78,"Fl. Prosecco (Casa Gheller)":4.17,
-  "Fl. Crémant (Les Graimen.)":9.70,
+  "Fl. Weißburgunder, Trautwein":4.80,"Fl. Pinot Noir, Trautwein":3.90,
+  "Fl. Lieubeau Rosé":5.78,"Fl. Prosecco Casa Gheller":4.17,
+  "Fl. Crémant de Limoux":9.70,"Fl. Nero D'Avola, Vitese":null,"Fl. Bronzinelle, Chateau Saint Martin":null,"Fl. Riesling, Martin Korrell":null,"Fl. Grüner Veltliner, Allram":null,"Fl. Vinho Verde, Obra Prima":null,"Fl. Spätburgunder Rosé, Barth":null,
   "Pot of Coffee":2.50,"Espresso":0,"Tea":0,
   "LD Aperol":1.15,"LD Campari":1.25,"LD Vermouth":1.32,
   "LD Vodka":0.74,"LD Gin":1.00,"LD Whisky":1.18,"LD Rum":0.80,
@@ -555,7 +584,7 @@ const DE_ALIAS={
 
 const SESS_KEY="vbl.sess.v2",FB_KEY="vbl.firebase",THEME_KEY="vbl.theme";
 let sessions=[],currentId=null,screen="sessions",activeSheet="verbrauch";
-let beid=0,cid=0,bDrinkSelected="",sessFilter="month",editMode=false,pendingPinAction=null;
+let beid=0,cid=0,bDrinkSelected="",sessFilter="month",editMode=false,pendingPinAction=null,djMode=false;
 let fbUrl="",syncTimer=null,sseSource=null,syncDebounce=null;
 const PIN_KEY="vbl.pin";
 function getPin(){try{return localStorage.getItem(PIN_KEY)||"1111";}catch(e){return"1111";}}
@@ -573,6 +602,7 @@ function requirePin(label,cb){
 function normalizeSess(s){
   if(!s)return s;
   if(!s.counts||typeof s.counts!=="object"||Array.isArray(s.counts))s.counts={};
+  if(!s.djCounts||typeof s.djCounts!=="object")s.djCounts={};
   if(!Array.isArray(s.custom))s.custom=[];
   if(!s.personal||typeof s.personal!=="object")s.personal={};
   if(!Array.isArray(s.bruch))s.bruch=[];
@@ -661,11 +691,11 @@ function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");cl
 function loadFBConfig(){try{fbUrl=localStorage.getItem(FB_KEY)||"https://spreedampfer-events-default-rtdb.europe-west1.firebasedatabase.app";}catch(e){fbUrl="https://spreedampfer-events-default-rtdb.europe-west1.firebasedatabase.app";}}
 function saveFBConfig(url){fbUrl=(url||"").trim().replace(/\/+$/,"");try{if(fbUrl)localStorage.setItem(FB_KEY,fbUrl);else localStorage.removeItem(FB_KEY);}catch(e){}}
 function setSyncDot(st){const d=$("#syncDot");if(!d)return;d.className="sync-dot"+(st==="on"?" on":st==="busy"?" busy":st==="err"?" err":"");const msgs={on:"Synced",busy:"Syncing…",err:"Sync error","":"Not connected"};const el=$("#syncStatusMsg");if(el)el.textContent=msgs[st]||"";}
-async function pushSession(s){if(!fbUrl||!s||!s.id)return;await fetch(`${fbUrl}/sessions/${s.id}.json`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)});}
-async function deleteSessionRemote(id){if(!fbUrl||!id)return;try{await fetch(`${fbUrl}/sessions/${id}.json`,{method:"DELETE"});}catch(e){}}
-async function syncDown(){if(!fbUrl)return;setSyncDot("busy");try{const r=await fetch(`${fbUrl}/sessions.json`);if(!r.ok)throw new Error(r.status);const data=await r.json();let changed=false;if(data&&typeof data==="object"&&!Array.isArray(data)){const remote=Object.values(data).filter(x=>x&&x.id);const remoteIds=new Set(remote.map(r=>r.id));remote.forEach(rs=>{normalizeSess(rs);const idx=sessions.findIndex(s=>s.id===rs.id);if(idx<0){sessions.push(rs);changed=true;}else if((rs.updatedAt||"")>(sessions[idx].updatedAt||"")){sessions[idx]=Object.assign({},sessions[idx],rs);changed=true;}});for(const s of sessions){if(!remoteIds.has(s.id)){try{await pushSession(s);}catch(e){}}};}else if(!data){for(const s of sessions){try{await pushSession(s);}catch(e){}}}if(changed){beid=sessions.reduce((m,s)=>(s.bruch||[]).reduce((n,e)=>Math.max(n,e.id||0),m),0);cid=sessions.reduce((m,s)=>(s.custom||[]).reduce((n,c)=>Math.max(n,parseInt((c.id||"c0").slice(1),10)||0),m),0);saveAll();if(screen==="sessions")renderSessionsList();else if(screen==="sheets"&&currentId)switchPane();}setSyncDot("on");}catch(e){console.warn("Sync:",e);setSyncDot("err");}}
+async function pushSession(s){if(!fbUrl||!s||!s.id)return;await fetch(`${fbUrl}/${FB_NS}/sessions/${s.id}.json`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)});}
+async function deleteSessionRemote(id){if(!fbUrl||!id)return;try{await fetch(`${fbUrl}/${FB_NS}/sessions/${id}.json`,{method:"DELETE"});}catch(e){}}
+async function syncDown(){if(!fbUrl)return;setSyncDot("busy");try{const r=await fetch(`${fbUrl}/${FB_NS}/sessions.json`);if(!r.ok)throw new Error(r.status);const data=await r.json();let changed=false;if(data&&typeof data==="object"&&!Array.isArray(data)){const remote=Object.values(data).filter(x=>x&&x.id);const remoteIds=new Set(remote.map(r=>r.id));remote.forEach(rs=>{normalizeSess(rs);const idx=sessions.findIndex(s=>s.id===rs.id);if(idx<0){sessions.push(rs);changed=true;}else if((rs.updatedAt||"")>(sessions[idx].updatedAt||"")){sessions[idx]=Object.assign({},sessions[idx],rs);changed=true;}});for(const s of sessions){if(!remoteIds.has(s.id)){try{await pushSession(s);}catch(e){}}};}else if(!data){for(const s of sessions){try{await pushSession(s);}catch(e){}}}if(changed){beid=sessions.reduce((m,s)=>(s.bruch||[]).reduce((n,e)=>Math.max(n,e.id||0),m),0);cid=sessions.reduce((m,s)=>(s.custom||[]).reduce((n,c)=>Math.max(n,parseInt((c.id||"c0").slice(1),10)||0),m),0);saveAll();if(screen==="sessions")renderSessionsList();else if(screen==="sheets"&&currentId)switchPane();}setSyncDot("on");}catch(e){/* sync suppressed */setSyncDot("err");}}
 function debouncedSync(){if(!fbUrl)return;clearTimeout(syncDebounce);syncDebounce=setTimeout(async()=>{const s=sess();if(!s.id)return;setSyncDot("busy");try{await pushSession(s);setSyncDot("on");}catch(e){setSyncDot("err");}},1500);}
-function startSync(){if(!fbUrl)return;if(syncTimer)clearInterval(syncTimer);syncTimer=setInterval(syncDown,30000);if(sseSource)try{sseSource.close();}catch(e){}try{sseSource=new EventSource(`${fbUrl}/sessions.json?sse=true`);sseSource.addEventListener("put",syncDown);sseSource.addEventListener("patch",syncDown);sseSource.onerror=()=>setSyncDot("err");}catch(e){}syncDown();}
+function startSync(){if(!fbUrl)return;if(syncTimer)clearInterval(syncTimer);syncTimer=setInterval(syncDown,30000);if(sseSource)try{sseSource.close();}catch(e){}try{sseSource=new EventSource(`${fbUrl}/${FB_NS}/sessions.json?sse=true`);sseSource.addEventListener("put",syncDown);sseSource.addEventListener("patch",syncDown);sseSource.onerror=()=>setSyncDot("err");}catch(e){}syncDown();}
 function stopSync(){if(syncTimer){clearInterval(syncTimer);syncTimer=null;}if(sseSource){try{sseSource.close();}catch(e){}sseSource=null;}setSyncDot("");}
 
 /* PERIOD FILTER */
@@ -797,11 +827,50 @@ function defaultMode(id){
 }
 function bumpV(id,d){const s=sess();let v=Math.max(0,Math.min(9999,Math.round((s.counts[id]||0)+d)));if(v===0){delete s.counts[id];delete s.countMode[id];}else{s.counts[id]=v;if(!s.countMode[id])s.countMode[id]=defaultMode(id);}touchSess();}
 function setV(id,val){const s=sess();let v=Math.max(0,Math.min(9999,Math.round(val||0)));if(v===0){delete s.counts[id];delete s.countMode[id];}else{s.counts[id]=v;if(!s.countMode[id])s.countMode[id]=defaultMode(id);}touchSess();}
+// German↔English search synonyms
+const SYNONYMS={
+  "wasser":"water","cola":"coca","mate":"club mate","bier":"pilsner",
+  "radler":"radler","pils":"pilsner","helles":"augustiner",
+  "wein":"wine","rotwein":"red wine","weißwein":"white wine","rose":"ros",
+  "sekt":"prosecco","cremant":"cremant","saftschorle":"schorle",
+  "saft":"juice","apfelsaft":"juice","orangensaft":"juice",
+  "kaffee":"coffee","tee":"tea","espresso":"espresso",
+  "schnaps":"shots","shot":"shots","longdrink":"ld",
+  "wodka":"vodka","gin":"gin","rum":"rum","whiskey":"whisky",
+  "tequila":"tequila","mezcal":"mezcal","aperol":"aperol",
+  "campari":"campari","vermouth":"vermouth","ingwer":"ingava",
+  "ingwerschnaps":"ingava","flasche":"fl.","fl ":"fl.",
+  "beerdigungsbier":"clausthaler","alkoholfrei":"clausthaler",
+  "sprudel":"wasser","mineralwasser":"wasser","limo":"soft",
+  "tonic":"soft","ginger":"soft","redbull":"red bull",
+  "biozisch":"biozisc","lemondaid":"lemon","chary":"chariy",
+  "makava":"makava","prosecco":"prosecco","crémant":"cremant"
+};
+function expandSearch(q){
+  const lo=q.toLowerCase();
+  const terms=[lo];
+  Object.entries(SYNONYMS).forEach(([de,en])=>{
+    if(lo.includes(de))terms.push(en);
+    if(lo.includes(en))terms.push(de);
+  });
+  return terms;
+}
 function renderResults(){
   const q=$("#searchV").value.trim();$("#clrV").classList.toggle("hidden",!q);
   const box=$("#vResults");if(!q){box.innerHTML="";return;}
-  const ql=q.toLowerCase();
-  const matches=poolV().filter(i=>i.n.toLowerCase().includes(ql)||(i.de||"").includes(ql)).slice(0,14);
+  const searchTerms=expandSearch(q);
+  const rules2=getLocRules();
+  let matches=poolV().filter(i=>{
+    const name=(i.n+" "+(i.s||"")).toLowerCase();
+    return searchTerms.some(t=>name.includes(t.toLowerCase()));
+  });
+  // Sort location-preferred items to top
+  matches.sort((a,b)=>{
+    const aPin=rules2.some(r=>r.n===a.n&&r.s===a.s)?-1:0;
+    const bPin=rules2.some(r=>r.n===b.n&&r.s===b.s)?-1:0;
+    return aPin-bPin;
+  });
+  matches=matches.slice(0,18);
   let html="";
   matches.forEach(i=>{const qty=sess().counts[i.id]||0;const szp=i.s?`<span class="szpill">${i.s}</span>`:"";const qtyCtrl=qty>0?`<div class="stepper" style="flex:0 0 auto"><button class="minus" data-sub="${i.id}">−</button><input class="num" inputmode="numeric" data-qty="${i.id}" value="${qty}" style="width:38px"/><button class="plus" data-plus="${i.id}">+</button></div>`:`<button class="padd" data-add="${i.id}" aria-label="add">+</button>`;html+=`<div class="res-row" data-add="${i.id}"><div class="body"><div class="nm">${esc(i.n)}${szp}</div><div class="sub num">${eur(i.p)}${i.custom?" · custom":""}</div></div>${qtyCtrl}</div>`;});
   const exact=poolV().some(i=>i.n.toLowerCase()===ql);
@@ -810,13 +879,26 @@ function renderResults(){
   const trg=$("#anTrigger");if(trg)trg.onclick=()=>{$("#anName").value=q;$("#anSize").value="";$("#anPrice").value="";$("#anForm").classList.remove("hidden");$("#anPrice").focus();};
 }
 function renderOrder(){
-  const s=sess();const groups=MENU.map(c=>({c:c.c,items:c.items}));
-  if((s.custom||[]).length)groups.push({c:"Manuell hinzugefügt",items:s.custom,cust:true});
+  const s=sess();const locRules=getLocRules();
+  const activeCounts=djMode?(s.djCounts||{}):(s.counts||{});
+  // groups defined first so location rules can unshift into it
+  const groups=MENU.map(c=>({c:c.c,items:c.items}));
+  // Pinned items for this venue at the top
+  if(locRules.length){
+    const pinnedItems=locRules.map(rule=>{
+      const src=ALLV.find(i=>i.n===rule.n&&i.s===rule.s);
+      return src?{...src,_pinned:true}:null;
+    }).filter(Boolean);
+    if(pinnedItems.length){
+      groups.unshift({c:"This Venue — preferred",items:pinnedItems,_pinned:true});
+    }
+  }
+  if((s.custom||[]).length)groups.push({c:"⚡ Custom Drinks (added by you)",items:s.custom,cust:true});
   const host=$("#vOrder");host.innerHTML="";let any=false;
   const abT=(s.abrechnung?.types||[]);
   const isCombMode=abT.includes("pauschale")&&(abT.includes("verbrauch")||abT.includes("direct"));
   const cm=s.countMode||{};
-  groups.forEach(cat=>{const items=cat.items.filter(i=>(s.counts[i.id]||0)>0);if(!items.length)return;any=true;const sec=document.createElement("div");sec.className="cat";const cq=items.reduce((t,i)=>t+s.counts[i.id],0),cs=items.reduce((t,i)=>t+s.counts[i.id]*i.p,0);sec.innerHTML=`<div class="cat-h${cat.cust?" cust":""}"><span>${cat.cust?"⚠ ":""}${cat.c}</span><span class="cc num">${cq} · ${eur(cs)}</span></div>`;items.forEach(it=>{const qty=s.counts[it.id];const row=document.createElement("div");row.className="item has";const mode=cm[it.id]||"p";
+  groups.forEach(cat=>{const items=cat.items.filter(i=>(activeCounts[i.id]||0)>0);if(!items.length)return;any=true;const sec=document.createElement("div");sec.className="cat";const cq=items.reduce((t,i)=>t+(activeCounts[i.id]||0),0),cs=items.reduce((t,i)=>t+(activeCounts[i.id]||0)*i.p,0);sec.innerHTML=`<div class="cat-h${cat.cust?" cust":""}"><span>${cat.cust?"⚠ ":""}${cat.c}</span><span class="cc num">${cq} · ${eur(cs)}</span></div>`;items.forEach(it=>{const qty=activeCounts[it.id];const row=document.createElement("div");row.className="item has";const mode=cm[it.id]||"p";
       const badge=isCombMode?`<div class="mode-seg"><button class="seg-p${mode==="p"?" on":""}" data-mode="${it.id}" data-val="p">Flat Rate</button><div class="seg-div"></div><button class="seg-nv${mode==="v"?" on":""}" data-mode="${it.id}" data-val="v">Per Drink</button></div>`:"";
       row.innerHTML=`<div class="body" data-add="${it.id}"><div class="nm">${esc(it.n)}${it.s?`<span class="szpill">${it.s}</span>`:""}${it.custom?'<span class="bdg">custom</span>':""}</div><div class="sub"><span class="num">${eur(it.p)}</span><span class="lt num">${eur(qty*it.p)}</span></div></div>${badge}<div class="stepper"><button class="minus" data-sub="${it.id}">−</button><input class="num" inputmode="numeric" data-qty="${it.id}" value="${qty}"/><button class="plus" data-plus="${it.id}">+</button></div>`;sec.appendChild(row);});host.appendChild(sec);});
   if(!any)host.innerHTML=`<div class="empty">Nothing entered yet.<br>Search for a drink above.</div>`;
@@ -826,11 +908,41 @@ function renderV(){
   const s5=sess();const od=$("#djOrdered"),ud=$("#djUsed");
   if(od&&document.activeElement!==od)od.value=s5.djOrdered||"";
   if(ud&&document.activeElement!==ud)ud.value=s5.djUsed||"";
+  // Location rule banner
+  const rules=getLocRules();
+  const rulesBanner=$("#locRulesBanner");
+  if(rulesBanner){
+    if(rules.length){
+      rulesBanner.textContent=rules.map(r=>r.note).join(" · ");
+      rulesBanner.style.display="block";
+    } else {
+      rulesBanner.style.display="none";
+    }
+  }
+  // Update DJ mode button states
+  {const eb=document.getElementById("btnModeEvent"),db=document.getElementById("btnModeDJ");
+  if(eb&&db){const acc="var(--accent)",accTxt="var(--accent-txt)",line="var(--line2)",mut="var(--muted)";
+    eb.style.background=djMode?"transparent":acc;eb.style.borderColor=djMode?line:acc;eb.style.color=djMode?mut:accTxt;
+    db.style.background=djMode?acc:"transparent";db.style.borderColor=djMode?acc:line;db.style.color=djMode?accTxt:mut;
+  }}
+  // Show/hide DJ panel based on mode
+  const _djp=document.getElementById("djPanel");
+  if(_djp)_djp.style.display=djMode?"block":"none";
+  // Wire DJ fields every render to ensure persistence
+  function _saveDJ(){const s=sess();s.djOrdered=parseNum(od&&od.value)||0;s.djUsed=parseNum(ud&&ud.value)||0;touchSess();}
+  if(od){od.oninput=_saveDJ;od.onchange=_saveDJ;od.onblur=_saveDJ;}
+  if(ud){ud.oninput=_saveDJ;ud.onchange=_saveDJ;ud.onblur=_saveDJ;}
 renderResults();renderWarn();renderOrder();renderTabs();renderBar();}
 $("#searchV").addEventListener("input",renderV);
 $("#clrV").onclick=()=>{$("#searchV").value="";$("#anForm").classList.add("hidden");renderV();};
 $("#anCancel").onclick=()=>$("#anForm").classList.add("hidden");
-$("#anSave").onclick=()=>{const n=$("#anName").value.trim(),s=$("#anSize").value.trim(),p=parsePrice($("#anPrice").value);if(!n){$("#anName").focus();toast("Enter name");return;}if(isNaN(p)||p<0){$("#anPrice").focus();toast("Enter a valid price");return;}const id="c"+(++cid);const se=sess();if(!se.custom)se.custom=[];se.custom.push({id,n,s,p,custom:true});se.counts[id]=1;touchSess();$("#anForm").classList.add("hidden");$("#searchV").value="";renderV();toast(`"${n}" added — check the price!`);};
+$("#anSave").onclick=()=>{const n=$("#anName").value.trim(),s=$("#anSize").value.trim(),p=parsePrice($("#anPrice").value)||0;if(!n){$("#anName").focus();toast("Enter name");return;}const id="c"+(++cid);const se=sess();if(!se.custom)se.custom=[];se.custom.push({id,n,s,p,custom:true});se.counts[id]=1;touchSess();$("#anForm").classList.add("hidden");$("#searchV").value="";renderV();
+      // Scroll order list into view and briefly highlight new item
+      setTimeout(()=>{
+        const newRow=document.querySelector(".cat.cust");
+        if(newRow)newRow.scrollIntoView({behavior:"smooth",block:"start"});
+      },80);
+      toast(`"${n}" added ✓ — scroll down to see it`);};
 $("#vResults").addEventListener("click",e=>{
   const plus=e.target.closest("[data-plus]"),sub=e.target.closest("[data-sub]"),add=e.target.closest("[data-add]");
   if(plus){bumpV(plus.dataset.plus,1);renderResults();return;}
@@ -851,8 +963,11 @@ function pset(id,val){const s=sess();let v=Math.max(0,Math.min(9999,Math.round(v
 function renderPResults(){
   const q=$("#searchP").value.trim();$("#clrP").classList.toggle("hidden",!q);
   const box=$("#pResults");if(!q){box.innerHTML="";return;}
-  const ql=q.toLowerCase();
-  const matches=ALLP.concat(sess().customPersonal||[]).filter(i=>i.n.toLowerCase().includes(ql)||(i.de||"").includes(ql)).slice(0,14);
+  const ql=q.toLowerCase();const pTerms2=expandSearch(q);
+  const matches=ALLP.concat(sess().customPersonal||[]).filter(i=>{
+    const nm=(i.n+" "+(i.s||"")).toLowerCase();
+    return pTerms2.some(t=>nm.includes(t.toLowerCase()));
+  }).slice(0,18);
   const pExact=ALLP.concat(sess().customPersonal||[]).some(i=>i.n.toLowerCase()===ql);
   let pHtml=matches.map(i=>{const qty=(i.isCP?sess().personal[i.id]||0:sess().personal[i.id]||0);return`<div class="res-row" data-padd="${i.id}"><div class="body"><div class="nm">${esc(i.n)}${i.s?`<span class="szpill">${i.s}</span>`:""}</div></div>${qty?`<span class="qb">×${qty}</span>`:""}<button class="padd" data-padd="${i.id}" aria-label="add">+</button></div>`;}).join("");
   if(!pExact)pHtml+=`<button class="addnew-trigger" id="pnTrigger"><span>+</span> Add "${esc(q)}" as a new drink</button>`;
@@ -890,8 +1005,19 @@ $("#pOrder").addEventListener("change",e=>{const inp=e.target.closest("[data-pqt
 function renderBResults(){
   const q=$("#bSearch").value.trim();$("#clrBS").classList.toggle("hidden",!q);
   const box=$("#bResults");if(!q){box.innerHTML="";return;}
-  const ql=q.toLowerCase();
-  const matches=poolV().filter(i=>i.n.toLowerCase().includes(ql)||(i.de||"").includes(ql)).slice(0,14);
+  const searchTerms=expandSearch(q);
+  const rules2=getLocRules();
+  let matches=poolV().filter(i=>{
+    const name=(i.n+" "+(i.s||"")).toLowerCase();
+    return searchTerms.some(t=>name.includes(t.toLowerCase()));
+  });
+  // Sort location-preferred items to top
+  matches.sort((a,b)=>{
+    const aPin=rules2.some(r=>r.n===a.n&&r.s===a.s)?-1:0;
+    const bPin=rules2.some(r=>r.n===b.n&&r.s===b.s)?-1:0;
+    return aPin-bPin;
+  });
+  matches=matches.slice(0,18);
   let html=matches.map(i=>{const qty=sess().bruchCounts[i.id]||0;const szp=i.s?`<span class="szpill">${i.s}</span>`:"";return`<div class="res-row" data-badd="${i.id}"><div class="body"><div class="nm">${esc(i.n)}${szp}</div><div class="sub num">${eur(i.p)}</div></div>${qty?`<span class="qb">×${qty}</span>`:""}<button class="padd" data-badd="${i.id}" aria-label="add">+</button></div>`;}).join("");
   const bExact=poolV().some(i=>i.n.toLowerCase()===ql);
   if(!bExact)html+=`<button class="addnew-trigger" id="bnTrigger"><span>+</span> Add "${esc(q)}" as a new item</button>`;
@@ -925,9 +1051,8 @@ function renderB(){renderBResults();renderBOrder();renderTabs();renderBar();}
 $("#bSearch").addEventListener("input",renderB);
 $("#bnCancel").onclick=()=>$("#bnForm").classList.add("hidden");
 $("#bnSave").onclick=()=>{
-  const n=$("#bnName").value.trim(),s=$("#bnSize").value.trim(),p=parsePrice($("#bnPrice").value);
+  const n=$("#bnName").value.trim(),s=$("#bnSize").value.trim(),p=parsePrice($("#bnPrice").value)||0;
   if(!n){$("#bnName").focus();toast("Enter name");return;}
-  if(isNaN(p)||p<0){$("#bnPrice").focus();toast("Enter a valid price");return;}
   const id="c"+(++cid);const se=sess();if(!se.custom)se.custom=[];
   se.custom.push({id,n,s,p,ek:0,custom:true});
   se.bruchCounts[id]=1;touchSess();
@@ -950,8 +1075,8 @@ $("#bOrder").addEventListener("change",e=>{
 $("#bOrder").addEventListener("focus",e=>{const inp=e.target.closest("[data-bpct]");if(inp)inp.select();},true);
 function renderStunden(){
   const sh=getSH();const host=$("#stundenFields");if(!host)return;
-  host.innerHTML=SH_ROLES.map(r=>{const val=(sh[r.k]!=null&&sh[r.k]!=="")?sh[r.k]:"";return '<div class="abr-row"><span class="al" style="font-weight:500">'+r.label+'</span><div class="cur-input" style="gap:6px"><input type="number" inputmode="decimal" min="0" step="0.25" data-shk="'+r.k+'" value="'+val+'" placeholder="\u2014" style="width:72px;height:38px;border-radius:9px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:0 8px;outline:none;font-family:DM Mono,monospace;font-size:15px;text-align:right"/><span style="font-size:13px;color:var(--faint)">h</span></div></div>';}).join("");
-  host.querySelectorAll("[data-shk]").forEach(inp=>{inp.addEventListener("change",()=>{const sh2=getSH(),v=inp.value.trim();sh2[inp.dataset.shk]=(v===""?null:parseFloat(v)||0);touchSess();renderStundenTotal();renderTabs();});inp.addEventListener("focus",e=>e.target.select());});
+  host.innerHTML=SH_ROLES.map(r=>{const val=(sh[r.k]!=null&&sh[r.k]!=="")?sh[r.k]:"";return '<div class="abr-row"><span class="al" style="font-weight:500">'+r.label+'</span><div class="cur-input" style="gap:6px"><input type="text" inputmode="decimal" data-shk="'+r.k+'" value="'+val+'" placeholder="\u2014" style="width:72px;height:38px;border-radius:9px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:0 8px;outline:none;font-family:DM Mono,monospace;font-size:15px;text-align:right"/><span style="font-size:13px;color:var(--faint)">h</span></div></div>';}).join("");
+  host.querySelectorAll("[data-shk]").forEach(inp=>{inp.addEventListener("change",()=>{const sh2=getSH(),v=inp.value.trim();sh2[inp.dataset.shk]=(v===""?null:parseNum(v)||0);touchSess();renderStundenTotal();renderTabs();});inp.addEventListener("focus",e=>e.target.select());});
   renderStundenTotal();renderTabs();renderBar();
 }
 function renderStundenTotal(){const tot=shTotal(),el=$("#stundenTotal");if(!el)return;el.innerHTML=tot>0?'<span>Total</span><span class="num" style="color:var(--accent)">'+tot+'h</span>':"";}
@@ -978,7 +1103,7 @@ function renderAbrechnung(){
   const bw=$("#basicAddonsWrap");if(bw)bw.classList.toggle("hidden",subType!=="basic");
   const aw=$("#advancedAddonsWrap");if(aw)aw.classList.toggle("hidden",subType!=="advanced");
   // add-on buttons
-  [["ao-spritz","spritz"],["ao-shots","shots"]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.classList.toggle("sel",(a.addons||{})[p[1]]===true);});
+  [["ao-spritz","spritz"],["ao-cremant","cremant"],["ao-shots","shots"]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.classList.toggle("sel",(a.addons||{})[p[1]]===true);});
   [["pft-netto","netto"],["pft-brutto","brutto"]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.classList.toggle("sel",(a.pauschale_fee_type||"netto")===p[1]);});
   [["tip-cash","cash"],["tip-payout","payout"]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.classList.toggle("sel",a.tipSource===p[1]);});
   const pfi=$("#abrPauschaleFee");if(pfi&&document.activeElement!==pfi)pfi.value=a.pauschale_fee||"";
@@ -1055,7 +1180,7 @@ function renderSummary(){
   $("#sumBruchWrap").innerHTML=bruchItems.length?`<p class="sum-sec-h">Breakage · ${eur(bruchTot)}</p><div class="sum-card">`+bruchItems.map(i=>{const bv=parseFloat((s.bruchCounts||{})[i.id])||0;const cost=bv*i.p;const label=bv===Math.round(bv)?bv+"×":bv+" btl";return`<div class="sum-row"><span class="q num d" style="min-width:48px">${label}</span><span class="n">${esc(i.n)}${i.s?`<small>${i.s}</small>`:""}</span><span class="v num">${i.p>0?eur(cost):""}</span></div>`;}).join("")+`<div class="sum-row"><span class="q">∑</span><span class="n" style="font-weight:600">Total Breakage</span><span class="v num" style="color:var(--danger)">${eur(bruchTot)}</span></div></div>`:"";
   const sh=s.stunden&&!Array.isArray(s.stunden)?s.stunden:{};const shEntries=SH_ROLES.filter(r=>(parseFloat(sh[r.k])||0)>0);const shTot=SH_ROLES.reduce((t,r)=>t+(parseFloat(sh[r.k])||0),0);
   $("#sumStundenWrap").innerHTML=shEntries.length?`<p class="sum-sec-h">Hours Sheet · ${shTot}h total</p><div class="sum-card">`+shEntries.map(r=>`<div class="sum-row"><span class="q num" style="color:var(--muted)">${sh[r.k]}h</span><span class="n">${r.label}</span></div>`).join("")+`</div>`:"";
-    const ab=s.abrechnung||{};const abCash=parseFloat(ab.cash)||0,abSumup=parseFloat(ab.sumup)||0,abLight=parseFloat(ab.light)||0,abTip=parseFloat(ab.tip)||0;
+    const ab=s.abrechnung||{};const abCash=parseNum(ab.cash),abSumup=parseNum(ab.sumup),abLight=parseNum(ab.light),abTip=parseNum(ab.tip);
   const abHasData=(ab.types&&ab.types.length)||abCash||abSumup||abLight||abTip||parseFloat(ab.pauschale_fee);
   let abrHtml="";
   if(abHasData){
@@ -1069,7 +1194,7 @@ function renderSummary(){
       }).join(" + ");
       abrHtml+=`<div class="sum-row"><span class="q" style="color:var(--muted)">Type</span><span class="n" style="font-weight:600">${typeLabel}</span></div>`;
       // Add-ons
-      const addonLabels=Object.entries(ab.addons||{}).filter(([k,v])=>v).map(([k])=>k==="spritz"?"Aperol / Campari Spritz":"Free Shots").join(", ");
+      const addonLabels=Object.entries(ab.addons||{}).filter(([k,v])=>v).map(([k])=>k==="spritz"?"Aperol / Campari Spritz":k==="cremant"?"Crémant":"Free Shots").join(", ");
       if(addonLabels)abrHtml+=`<div class="sum-row"><span class="q"></span><span class="n" style="color:var(--accent)">+ ${addonLabels}</span></div>`;
     }
     // Budget limit (By Consumption)
@@ -1140,11 +1265,11 @@ function downloadExcel(){
     if(t==="pauschale")return ab.pauschalenType==="basic"?"Open Bar Basic":ab.pauschalenType==="advanced"?"Open Bar Advanced":"Flat Rate";
     return t==="verbrauch"?"Nach Verbrauch":"Direct Payment";
   });
-  const addonLabels=Object.entries(ab.addons||{}).filter(([k,v])=>v).map(([k])=>k==="spritz"?"Aperol/Campari Spritz":"Free Shots");
+  const addonLabels=Object.entries(ab.addons||{}).filter(([k,v])=>v).map(([k])=>k==="spritz"?"Aperol/Campari Spritz":k==="cremant"?"Crémant":"Free Shots");
   const payLabel=[...payTypes,...addonLabels].join(" + ")||"—";
 
   const cash=ef(ab.cash),sumup=ef(ab.sumup),light=ef(ab.light),tip=ef(ab.tip);
-  const rechnung=parseFloat(ab.pauschale_fee)||0;
+  const rechnung=parseNum(ab.pauschale_fee);
   const allItems=ALLV.concat(s.custom||[]);
   const persItems=ALLP.concat(s.customPersonal||[]);
 
@@ -1153,18 +1278,22 @@ function downloadExcel(){
     ["Wasser","0,50 l",3.00,0.62],["Coca Cola / Zero","0,33 l",3.50,0.64],
     ["Saftschorle","0,20 l",3.50,0.26],["Saft","0,20 l",3.50,0.40],
     ["Soft (Tonic, Ginger Beer etc.)","0,20 l",3.00,0.32],
-    ["Club Mate","0,50 l",4.00,0.65],["Voelkel / BioZisch","0,50 l",3.50,0.81],
+    ["Club Mate","0,50 l",4.00,0.65],
+    ["Club Mate","0,33 l",3.50,0.43],["Voelkel / BioZisch","0,50 l",3.50,0.81],
     ["LemonAid / ChariTea","0,33 l",3.50,1.14],["Makava","0,33 l",4.00,1.04],
     ["Red Bull","0,20 l",4.00,0.88],
     ["Berliner Pilsner","0,33 l",4.00,0.55],["Augustiner Helles","0,5 l",4.50,0.82],
     ["Berliner Radler","0,33 l",3.50,0.60],["Clausthaler (N/A)","0,33 l",3.50,0.79],
     ["Weißwein","0,20 l",6.00,0.96],["Weißweinschorle","0,20 l",5.00,0.54],
-    ["Rotwein","0,20 l",7.00,1.11],["Rosé","0,20 l",7.00,null],
-    ["Prosecco","0,10 l",3.50,0.56],["Prosecco auf Eis","0,30 l",7.00,1.11],
+    ["Rotwein","0,20 l",7.00,1.11],["Lieubeau Rosé, Lieubeau","0,20 l",7.00,null],
+    ["Prosecco Casa Gheller","0,10 l",3.50,0.56],["Prosecco auf Eis","0,30 l",7.00,1.11],
     ["Crémant","0,10 l",7.00,null],
-    ["Fl. Weißwein","0,75 l",23.00,4.80],["Fl. Rotwein","0,75 l",23.00,3.90],
-    ["Fl. Rosé","0,75 l",23.00,null],["Fl. Prosecco","0,75 l",21.00,4.17],
-    ["Fl. Crémant","0,75 l",49.00,null],["Fl. Saft","1 l",18.00,1.73],
+    ["Fl. Weißburgunder, Trautwein","1,0 l",23.00,17.65],["Fl. Riesling, Martin Korrell","1,0 l",27.50,23.11],
+    ["Fl. Grüner Veltliner, Allram","0,75 l",36.00,30.25],["Fl. Vinho Verde, Obra Prima","0,75 l",30.00,25.21],
+    ["Fl. Pinot Noir, Trautwein","0,75 l",23.00,17.65],["Fl. Nero D'Avola, Vitese","0,75 l",24.00,20.17],
+    ["Fl. Bronzinelle, Chateau Saint Martin","0,75 l",32.00,26.89],
+    ["Fl. Lieubeau Rosé, Familie Lieubeau","0,75 l",23.00,17.65],["Fl. Spätburgunder Rosé, Barth","0,75 l",29.00,24.37],
+    ["Fl. Prosecco Casa Gheller","0,75 l",21.00,17.65],["Fl. Crémant de Limoux, Les Graimenous","0,75 l",49.00,41.18],["Fl. Saft","1 l",17.50,1.73],
     ["Tee","",2.00,null],["Kanne Kaffee","2 l",12.00,null],
     ["Espresso / Nespresso","",2.50,null],
     ["LD Aperol Spritz","0,30 l",8.00,1.15],["LD Campari","0,30 l",8.00,1.25],
@@ -1187,7 +1316,7 @@ function downloadExcel(){
   // ══════════════════════════════════════════════════════════════════════════
   // HELPER: build a formatted item sheet (Verbrauchsliste / Personal / Bruch)
   // ══════════════════════════════════════════════════════════════════════════
-  function buildItemSheet(ws,sheetTitle,subtitle,getQty,isBruch){
+  function buildItemSheet(ws,sheetTitle,subtitle,getQty,isBruch,customItemsList){
     const DATA_START=6; // first data row (title=1,subtitle=2,info=3,blank=4,header=5)
     const N=ALL.length;
     const TOTAL_ROW=DATA_START+N; // SUMME row
@@ -1226,16 +1355,37 @@ function downloadExcel(){
       ws["G"+rowN]=tf("=C"+rowN+"*E"+rowN,"n",st(false,C.grey,bg,"right",M));
     });
 
+    // Custom items (added by user)
+    const custItems2=customItemsList||[];
+    let custOffset=0;
+    if(custItems2.length){
+      const custH=TOTAL_ROW;
+      ws["B"+custH]=tv("⚡ Manuell / Custom Drinks — EK-Preise fehlen, bitte prüfen!",
+        st(true,"BF5C00","FEF0E0","left",null,9));
+      custItems2.forEach((it,ci)=>{
+        const rN=custH+1+ci;custOffset=ci+1;
+        const qty=getQty(it.n);const bg=ci%2===0?"FFFBF5":"FEF0E0";
+        ws["A"+rN]=tv(ALL.length+ci+1,st(false,"BF5C00",bg,"center",H,9));
+        ws["B"+rN]=tv("⚠ "+it.n+(it.s?" ("+it.s+")":""),st(qty>0,qty>0?"BF5C00":"999999",bg));
+        if(qty)ws["C"+rN]=tv(qty,st(true,"0000BB","FFFF99","center",H));
+        const hasVK=it.p&&it.p>0;
+        ws["D"+rN]=tv(hasVK?it.p:"VK fehlt!",hasVK?st(true,"0000BB",bg,"right",M2):st(true,"C0392B","FFEEEE","left",null,9,true));
+        ws["E"+rN]=tv("← EK + VK prüfen!",st(false,"C0392B","FFEEEE","left",null,8,true));
+        ws["F"+rN]=hasVK?tf("=C"+rN+"*D"+rN,st(false,qty>0?"8A6012":"999999",bg,"right",M)):tv("preis prüfen",st(false,"C0392B","FFEEEE","left",null,8,true));
+      });
+    }
+    const REAL_TOTAL=TOTAL_ROW+custOffset+(custItems2.length>0?1:0);
+
     // SUMME row
-    ws["B"+TOTAL_ROW]=tv("SUMME (€)",st(true,C.dark,C.goldBg));
+    ws["B"+REAL_TOTAL]=tv("SUMME (€)"+(custItems2.length?" · inkl. "+custItems2.length+" Custom":""),st(true,C.dark,C.goldBg));
     ws["F"+TOTAL_ROW]=tf("=SUM(F"+DATA_START+":F"+(TOTAL_ROW-1)+")","n",st(true,C.gold,C.goldBg,"right",M));
     ws["G"+TOTAL_ROW]=tf("=SUM(G"+DATA_START+":G"+(TOTAL_ROW-1)+")","n",st(true,C.gold,C.goldBg,"right",M));
 
     // Netto row
     const NETTO=TOTAL_ROW+1;
     ws["B"+NETTO]=tv("davon Netto (÷1,19)",st(false,C.grey,null,"right",null,8,true));
-    ws["F"+NETTO]=tf("=F"+TOTAL_ROW+"/1.19","n",st(false,C.grey,null,"right",M));
-    ws["G"+NETTO]=tf("=G"+TOTAL_ROW+"/1.19","n",st(false,C.grey,null,"right",M));
+    ws["F"+NETTO]=tf("=F"+REAL_TOTAL+"/1.19","n",st(false,C.grey,null,"right",M));
+    ws["G"+NETTO]=tf("=G"+REAL_TOTAL+"/1.19","n",st(false,C.grey,null,"right",M));
 
     return {totalRow:TOTAL_ROW,vkCol:"F",ekCol:"G"};
   }
@@ -1279,9 +1429,20 @@ function downloadExcel(){
   inputRow(R.tip,"Trinkgeld via SumUp / Lightspeed  (aus Kasse auszahlen!)",tip,"⚠ Kartentrinkgeld");
   dataRow(R.sumA,"Summe Einnahmen  (A)","=SUM(E"+R.rech+":E"+(R.sumA-1)+")",M,true,C.green,C.greenBg);
 
+  // ── Wareneinsatzquote (only relevant for Direct Payment) ─────────────────
+  const hasDirect=(ab.types||[]).includes("direct");
+  const R_WEQ=R.sumA+2;
+  if(hasDirect){
+    ovWs["B"+R_WEQ]=tv("Durchschnittliche Wareneinsatzquote (für Direct Payment)",st(false,"555555",null));
+    ovWs["C"+R_WEQ]=tv("Anteil EK (z.B. 19% = 0,19):",st(false,"555555",null,"right",null,8,true));
+    ovWs["E"+R_WEQ]=tv(0.19,st(true,"0000BB","FFFF99","right","0%"));
+  }
+
   // ── B: KOSTEN ─────────────────────────────────────────────────────────────
-  const CONS_TOTAL=ALL.length+6; // SUMME row = DATA_START(6) + N items
-  const PERS_TOTAL=ALL.length+6; // same for Personal Getränke
+  const _custLen=(s.custom||[]).length;
+  const _persCustomLen=(s.customPersonal||[]).length;
+  const CONS_TOTAL=ALL.length+6+(_custLen>0?_custLen+1:0); // shifts if custom items exist
+  const PERS_TOTAL=ALL.length+6+(_persCustomLen>0?_persCustomLen+1:0); // same for personal
   band(18,"B.  KOSTEN  (Wareneinsatz)",C.gold,C.goldBg);
   for(const [c,t,al] of [["B","Position","left"],["C","VK-Wert (€)","right"],["D","VK-Wert Brutto (€)","right"],["E","Wareneinsatz / EK (€)","right"]])
     ovWs[c+"19"]=tv(t,st(true,C.grey,C.greyBg,al,null,9));
@@ -1296,7 +1457,16 @@ function downloadExcel(){
   ovWs["C"+RB.cons]=tf("=IFERROR('Verbrauchsliste'!F"+CONS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
   ovWs["D"+RB.cons]=tf("=IFERROR('Verbrauchsliste'!F"+CONS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
   ovWs["E"+RB.cons]=tf("=IFERROR('Verbrauchsliste'!G"+CONS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
-  dataRow(RB.nach,"Nachverbrauch / DJ-Tickets  (→ Tab: Nachverbrauch DJ-Tickets)");
+  dataRow(RB.nach,"Nachverbrauch / DJ-Tickets  (→ Tab: Nachverbrauch DJ-Tickets)")
+  // Direct Payment estimated EK
+  if(hasDirect){
+    const RB_DIRECT=RB.nach+1;
+    ovWs["B"+RB_DIRECT]=tv("Geschätzter Wareneinsatz (Einnahmen × Quote) — Direct Payment",st(false,C.gold,null));
+    ovWs["E"+RB_DIRECT]=tf("=IFERROR(E"+R_WEQ+"*E"+R.sumA+",0)",st(false,C.gold,C.goldBg,"right",M));
+    // Update sumB to include direct EK
+    ovWs["B"+RB.sumB]=tv("Summe Wareneinsatz  (B)",st(true,C.gold,C.goldBg,"left",null,11));
+    ovWs["E"+RB.sumB]=tf("=E"+RB.pers+"+E"+RB.bruc+"+E"+RB.cons+"+E"+RB.nach+"+E"+RB_DIRECT,st(true,C.gold,C.goldBg,"right",M));
+  };
   ovWs["C"+RB.nach]=tf("=IFERROR('Nachverbrauch DJ-Tickets'!F"+CONS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
   ovWs["E"+RB.nach]=tf("=IFERROR('Nachverbrauch DJ-Tickets'!G"+CONS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
   dataRow(RB.sumB,"Summe Wareneinsatz  (B)","=E"+RB.pers+"+E"+RB.bruc+"+E"+RB.cons+"+E"+RB.nach,M,true,C.gold,C.goldBg);
@@ -1337,12 +1507,15 @@ function downloadExcel(){
   const verbrWs={},persWs={},nvWs={},bruchWs={};
 
   buildItemSheet(verbrWs,"Verbrauchsliste",payLabel,
-    name=>matchQty(name,allItems,s.counts));
+    name=>matchQty(name,allItems,s.counts),false,s.custom||[]);
   buildItemSheet(persWs,"Personal Getränke","Personalgetränke — "+fmtD(s.date),
-    name=>matchQty(name,persItems,s.personal));
-  buildItemSheet(nvWs,"Nachverbrauch DJ-Tickets","Eingelöste Getränke (DJ-Ticket-Inhaber)",()=>0);
+    name=>matchQty(name,persItems,s.personal),false,s.customPersonal||[]);
+  // Nachverbrauch: use djCounts (drinks consumed by DJ ticket holders)
+  const djCts=s.djCounts||{};
+  buildItemSheet(nvWs,"Nachverbrauch DJ-Tickets","Eingelöste Getränke — DJ Ticket Inhaber",
+    name=>{const i=allItems.find(x=>x.n===name);return i?djCts[i.id]||0:0;},false,[]);
   buildItemSheet(bruchWs,"Bruch","Beschädigte / Verdorbene Ware",
-    name=>{const i=allItems.find(x=>x.n===name);return i?parseFloat((s.bruchCounts||{})[i.id])||0:0;},true);
+    name=>{const i=allItems.find(x=>x.n===name);return i?parseFloat((s.bruchCounts||{})[i.id])||0:0;},true,[]);
 
   // DJ ticket info at top of NV sheet
   nvWs["B2"]=tv("Vereinbarte Tickets: "+(s.djOrdered||"—")+"  |  Eingelöst: "+(s.djUsed||"—"),st(false,C.gold,null,"left",null,10));
@@ -1379,6 +1552,26 @@ function downloadExcel(){
   toast("Excel downloaded ✓");
 }
 window.downloadExcel=downloadExcel;
+function newSessionFlow(){
+  toast("Opening setup...");
+  try{
+    currentId=null;editMode=false;
+    // Directly show/hide screens in case go() has issues
+    ["scrSessions","scrSheets","scrSummary"].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add("hidden");});
+    const setup=document.getElementById("scrSetup");if(setup)setup.classList.remove("hidden");
+    screen="setup";
+    // Try full go() flow
+    go("setup");
+  }catch(ex){
+    toast("Error: "+ex.message);
+    console.error("newSessionFlow error:",ex);
+    // Fallback: just show setup screen directly
+    const setup=document.getElementById("scrSetup");if(setup)setup.classList.remove("hidden");
+    const sess_=document.getElementById("scrSessions");if(sess_)sess_.classList.add("hidden");
+    try{renderSetup();}catch(e2){console.error("renderSetup:",e2);}
+  }
+}
+window.newSessionFlow=newSessionFlow;
 $("#dlXlsx")&&($("#dlXlsx").onclick=()=>requirePin("download Excel",downloadExcel,"Download"));
 
 
@@ -1407,7 +1600,7 @@ $("#syncBtn").onclick=openSyncModal;
 document.querySelectorAll("#closeSyncModal,#closeSyncModal2").forEach(b=>b.onclick=()=>$("#syncModal").classList.add("hidden"));
 $("#syncModal").addEventListener("click",e=>{if(e.target===$("#syncModal"))$("#syncModal").classList.add("hidden");});
 $("#copyRules").onclick=async e=>{const text=JSON.stringify({"rules":{".read":true,".write":true}},null,2);try{await navigator.clipboard.writeText(text);}catch(err){const ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();}e.target.textContent="Copied!";setTimeout(()=>{e.target.textContent="Copy";},1500);};
-$("#fbConnect").onclick=async()=>{const url=$("#fbUrlInput").value.trim();if(!url)return;saveFBConfig(url);setSyncDot("busy");try{const r=await fetch(`${fbUrl}/sessions.json`);if(r.ok){setSyncDot("on");startSync();for(const s of sessions){try{await pushSession(s);}catch(e){}}openSyncModal();}else{setSyncDot("err");const el=$("#syncStatusMsg");if(el)el.textContent="Could not connect — check the URL";}}catch(e){setSyncDot("err");const el=$("#syncStatusMsg");if(el)el.textContent="Could not connect — check URL and internet";}};
+$("#fbConnect").onclick=async()=>{const url=$("#fbUrlInput").value.trim();if(!url)return;saveFBConfig(url);setSyncDot("busy");try{const r=await fetch(`${fbUrl}/${FB_NS}/sessions.json`);if(r.ok){setSyncDot("on");startSync();for(const s of sessions){try{await pushSession(s);}catch(e){}}openSyncModal();}else{setSyncDot("err");const el=$("#syncStatusMsg");if(el)el.textContent="Could not connect — check the URL";}}catch(e){setSyncDot("err");const el=$("#syncStatusMsg");if(el)el.textContent="Could not connect — check URL and internet";}};
 $("#fbDisconnect").onclick=()=>{saveFBConfig("");stopSync();openSyncModal();};
 
 /* PIN MODAL */
@@ -1435,6 +1628,27 @@ $("#pinCancel").onclick=()=>{$("#pinModal").classList.add("hidden");pinCallback=
 $("#pinInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("#pinConfirm").click();});
 
 
+
+/* DECIMAL SEPARATOR — accept 0,15 and 0.15 everywhere */
+
+// Convert comma→dot on all decimal/number inputs while typing
+document.addEventListener("input",function(e){
+  const el=e.target;
+  if(el.tagName!=="INPUT")return;
+  const mode=el.getAttribute("inputmode");
+  if(mode==="decimal"||mode==="numeric")return; // handled individually
+  if(el.type==="text"&&el.id&&(
+    el.id==="abrCash"||el.id==="abrSumup"||el.id==="abrLight"||
+    el.id==="abrTip"||el.id==="abrPauschaleFee"||el.id==="abrGuests"
+  )){
+    const p=el.selectionStart,v=el.value;
+    if(v.includes(",")&&!v.includes(".")){
+      el.value=v.replace(",",".");
+      try{el.setSelectionRange(p,p);}catch(x){}
+    }
+  }
+},true);
+
 /* PAYMENT HELPERS — called via inline onclick, always reliable */
 function togglePayType(t){var a=getAbr();if(!a.types)a.types=[];var i=a.types.indexOf(t);if(i>=0)a.types.splice(i,1);else a.types.push(t);a.type=a.types[0]||"";if(!a.types.includes("pauschale"))a.pauschalenType="";saveAbr();}
 function selectSubType(t){var a=getAbr();a.pauschalenType=(a.pauschalenType===t?"":t);if(a.pauschalenType&&(!a.types||!a.types.includes("pauschale"))){if(!a.types)a.types=[];a.types.push("pauschale");a.type="pauschale";}saveAbr();}
@@ -1442,13 +1656,119 @@ function toggleAddon(k){var a=getAbr();if(!a.addons)a.addons={};a.addons[k]=!a.a
 function selectPFT(t){getAbr().pauschale_fee_type=t;saveAbr();}
 function selectTip(t){getAbr().tipSource=t;saveAbr();}
 // Expose to global scope for inline onclick
-window.togglePayType=togglePayType;window.selectSubType=selectSubType;
+window.togglePayType=togglePayType;
+function setDJMode(on){
+  djMode=!!on;
+  const eb=document.getElementById("btnModeEvent");
+  const db=document.getElementById("btnModeDJ");
+  const qs=document.getElementById("djModeQty");
+  if(!eb||!db)return;
+  const acc="var(--accent)",accTxt="var(--accent-txt)",line="var(--line2)",mut="var(--muted)",gold="#8A6012";
+  eb.style.background=djMode?"transparent":acc;
+  eb.style.borderColor=djMode?line:acc;
+  eb.style.color=djMode?mut:accTxt;
+  db.style.background=djMode?acc:"transparent";
+  db.style.borderColor=djMode?acc:line;
+  db.style.color=djMode?accTxt:mut;
+  const s=sess();const djQ=Object.values(s.djCounts||{}).reduce((t,v)=>t+v,0);
+  if(qs)qs.textContent=djMode&&djQ?"→ "+djQ+" drinks logged":"";
+  // Show DJ panel only in DJ Tickets mode
+  const djPanelEl=document.getElementById("djPanel");
+  if(djPanelEl)djPanelEl.style.display=djMode?"block":"none";
+  renderOrder();
+}
+window.setDJMode=setDJMode;window.selectSubType=selectSubType;
 window.toggleAddon=toggleAddon;window.selectPFT=selectPFT;window.selectTip=selectTip;
+
+
+/* MONTHLY REPORT */
+function sessRevTotal(s){return ALLV.concat(s.custom||[]).reduce((t,i)=>t+(s.counts[i.id]||0)*i.p,0);}
+function sessEKTotal(s){return ALLV.concat(s.custom||[]).reduce((t,i)=>t+(s.counts[i.id]||0)*(EK[i.n]||0),0);}
+function sessIncome(s){const a=s.abrechnung||{};return (parseFloat(a.cash)||0)+(parseFloat(a.sumup)||0)+(parseFloat(a.light)||0)+(parseFloat(a.pauschale_fee)||0);}
+
+
+function downloadReportExcel(filter){
+  if(!window.XLSX){toast("Excel loading…");return;}
+  const XLSX=window.XLSX;
+  const C={gold:"8A6012",goldBg:"FDF3DC",green:"1A6B3C",greenBg:"E8F5EE",
+    grey:"555555",greyBg:"EBEBEB",dark:"1A1A1A",red:"C0392B"};
+  function st(bold,color,bg,align,fmt,sz){
+    const s={font:{name:"Arial",bold:!!bold,sz:sz||10,color:{rgb:color||C.dark}},
+             alignment:{horizontal:align||"left",vertical:"center"}};
+    if(bg)s.fill={fgColor:{rgb:bg},bgColor:{rgb:bg},patternType:"solid"};
+    if(fmt)s.numFmt=fmt;return s;
+  }
+  function tv(v,s){return v==null?null:{t:typeof v==="number"?"n":"s",v,s};}
+  function setRef(ws){const cells=Object.keys(ws).filter(k=>!k.startsWith("!"));if(!cells.length){ws["!ref"]="A1:A1";return;}let mr=0,mc=0;cells.forEach(a=>{const m=a.match(/([A-Z]+)(\d+)/);if(!m)return;const c=m[1].split("").reduce((n,ch)=>n*26+ch.charCodeAt(0)-64,0),r=parseInt(m[2]);mr=Math.max(mr,r);mc=Math.max(mc,c);});const col=n=>{let s="";while(n>0){s=String.fromCharCode(64+n%26||26)+s;n=Math.floor((n-1)/26);}return s;};ws["!ref"]="A1:"+col(mc)+mr;}
+
+  const wb=XLSX.utils.book_new();
+  const now=new Date();
+
+  function buildSummarySheet(sess_list,title){
+    const ws={};
+    ws["!cols"]=[{wch:12},{wch:22},{wch:26},{wch:16},{wch:8},{wch:13},{wch:13},{wch:13},{wch:12},{wch:9},{wch:12}];
+    ws["A1"]=tv(title,st(true,C.gold,null,"left",null,13));
+    ws["A2"]=tv("Erstellt: "+now.toLocaleDateString("de-DE"),st(false,C.grey,null,"left",null,9));
+    const hdrs=["Datum","Ort","Veranstaltung","Zahlungsart","Gäste","Einnahmen (€)","VK-Wert (€)","EK gesamt (€)","Gewinn (€)","Stunden","DJ Tickets"];
+    hdrs.forEach((h,i)=>{const col=String.fromCharCode(65+i);ws[col+"4"]=tv(h,st(true,C.grey,C.greyBg,i>4?"right":"left",null,9));});
+    let r=5,totInc=0,totVK=0,totEK=0,totHrs=0;
+    sess_list.forEach(s=>{
+      const ab=s.abrechnung||{};
+      const income=sessIncome(s);const vk=sessRevTotal(s);const ek=sessEKTotal(s);
+      const sh=s.stunden&&!Array.isArray(s.stunden)?s.stunden:{};
+      const hrs=SH_ROLES.reduce((t,r)=>t+(parseFloat(sh[r.k])||0),0);
+      const payT=(ab.types||[]).map(t=>t==="pauschale"?(ab.pauschalenType==="basic"?"Open Bar Basic":"Open Bar Advanced"):t==="verbrauch"?"Nach Verbrauch":"Direct Payment").join(" + ");
+      const bg=r%2===0?null:"FAFAF8";
+      const d=s.date?new Date(s.date+"T12:00:00").toLocaleDateString("de-DE"):"-";
+      if(tv(d,st(false,C.dark,bg)))ws["A"+r]=tv(d,st(false,C.dark,bg));
+      if(tv(s.loc||"",st(false,C.dark,bg,"left",null,10)))ws["B"+r]=tv(s.loc||"",st(true,C.dark,bg,"left",null,10));
+      ws["C"+r]=tv(s.event||"",st(false,C.grey,bg));
+      ws["D"+r]=tv(payT||"—",st(false,C.grey,bg));
+      if(s.guests)ws["E"+r]=tv(s.guests,st(false,C.dark,bg,"right","#,##0"));
+      if(income)ws["F"+r]=tv(income,st(false,C.dark,bg,"right","#,##0.00"));
+      if(vk)ws["G"+r]=tv(vk,st(false,C.gold,bg,"right","#,##0.00"));
+      if(ek)ws["H"+r]=tv(ek,st(false,C.grey,bg,"right","#,##0.00"));
+      const profit=income-ek;
+      if(income||ek)ws["I"+r]=tv(profit,st(profit>=0,profit>=0?C.green:C.red,bg,"right","#,##0.00"));
+      if(hrs)ws["J"+r]=tv(hrs,st(false,C.grey,bg,"right","#,##0"));
+      if(s.djUsed||s.djOrdered)ws["K"+r]=tv((s.djUsed||0)+"/"+(s.djOrdered||"?"),st(false,C.grey,bg));
+      totInc+=income;totVK+=vk;totEK+=ek;totHrs+=hrs;r++;
+    });
+    ws["A"+r]=tv("TOTAL ("+sess_list.length+" Events)",st(true,C.dark,C.goldBg));
+    ws["F"+r]=tv(totInc,st(true,C.gold,C.goldBg,"right","#,##0.00"));
+    ws["G"+r]=tv(totVK,st(true,C.gold,C.goldBg,"right","#,##0.00"));
+    ws["H"+r]=tv(totEK,st(true,C.grey,C.goldBg,"right","#,##0.00"));
+    ws["I"+r]=tv(totInc-totEK,st(true,C.green,C.goldBg,"right","#,##0.00"));
+    ws["J"+r]=tv(totHrs||null,st(true,C.grey,C.goldBg,"right","#,##0"));
+    setRef(ws);return ws;
+  }
+
+  const now2=new Date();
+  const lastMonth=sessions.filter(s=>{const d=new Date(s.date||s.createdAt||"");return d.getMonth()===now2.getMonth()&&d.getFullYear()===now2.getFullYear();}).sort((a,b)=>b.date>a.date?1:-1);
+  const allSess=sessions.filter(s=>s.date||s.createdAt).sort((a,b)=>b.date>a.date?1:-1);
+
+  const monthName=now2.toLocaleDateString("de-DE",{month:"long",year:"numeric"});
+  XLSX.utils.book_append_sheet(wb,buildSummarySheet(lastMonth,"Events — "+monthName),"Dieser Monat");
+  XLSX.utils.book_append_sheet(wb,buildSummarySheet(allSess,"Events — Alle Zeit"),"Alle Zeit");
+
+  const fname="Spreedampfer_Events_"+(filter==="month"?now2.toISOString().slice(0,7):"Alle_Zeit")+".xlsx";
+  XLSX.writeFile(wb,fname);
+  toast("Report downloaded ✓");
+}
+
+// Wire report modal
+$("#reportBtn")&&($("#reportBtn").onclick=()=>requirePin("view reports",()=>{
+  const m=$("#reportModal");if(!m)return;
+  m.classList.remove("hidden");m.style.display="flex";
+}));
+$("#reportClose")&&($("#reportClose").onclick=()=>{const m=$("#reportModal");if(m){m.classList.add("hidden");m.style.display="none";}});
+$("#repDownloadMonth")&&($("#repDownloadMonth").onclick=()=>downloadReportExcel("month"));
+$("#repDownloadAll")&&($("#repDownloadAll").onclick=()=>downloadReportExcel("all"));
 
 /* BOTTOM BAR */
 function renderBar(){
   const inner=$("#barInner");
-  if(screen==="sessions"){inner.innerHTML=`<button class="cta" id="newSessBtn"><span>+</span> New Session</button>`;$("#newSessBtn").onclick=()=>{currentId=null;editMode=false;go("setup");};}
+  if(screen==="sessions"){inner.innerHTML=`<button class="cta" id="newSessBtn"><span>+</span> New Session</button>`;$("#newSessBtn")&&($("#newSessBtn").onclick=newSessionFlow);}
   else if(screen==="setup"){const ready=!!(sess().loc);inner.innerHTML=`<button class="cta ghost" id="backSetupBtn">←</button><button class="cta" id="startSessBtn" ${ready?"":"disabled"}>${editMode?"Save Changes →":"Start →"}</button>`;$("#backSetupBtn").onclick=()=>{if(editMode){editMode=false;go("sessions");}else{if(currentId&&!revQty()&&!persQty()){sessions=sessions.filter(s=>s.id!==currentId);currentId=null;saveAll();}go("sessions");}};
   $("#startSessBtn").onclick=()=>{if(!sess().loc)return;const s=sess();s.date=$("#fDate").value;s.event=$("#fEvent").value.trim();touchSess();if(editMode){editMode=false;go("sessions");}else{activeSheet="verbrauch";go("sheets");}};}
   else if(screen==="sheets"){const _t=$("#tabs");if(_t&&_t.children.length<3)renderTabs();inner.innerHTML=`<button class="cta ghost" id="toSessions">←</button><div class="total-pill"><span class="pl">Revenue · ${revQty()}</span><span class="pv num">${eur(revTotal())}</span></div><button class="cta" id="goSum">Close Out →</button>`;$("#toSessions").onclick=()=>go("sessions");$("#goSum").onclick=()=>go("summary");}
@@ -1490,9 +1810,25 @@ loadAll();loadFBConfig();
 if(fbUrl)startSync();
 go("sessions");
 })();
-
 </script>
-
+<!-- Monthly Report Modal -->
+<div class="modal-bg hidden" id="reportModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0">
+  <div style="background:var(--bg);border-radius:18px;padding:0;width:min(600px,96vw);box-shadow:0 8px 40px rgba(0,0,0,0.3);margin:auto">
+    <div style="padding:20px 24px 14px;border-bottom:1px solid var(--line2);display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700;font-size:16px">Event Reports</span>
+      <button id="reportClose" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer">✕</button>
+    </div>
+    <div style="padding:24px">
+      <p style="color:var(--muted);font-size:13px;margin-bottom:20px;line-height:1.5">Download an Excel summary of all events for a given period. Each row = one event with date, location, payment type, income, costs and profit.</p>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <button class="cta" id="repDownloadMonth" style="height:52px;font-size:15px;font-weight:600">
+          ⬇ This Month — Download Excel
+        </button>
+        <button class="cta ghost" id="repDownloadAll" style="height:52px;font-size:15px;font-weight:600">
+          ⬇ All Time — Download Excel
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 </body>
