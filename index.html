@@ -873,7 +873,7 @@ function renderResults(){
   matches=matches.slice(0,18);
   let html="";
   matches.forEach(i=>{const qty=sess().counts[i.id]||0;const szp=i.s?`<span class="szpill">${i.s}</span>`:"";const qtyCtrl=qty>0?`<div class="stepper" style="flex:0 0 auto"><button class="minus" data-sub="${i.id}">−</button><input class="num" inputmode="numeric" data-qty="${i.id}" value="${qty}" style="width:38px"/><button class="plus" data-plus="${i.id}">+</button></div>`:`<button class="padd" data-add="${i.id}" aria-label="add">+</button>`;html+=`<div class="res-row" data-add="${i.id}"><div class="body"><div class="nm">${esc(i.n)}${szp}</div><div class="sub num">${eur(i.p)}${i.custom?" · custom":""}</div></div>${qtyCtrl}</div>`;});
-  const exact=poolV().some(i=>i.n.toLowerCase()===ql);
+  const exact=poolV().some(i=>i.n.toLowerCase()===q.toLowerCase());
   if(!exact)html+=`<button class="addnew-trigger" id="anTrigger"><span>+</span> Add "${esc(q)}" as a new drink</button>`;
   box.innerHTML=html;
   const trg=$("#anTrigger");if(trg)trg.onclick=()=>{$("#anName").value=q;$("#anSize").value="";$("#anPrice").value="";$("#anForm").classList.remove("hidden");$("#anPrice").focus();};
@@ -1019,7 +1019,7 @@ function renderBResults(){
   });
   matches=matches.slice(0,18);
   let html=matches.map(i=>{const qty=sess().bruchCounts[i.id]||0;const szp=i.s?`<span class="szpill">${i.s}</span>`:"";return`<div class="res-row" data-badd="${i.id}"><div class="body"><div class="nm">${esc(i.n)}${szp}</div><div class="sub num">${eur(i.p)}</div></div>${qty?`<span class="qb">×${qty}</span>`:""}<button class="padd" data-badd="${i.id}" aria-label="add">+</button></div>`;}).join("");
-  const bExact=poolV().some(i=>i.n.toLowerCase()===ql);
+  const bExact=poolV().some(i=>i.n.toLowerCase()===q.toLowerCase());
   if(!bExact)html+=`<button class="addnew-trigger" id="bnTrigger"><span>+</span> Add "${esc(q)}" as a new item</button>`;
   box.innerHTML=html;
   const bnt=$("#bnTrigger");if(bnt)bnt.onclick=()=>{$("#bnName").value=q;$("#bnSize").value="";$("#bnPrice").value="";$("#bnForm").classList.remove("hidden");$("#bnPrice").focus();};
@@ -1688,7 +1688,8 @@ function sessIncome(s){const a=s.abrechnung||{};return (parseFloat(a.cash)||0)+(
 
 
 function downloadReportExcel(filter){
-  if(!window.XLSX){toast("Excel loading…");return;}
+  if(!window.XLSX){toast("Excel library not loaded — try again");return;}
+  try{
   const XLSX=window.XLSX;
   const C={gold:"8A6012",goldBg:"FDF3DC",green:"1A6B3C",greenBg:"E8F5EE",
     grey:"555555",greyBg:"EBEBEB",dark:"1A1A1A",red:"C0392B"};
@@ -1720,7 +1721,7 @@ function downloadReportExcel(filter){
       const payT=(ab.types||[]).map(t=>t==="pauschale"?(ab.pauschalenType==="basic"?"Open Bar Basic":"Open Bar Advanced"):t==="verbrauch"?"Nach Verbrauch":"Direct Payment").join(" + ");
       const bg=r%2===0?null:"FAFAF8";
       const d=s.date?new Date(s.date+"T12:00:00").toLocaleDateString("de-DE"):"-";
-      if(tv(d,st(false,C.dark,bg)))ws["A"+r]=tv(d,st(false,C.dark,bg));
+      if(d)ws["A"+r]=tv(d,st(false,C.dark,bg));
       if(tv(s.loc||"",st(false,C.dark,bg,"left",null,10)))ws["B"+r]=tv(s.loc||"",st(true,C.dark,bg,"left",null,10));
       ws["C"+r]=tv(s.event||"",st(false,C.grey,bg));
       ws["D"+r]=tv(payT||"—",st(false,C.grey,bg));
@@ -1739,21 +1740,31 @@ function downloadReportExcel(filter){
     ws["G"+r]=tv(totVK,st(true,C.gold,C.goldBg,"right","#,##0.00"));
     ws["H"+r]=tv(totEK,st(true,C.grey,C.goldBg,"right","#,##0.00"));
     ws["I"+r]=tv(totInc-totEK,st(true,C.green,C.goldBg,"right","#,##0.00"));
-    ws["J"+r]=tv(totHrs||null,st(true,C.grey,C.goldBg,"right","#,##0"));
+    if(totHrs)ws["J"+r]=tv(totHrs,st(true,C.grey,C.goldBg,"right","#,##0"));
     setRef(ws);return ws;
   }
 
   const now2=new Date();
-  const lastMonth=sessions.filter(s=>{const d=new Date(s.date||s.createdAt||"");return d.getMonth()===now2.getMonth()&&d.getFullYear()===now2.getFullYear();}).sort((a,b)=>b.date>a.date?1:-1);
   const allSess=sessions.filter(s=>s.date||s.createdAt).sort((a,b)=>b.date>a.date?1:-1);
-
+  const lastMonth=allSess.filter(s=>{const d=new Date(s.date||s.createdAt||"");return d.getMonth()===now2.getMonth()&&d.getFullYear()===now2.getFullYear();});
   const monthName=now2.toLocaleDateString("de-DE",{month:"long",year:"numeric"});
-  XLSX.utils.book_append_sheet(wb,buildSummarySheet(lastMonth,"Events — "+monthName),"Dieser Monat");
-  XLSX.utils.book_append_sheet(wb,buildSummarySheet(allSess,"Events — Alle Zeit"),"Alle Zeit");
+
+  // Build the right sheet(s) based on filter
+  if(filter==="month"){
+    if(!lastMonth.length){toast("No events this month");return;}
+    XLSX.utils.book_append_sheet(wb,buildSummarySheet(lastMonth,"Events — "+monthName),"Dieser Monat");
+  } else {
+    if(!allSess.length){toast("No events logged yet");return;}
+    XLSX.utils.book_append_sheet(wb,buildSummarySheet(allSess,"Events — Alle Zeit"),"Alle Zeit");
+  }
 
   const fname="Spreedampfer_Events_"+(filter==="month"?now2.toISOString().slice(0,7):"Alle_Zeit")+".xlsx";
   XLSX.writeFile(wb,fname);
   toast("Report downloaded ✓");
+  }catch(ex){
+    console.error("Report error:",ex);
+    toast("Error: "+ex.message);
+  }
 }
 
 // Wire report modal
@@ -1821,10 +1832,10 @@ go("sessions");
     <div style="padding:24px">
       <p style="color:var(--muted);font-size:13px;margin-bottom:20px;line-height:1.5">Download an Excel summary of all events for a given period. Each row = one event with date, location, payment type, income, costs and profit.</p>
       <div style="display:flex;flex-direction:column;gap:12px">
-        <button class="cta" id="repDownloadMonth" style="height:52px;font-size:15px;font-weight:600">
+        <button id="repDownloadMonth" style="display:block;width:100%;height:52px;border-radius:13px;border:none;background:var(--good);color:#06241c;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:0">
           ⬇ This Month — Download Excel
         </button>
-        <button class="cta ghost" id="repDownloadAll" style="height:52px;font-size:15px;font-weight:600">
+        <button id="repDownloadAll" style="display:block;width:100%;height:52px;border-radius:13px;border:2px solid var(--line);background:transparent;color:var(--txt);font-size:15px;font-weight:600;cursor:pointer;margin-bottom:0">
           ⬇ All Time — Download Excel
         </button>
       </div>
