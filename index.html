@@ -226,7 +226,13 @@ input,select,textarea{font-family:inherit;font-size:16px}
   <div class="brand"><div class="k">Spreedampfer Events</div><div class="s" id="brandSub">Sessions</div></div>
   <div class="spacer"></div>
   <button class="icon-btn hidden" id="shareBtn" aria-label="Hand Off"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
-  <button class="cta ghost" id="reportBtn" style="height:40px;padding:0 14px;font-size:13px;font-weight:600;border-radius:11px;margin-right:6px">Report</button>
+  <div style="position:relative;display:inline-block">
+    <button id="settingsBtn" onclick="toggleSettingsMenu()" class="icon-btn" aria-label="Settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    <div id="settingsMenu" style="display:none;position:absolute;right:0;top:44px;background:var(--bg);border:1px solid var(--line2);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.18);z-index:200;min-width:180px;overflow:hidden">
+      <button id="reportBtn" onclick="openReports()" style="display:block;width:100%;padding:13px 16px;background:none;border:none;text-align:left;font-size:14px;font-weight:500;color:var(--txt);cursor:pointer;border-bottom:1px solid var(--line2)">Reports</button>
+      <button onclick="openDrinkManager()" style="display:block;width:100%;padding:13px 16px;background:none;border:none;text-align:left;font-size:14px;font-weight:500;color:var(--txt);cursor:pointer">Drink Manager</button>
+    </div>
+  </div>
     <button class="icon-btn" id="syncBtn" aria-label="Cloud Sync" title="Cloud Sync"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></button>
   <button class="icon-btn" id="themeBtn" aria-label="Theme"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
 </div>
@@ -258,6 +264,58 @@ input,select,textarea{font-family:inherit;font-size:16px}
         <button id="btnModeDJ" onclick="setDJMode(true)" style="flex:1;height:36px;border-radius:10px;font-size:13px;font-weight:600;border:2px solid var(--line2);background:transparent;color:var(--muted)">DJ Tickets</button>
         <span id="djModeQty" style="font-size:12px;color:var(--muted);white-space:nowrap"></span>
       </div>
+      <!-- Consumption Phases -->
+      <div id="phasesBar" style="display:none;margin-bottom:8px">
+        <div id="phaseTabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px"></div>
+        <div id="phaseSettings" style="display:none;margin-top:8px;background:var(--card);border-radius:14px;padding:14px 14px 10px;border:1px solid var(--line2)">
+          <p style="font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;margin:0 0 10px">Period Settings</p>
+          <div style="display:flex;gap:8px;margin-bottom:10px">
+            <div style="flex:1">
+              <p style="font-size:11px;color:var(--muted);margin:0 0 4px">Name</p>
+              <input id="phName" type="text" placeholder="e.g. Open Bar" onchange="savePhaseSettings()" style="width:100%;box-sizing:border-box;padding:9px 11px;border-radius:9px;border:1px solid var(--line2);background:var(--bg);color:var(--txt);font-size:13px"/>
+            </div>
+            <div>
+              <p style="font-size:11px;color:var(--muted);margin:0 0 4px">From</p>
+              <input id="phStart" type="time" onchange="savePhaseSettings()" style="padding:9px 10px;border-radius:9px;border:1px solid var(--line2);background:var(--bg);color:var(--txt);font-size:13px"/>
+            </div>
+            <div>
+              <p style="font-size:11px;color:var(--muted);margin:0 0 4px">To</p>
+              <input id="phEnd" type="time" onchange="savePhaseSettings()" style="padding:9px 10px;border-radius:9px;border:1px solid var(--line2);background:var(--bg);color:var(--txt);font-size:13px"/>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <div style="flex:1">
+              <p style="font-size:11px;color:var(--muted);margin:0 0 4px">Payment Type</p>
+              <select id="phPayType" onchange="savePhaseSettings()" style="width:100%;padding:9px 11px;border-radius:9px;border:1px solid var(--line2);background:var(--bg);color:var(--txt);font-size:13px;cursor:pointer">
+                <option value="pauschale">Open Bar / Flat Rate</option>
+                <option value="verbrauch">By Consumption</option>
+                <option value="direct">Direct Payment</option>
+              </select>
+            </div>
+            <div id="phFlatRateWrap" style="display:none;flex:1">
+              <p style="font-size:11px;color:var(--muted);margin:0 0 4px">Package</p>
+              <select id="phPauschalenType" onchange="savePhaseSettings()" style="width:100%;padding:9px 11px;border-radius:9px;border:1px solid var(--line2);background:var(--bg);color:var(--txt);font-size:13px;cursor:pointer">
+                <option value="basic">Open Bar Basic</option>
+                <option value="advanced">Open Bar Advanced</option>
+              </select>
+            </div>
+            <div id="phBudgetWrap" style="width:120px;display:none">
+              <p style="font-size:11px;color:var(--muted);margin:0 0 4px">Budget (€)</p>
+              <input id="phBudget" type="text" inputmode="decimal" placeholder="e.g. 2000" onchange="savePhaseSettings()" style="width:100%;box-sizing:border-box;padding:9px 11px;border-radius:9px;border:1px solid var(--line2);background:var(--bg);color:var(--txt);font-size:13px"/>
+            </div>
+          </div>
+          <div id="phAddonsWrap" style="margin-top:8px">
+            <p style="font-size:11px;color:var(--muted);margin:0 0 6px">Add-ons booked</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button id="phAddon_spritz" onclick="togglePhAddon('spritz')" class="tip-opt" style="font-size:12px;padding:5px 12px;border-radius:8px;border:1px solid var(--line2);background:transparent;color:var(--txt);cursor:pointer">+ Aperol / Campari Spritz</button>
+              <button id="phAddon_cremant" onclick="togglePhAddon('cremant')" class="tip-opt" style="font-size:12px;padding:5px 12px;border-radius:8px;border:1px solid var(--line2);background:transparent;color:var(--txt);cursor:pointer">+ Crémant</button>
+              <button id="phAddon_shots" onclick="togglePhAddon('shots')" class="tip-opt" style="font-size:12px;padding:5px 12px;border-radius:8px;border:1px solid var(--line2);background:transparent;color:var(--txt);cursor:pointer">+ Free Shots</button>
+            </div>
+          </div>
+          <div id="phBudgetInfo" style="display:none;font-size:12px;font-weight:600;padding:8px 4px 2px;margin-top:2px"></div>
+        </div>
+        <button onclick="addPhase()" style="width:100%;padding:7px;border-radius:8px;border:1px dashed var(--line2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer">+ Add Consumption Period</button>
+      </div>
       <!-- DJ Tickets quick panel -->
       <div id="locRulesBanner" style="display:none;background:var(--card2);border-radius:10px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--muted);font-weight:500"></div>
       <div id="djPanel" style="background:var(--card2);border-radius:13px;padding:12px 14px;margin-bottom:10px;display:none">
@@ -280,8 +338,7 @@ input,select,textarea{font-family:inherit;font-size:16px}
       <div class="list" id="vOrder"></div>
     </div>
     <div id="panePersonal" class="hidden">
-      <p class="hint">Staff drinks — no spirits please.</p>
-      <div class="search"><span class="si">⌕</span><input type="text" id="searchP" placeholder="Search drinks…" autocomplete="off"/><button class="clr hidden" id="clrP">✕</button></div>
+            <div class="search"><span class="si">⌕</span><input type="text" id="searchP" placeholder="Search drinks…" autocomplete="off"/><button class="clr hidden" id="clrP">✕</button></div>
       <div id="pResults" class="results"></div>
       <div class="miniform hidden" id="pnForm">
         <p class="fl">Add Custom Staff Drink</p>
@@ -327,6 +384,7 @@ input,select,textarea{font-family:inherit;font-size:16px}
             <div class="tip-row">
               <button class="tip-opt" id="ao-spritz" onclick="toggleAddon('spritz')">+ Aperol / Campari Spritz</button>
               <button class="tip-opt" id="ao-cremant" onclick="toggleAddon('cremant')">+ Crémant</button>
+              <button class="tip-opt" id="ao-shots-basic" onclick="toggleAddon('shots')">+ Free Shots</button>
             </div>
           </div>
           <div id="advancedAddonsWrap" class="hidden">
@@ -339,7 +397,7 @@ input,select,textarea{font-family:inherit;font-size:16px}
         </div>
         <div id="verbrauchWrap" class="hidden" style="margin-bottom:14px">
           <div class="warn" style="border-color:var(--line2);background:var(--card2);color:var(--muted)">
-            <span style="flex:0 0 auto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span><span>Invoice will be sent to the organizer — no cash tracking needed.</span>
+            <span style="flex:0 0 auto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
           </div>
           <p class="label" style="margin-top:10px">Budget Limit <span style="font-size:10px;font-weight:400;color:var(--faint)">(optional)</span></p>
           <p style="font-size:12px;color:var(--faint);margin-bottom:8px">Organizer covers up to this amount — guests pay above it directly.</p>
@@ -355,8 +413,9 @@ input,select,textarea{font-family:inherit;font-size:16px}
           <p class="label">Income</p>
           <div class="miniform" style="margin-bottom:14px">
             <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">Cash</div><div class="cur-input" style="flex:1"><input type="text" inputmode="decimal" id="abrCash" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
-            <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">SumUp</div><div class="cur-input" style="flex:1"><input type="text" inputmode="decimal" id="abrSumup" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
-            <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">Lightspeed</div><div class="cur-input" style="flex:1"><input type="text" inputmode="decimal" id="abrLight" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
+            <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">DJ Bons</div><div class="cur-input" style="flex:1"><input type="text" inputmode="decimal" id="abrDjBon" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
+            <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">SumUp <span style="font-size:9px;color:var(--muted)">(inkl. Tips)</span></div><div class="cur-input" style="flex:1"><input type="text" inputmode="decimal" id="abrSumup" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
+            <div class="mf-row" style="align-items:center"><div class="cur-lbl" style="flex:0 0 90px">Lightspeed <span style="font-size:9px;color:var(--muted)">(exkl. Tips)</span></div><div class="cur-input" style="flex:1"><input type="text" inputmode="decimal" id="abrLight" inputmode="decimal" placeholder="0,00" step="0.01" min="0"/><span class="cur-lbl">€</span></div></div>
           </div>
           <p class="label">Tips</p>
           <div class="miniform" style="margin-bottom:14px">
@@ -375,7 +434,9 @@ input,select,textarea{font-family:inherit;font-size:16px}
           </div>
         </div>
         <div id="abrSummary" style="margin-bottom:14px"></div>
-        <p class="label">Notes</p>
+        <p class="label">Event End Time</p>
+          <div class="cur-input" style="margin-bottom:12px"><input type="time" id="abrEndTime" style="flex:1;padding:10px;border-radius:9px;border:1px solid var(--line2);background:var(--card);color:var(--txt);font-size:14px;width:100%;box-sizing:border-box"/></div>
+          <p class="label">Notes</p>
         <div class="miniform" style="margin-bottom:14px"><textarea id="abrNote" placeholder="Additional notes…" style="width:100%;min-height:64px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:9px 12px;outline:none;resize:none;font-size:15px;line-height:1.4"></textarea></div>
       </div>
     </div>
@@ -401,23 +462,10 @@ input,select,textarea{font-family:inherit;font-size:16px}
     <button id="editSession" style="width:100%;height:46px;border-radius:13px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-weight:500;font-size:15px;margin-bottom:10px">Edit Session</button>
     <button id="deleteSession" style="width:100%;height:46px;border-radius:13px;border:1px solid var(--danger);background:transparent;color:var(--danger);font-weight:500;font-size:15px;margin-bottom:16px">Delete Session</button>
     <button class="dl-primary" id="dlXlsx" style="background:var(--good);color:#06241c;margin-bottom:10px"><span style="display:inline-flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Download Excel</span></button>
-    <div class="dl-row" style="display:flex;gap:8px;margin-bottom:8px">
-      <button id="dlCsv"><span>▤</span> CSV</button>
-      <button id="copyText"><span>⧉</span> Text</button>
-      <button id="copyJson"><span>{ }</span> JSON</button>
-    </div>
-    <p class="note">PDF = full event report. CSV = one row per drink with date/location — stack all events into one master sheet.</p>
+    
   </section>
 </div>
 <div class="bottombar" id="bottombar"><div class="inner" id="barInner"></div></div>
-<div class="modal-bg hidden" id="modalBg">
-  <div class="modal">
-    <h3>Hand Off / Share</h3>
-    <p class="msub">Scan the QR code or send the link. The other person gets this session added to their app — their existing sessions stay untouched.</p>
-    <div id="qrbox"></div>
-    <div class="mrow"><button id="copyLink">⧉ Copy Link</button><button id="closeModal">Close</button></div>
-  </div>
-</div>
 <div class="modal-bg hidden" id="syncModal">
   <div class="modal" style="max-height:90vh;overflow-y:auto;text-align:left">
     <h3 style="text-align:center">Cloud Sync Setup</h3>
@@ -474,7 +522,7 @@ input,select,textarea{font-family:inherit;font-size:16px}
   </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" onerror="window.QRCode=null"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js" onerror="window.XLSX=null"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js" onerror="this._tried||(this._tried=1,this.src='https://unpkg.com/xlsx-js-style@1.2.0/dist/xlsx.bundle.js')" onload="window._xlsxReady=true"></script>
 <script>
 (function(){
 "use strict";
@@ -534,17 +582,12 @@ const MENU=[
     ["Thomas Henry Pink Grapefruit","1 l",0],["Bitter Lemon","1 l",0],["Ginger Beer","1 l",0],
   ]}
 ];
-const PMENU=[
-  {c:"Non-Alcoholic",items:[["Water","0,50 l"],["Coca Cola / Zero","0,33 l"],["Saftschorle","0,20 l"],["Juice","0,20 l"],["Soft (Tonic, Ginger Beer etc.)","0,20 l"],["Club Mate","0,33 l"],["Voelkel / BioZisch","0,50 l"],["LemonAid / ChariTea","0,33 l"],["Makava","0,33 l"],["Red Bull","0,20 l"],["Apfel Saft","1 l"],["Maracuja Saft","1 l"],["Mango Saft","1 l"],["Orange Saft","1 l"],["Cranberry Saft","1 l"],["Ananas Saft","1 l"]]},
-  {c:"Beer",items:[["Berliner Pilsner","0,33 l"],["Augustiner Helles","0,5 l"],["Augustiner Helles","0,33 l"],["Berliner Radler","0,33 l"],["Clausthaler (N/A)","0,33 l"]]},
-  {c:"Wine & Sparkling",items:[["White Wine","0,20 l"],["Red Wine","0,20 l"],["Rosé","0,20 l"],["White Wine Spritz","0,20 l"],["Prosecco","0,10 l"],["Prosecco on Ice","0,30 l"]]},
-  {c:"Coffee",items:[["Espresso",""]]},
-];
-const SH_ROLES=[{k:"vl",label:"Event Lead"},{k:"bar",label:"Bar"},{k:"service",label:"Service / Runner"},{k:"security",label:"Security"},{k:"leih",label:"Temp Staff"},{k:"garderobe",label:"Coatcheck"},{k:"aufabbau",label:"Setup & Breakdown"}];
+const PMENU=MENU; // shared menu — same as MENU
+const SH_ROLES=[{k:"vl",label:"Event Lead"},{k:"bar",label:"Bar"},{k:"service",label:"Service / Runner"},{k:"security",label:"Security"},{k:"leih",label:"Temp Staff"},{k:"garderobe",label:"Coatcheck"},{k:"aufabbau",label:"Setup & Breakdown"},{k:"soundtech",label:"Sound Technician"},{k:"lighttech",label:"Light Technician"}];
 let idc=0;
 MENU.forEach(c=>c.items=c.items.map(([n,s,p])=>({id:"v"+(idc++),n,s,p,ek:0})));
-PMENU.forEach(c=>c.items=c.items.map(([n,s])=>({id:"p"+(idc++),n,s})));
-const ALLV=MENU.flatMap(c=>c.items),ALLP=PMENU.flatMap(c=>c.items);
+// PMENU=MENU (shared) so no second transform needed
+const ALLV=MENU.flatMap(c=>c.items),ALLP=ALLV; // same items
 const ALLV_MAP=Object.fromEntries(ALLV.map(i=>[i.id,i]));
 /* EK PRICES from Einkauf_Verkauf_Kreuzberg.xlsx */
 const EK={
@@ -604,6 +647,17 @@ function normalizeSess(s){
   if(!s.counts||typeof s.counts!=="object"||Array.isArray(s.counts))s.counts={};
   if(!s.djCounts||typeof s.djCounts!=="object")s.djCounts={};
   if(!Array.isArray(s.custom))s.custom=[];
+  // Consumption phases: each has its own counts, name, time, payType
+  if(!Array.isArray(s.phases))s.phases=[];
+  if(s.activePhase===undefined)s.activePhase=null;
+  s.phases.forEach(p=>{
+    if(!p.counts)p.counts={};
+    if(!p.custom)p.custom=[];
+    if(!p.payType)p.payType="pauschale";
+    if(p.budget===undefined)p.budget=null;
+    if(!p.pauschalenType)p.pauschalenType="basic";
+    if(!p.addons||typeof p.addons!=="object")p.addons={};
+  });
   if(!s.personal||typeof s.personal!=="object")s.personal={};
   if(!Array.isArray(s.bruch))s.bruch=[];
   if(!s.bruchCounts||typeof s.bruchCounts!=="object")s.bruchCounts={};
@@ -659,9 +713,15 @@ const eurp=n=>n.toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionD
 const fmtDate=d=>{if(!d)return"";const p=d.split("-");return p.length===3?`${p[2]}.${p[1]}.${p[0]}`:d;};
 const esc=s=>(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function parsePrice(s){s=(s||"").trim();if(s.includes(","))s=s.replace(/\./g,"").replace(",",".");const v=parseFloat(s);return isFinite(v)?Math.round(v*100)/100:NaN;}
-const poolV=s=>ALLV.concat((s||sess()).custom||[]);
-const revTotalFor=s=>poolV(s).reduce((r,i)=>r+(s.counts[i.id]||0)*i.p,0);
-const revQtyFor=s=>poolV(s).reduce((r,i)=>r+(s.counts[i.id]||0),0);
+const poolV=s=>{const _s=s||sess();const ph=_s.activePhase;const phCustom=(Array.isArray(_s.phases)&&_s.phases[ph]&&_s.phases[ph].custom)||[];return ALLV.concat(_s.custom||[]).concat(phCustom);};
+const revTotalFor=s=>{
+  const allCounts=[s.counts,...(s.phases||[]).map(p=>p.counts||{})].reduce((acc,c)=>{Object.keys(c).forEach(k=>acc[k]=(acc[k]||0)+c[k]);return acc;},{});
+  return poolV(s).reduce((r,i)=>r+(allCounts[i.id]||0)*i.p,0);
+};
+const revQtyFor=s=>{
+  const allCounts=[s.counts,...(s.phases||[]).map(p=>p.counts||{})].reduce((acc,c)=>{Object.keys(c).forEach(k=>acc[k]=(acc[k]||0)+c[k]);return acc;},{});
+  return poolV(s).reduce((r,i)=>r+(allCounts[i.id]||0),0);
+};
 const persQtyFor=s=>ALLP.reduce((r,i)=>r+(s.personal[i.id]||0),0);
 const bruchQtyFor=s=>(s.bruch||[]).reduce((r,e)=>r+(e.qty||0),0);
 const revTotal=()=>revTotalFor(sess());const revQty=()=>revQtyFor(sess());
@@ -671,7 +731,11 @@ const activeP=()=>ALLP.filter(i=>(sess().personal[i.id]||0)>0);
 const activeCustom=()=>(sess().custom||[]).filter(i=>(sess().counts[i.id]||0)>0);
 function getSH(){const s=sess();if(!s.stunden||Array.isArray(s.stunden))s.stunden={};return s.stunden;}
 function shTotal(){const sh=getSH();return SH_ROLES.reduce((t,r)=>t+(parseFloat(sh[r.k])||0),0);}
-function getAbr(){const s=sess();if(!s.abrechnung)s.abrechnung={type:"",cash:0,sumup:0,light:0,tip:0,tipSource:"",notes:""};if(s.abrechnung.light===undefined)s.abrechnung.light=0;return s.abrechnung;}
+function getAbr(){const s=sess();if(!s.abrechnung)s.abrechnung={type:"",cash:0,sumup:0,light:0,tip:0,tipSource:"",notes:""};if(s.abrechnung.light===undefined)s.abrechnung.light=0;
+  if(s.abrechnung.djBon===undefined)s.abrechnung.djBon=0;
+  if(s.abrechnung.endTime===undefined)s.abrechnung.endTime="";
+  if(s.abrechnung.djBon===undefined)s.abrechnung.djBon=0;
+  if(s.abrechnung.endTime===undefined)s.abrechnung.endTime="";return s.abrechnung;}
 const poolBC=s=>ALLV.concat((s||sess()).custom||[]);
 function getPersPrice(item){const v=ALLV.find(i=>i.n===item.n&&(!item.s||i.s===item.s))||ALLV.find(i=>i.n===item.n);return v?v.p:0;}
 const persTotal=()=>ALLP.concat(sess().customPersonal||[]).reduce((t,i)=>{const qty=sess().personal[i.id]||0;return t+qty*getPersPrice(i);},0);
@@ -733,7 +797,13 @@ $("#sessCards").addEventListener("click",e=>{
   if(op){currentId=op.dataset.id;activeSheet="verbrauch";saveAll();go("sheets");
   let _att=0;const _fix=setInterval(()=>{if(screen!=="sheets"||++_att>10)return clearInterval(_fix);const _t=$("#tabs");if(!_t||_t.children.length<3){renderTabs();renderBar();}else clearInterval(_fix);},100);
   return;}
-  if(ex){currentId=ex.dataset.id;saveAll();go("summary");return;}
+  if(ex){
+    currentId=ex.dataset.id;saveAll();
+    requirePin("download Excel",()=>{
+      downloadExcel();
+    });
+    return;
+  }
   if(ed){currentId=ed.dataset.id;editMode=true;saveAll();go("setup");return;}
   if(dl){
     const se=sessions.find(s=>s.id===dl.dataset.id);if(!se)return;
@@ -825,27 +895,8 @@ function defaultMode(id){
   const ldOrShot=item.n.startsWith("LD ")||item.n.startsWith("Shots");
   return ldOrShot?"v":"p";
 }
-function bumpV(id,d){const s=sess();let v=Math.max(0,Math.min(9999,Math.round((s.counts[id]||0)+d)));if(v===0){delete s.counts[id];delete s.countMode[id];}else{s.counts[id]=v;if(!s.countMode[id])s.countMode[id]=defaultMode(id);}touchSess();}
-function setV(id,val){const s=sess();let v=Math.max(0,Math.min(9999,Math.round(val||0)));if(v===0){delete s.counts[id];delete s.countMode[id];}else{s.counts[id]=v;if(!s.countMode[id])s.countMode[id]=defaultMode(id);}touchSess();}
-// German↔English search synonyms
-const SYNONYMS={
-  "wasser":"water","cola":"coca","mate":"club mate","bier":"pilsner",
-  "radler":"radler","pils":"pilsner","helles":"augustiner",
-  "wein":"wine","rotwein":"red wine","weißwein":"white wine","rose":"ros",
-  "sekt":"prosecco","cremant":"cremant","saftschorle":"schorle",
-  "saft":"juice","apfelsaft":"juice","orangensaft":"juice",
-  "kaffee":"coffee","tee":"tea","espresso":"espresso",
-  "schnaps":"shots","shot":"shots","longdrink":"ld",
-  "wodka":"vodka","gin":"gin","rum":"rum","whiskey":"whisky",
-  "tequila":"tequila","mezcal":"mezcal","aperol":"aperol",
-  "campari":"campari","vermouth":"vermouth","ingwer":"ingava",
-  "ingwerschnaps":"ingava","flasche":"fl.","fl ":"fl.",
-  "beerdigungsbier":"clausthaler","alkoholfrei":"clausthaler",
-  "sprudel":"wasser","mineralwasser":"wasser","limo":"soft",
-  "tonic":"soft","ginger":"soft","redbull":"red bull",
-  "biozisch":"biozisc","lemondaid":"lemon","chary":"chariy",
-  "makava":"makava","prosecco":"prosecco","crémant":"cremant"
-};
+function bumpV(id,d){const s=sess();const ac=getActiveCounts();let v=Math.max(0,Math.min(9999,Math.round((ac[id]||0)+d)));if(v===0){delete ac[id];}else{ac[id]=v;}touchSess();}
+function setV(id,val){const s=sess();const ac=getActiveCounts();const nv=Math.max(0,parseNum(val)||0);if(!nv)delete ac[id];else ac[id]=nv;touchSess();}
 function expandSearch(q){
   const lo=q.toLowerCase();
   const terms=[lo];
@@ -880,7 +931,7 @@ function renderResults(){
 }
 function renderOrder(){
   const s=sess();const locRules=getLocRules();
-  const activeCounts=djMode?(s.djCounts||{}):(s.counts||{});
+  const activeCounts=getActiveCounts();
   // groups defined first so location rules can unshift into it
   const groups=MENU.map(c=>({c:c.c,items:c.items}));
   // Pinned items for this venue at the top
@@ -917,6 +968,70 @@ function renderV(){
       rulesBanner.style.display="block";
     } else {
       rulesBanner.style.display="none";
+    }
+  }
+  // Render consumption phases bar
+  const phasesBar=document.getElementById("phasesBar");
+  const _ps=sess();
+  if(phasesBar){
+    const hasPhases=Array.isArray(_ps.phases)&&s5.phases.length>0;
+    phasesBar.style.display="block"; // always show
+    if(hasPhases){
+      const phaseTabs=document.getElementById("phaseTabs");
+      const phSet=document.getElementById("phaseSettings");
+      if(phaseTabs){
+        const activeIdx=_ps.activePhase||0;
+        const allPeriods=(_ps.phases||[]);
+        phaseTabs.innerHTML=allPeriods.map((ph,i)=>{
+          const lbl=getPhaseLabel({...ph,idx:i});
+          const active=i===activeIdx;
+          const ptBadge=ph.payType==="verbrauch"?"Konsumation":ph.payType==="direct"?"Direkt":"Flat Rate";
+          const budSpent=ph.payType==="verbrauch"&&ph.budget?ALLV.concat(ph.custom||[]).reduce((t,x)=>t+(ph.counts[x.id]||0)*x.p,0):0;
+          const budRem=ph.budget?ph.budget-budSpent:null;
+          const remStr=budRem!==null?(budRem<0?" ⋅ €"+Math.abs(budRem).toFixed(0)+" over":" ⋅ €"+budRem.toFixed(0)+" left"):"";
+          return "<button onclick=\"setActivePhase("+i+")\" style=\"padding:5px 10px;border-radius:8px;border:"+(active?"none":"1px solid var(--line2)")+";background:"+(active?"var(--accent)":"transparent")+";color:"+(active?"var(--accent-txt)":"var(--muted)")+";font-size:12px;font-weight:600;cursor:pointer\">"+lbl+" <span style=\"font-size:10px;opacity:.7\">"+ptBadge+remStr+"<\/span> <span onclick=\"event.stopPropagation();deletePhase("+i+")\" style=\"margin-left:4px;opacity:.6\">\xd7<\/span><\/button>";
+        }).join("");
+        // Show settings for active non-main phase
+        if(phSet){phSet.style.display=allPeriods.length>0?"block":"none";}
+        if(Array.isArray(_ps.phases)&&_ps.phases[activeIdx]!==undefined){
+          const curPh=_ps.phases[activeIdx];
+          const pn=document.getElementById("phName"),ps=document.getElementById("phStart"),pe=document.getElementById("phEnd");
+          if(pn&&document.activeElement!==pn)pn.value=curPh.name||"";
+          if(ps&&document.activeElement!==ps)ps.value=curPh.startTime||"";
+          if(pe&&document.activeElement!==pe)pe.value=curPh.endTime||"";
+          const ptEl2=document.getElementById("phPayType");
+          if(ptEl2&&document.activeElement!==ptEl2)ptEl2.value=curPh.payType||"pauschale";
+          const budEl2=document.getElementById("phBudget");
+          if(budEl2&&document.activeElement!==budEl2)budEl2.value=curPh.budget||"";
+          const bWrap2=document.getElementById("phBudgetWrap");
+          if(bWrap2)bWrap2.style.display=curPh.payType==="verbrauch"?"block":"none";
+          // Flat rate wrap
+          const frWrap=document.getElementById("phFlatRateWrap");
+          if(frWrap)frWrap.style.display=curPh.payType==="pauschale"?"block":"none";
+          const awrap=document.getElementById("phAddonsWrap");
+          if(awrap)awrap.style.display=curPh.payType==="pauschale"?"block":"none";
+          const ptypeEl2=document.getElementById("phPauschalenType");
+          if(ptypeEl2)ptypeEl2.value=curPh.pauschalenType||"basic";
+          // Addon buttons
+          ["spritz","cremant","shots"].forEach(k=>{
+            const el=document.getElementById("phAddon_"+k);
+            if(el){const on=!!(curPh.addons&&curPh.addons[k]);el.classList.toggle("sel",on);el.style.background=on?"var(--accent)":"transparent";el.style.color=on?"var(--accent-txt)":"var(--txt)";}
+          });
+          // Budget remaining indicator
+          const budInfo=document.getElementById("phBudgetInfo");
+          if(budInfo){
+            if(curPh.payType==="verbrauch"&&curPh.budget){
+              const spent=ALLV.concat(curPh.custom||[]).reduce((t,i)=>t+(curPh.counts[i.id]||0)*i.p,0);
+              const rem=curPh.budget-spent;
+              budInfo.textContent="Spent: "+eur(spent)+" — Remaining: "+eur(rem);
+              budInfo.style.color=rem<0?"var(--red)":"var(--good)";
+              budInfo.style.display="block";
+            } else {
+              budInfo.style.display="none";
+            }
+          }
+        }
+      }
     }
   }
   // Update DJ mode button states
@@ -1128,6 +1243,8 @@ function renderAbrechnung(){
   if(activeSheet==="verbrauch")renderOrder();
   const gi=$("#abrGuests");if(gi&&document.activeElement!==gi)gi.value=s.guests||"";
   const ci=$("#abrCash");if(ci&&document.activeElement!==ci)ci.value=a.cash||"";
+  const di=$("#abrDjBon");if(di&&document.activeElement!==di)di.value=a.djBon||"";
+  const eti=$("#abrEndTime");if(eti&&document.activeElement!==eti)eti.value=a.endTime||"";
   const si=$("#abrSumup");if(si&&document.activeElement!==si)si.value=a.sumup||"";
   const li=$("#abrLight");if(li&&document.activeElement!==li)li.value=a.light||"";
   const ti=$("#abrTip");if(ti&&document.activeElement!==ti)ti.value=a.tip||"";
@@ -1159,7 +1276,8 @@ function renderAbrechnung(){
   renderTabs();renderBar();
 }
 $("#abrPauschaleFee").addEventListener("input",()=>{getAbr().pauschale_fee=$("#abrPauschaleFee").value;saveAbr();});
-["abrCash","abrSumup","abrLight","abrTip"].forEach(id=>{const el=$("#"+id);if(!el)return;el.addEventListener("input",()=>{const a=getAbr();if(id==="abrCash")a.cash=el.value;if(id==="abrSumup")a.sumup=el.value;if(id==="abrLight")a.light=el.value;if(id==="abrTip")a.tip=el.value;saveAbr();});});
+["abrCash","abrSumup","abrLight","abrTip","abrDjBon","abrEndTime"].forEach(id=>{const el=$("#"+id);if(!el)return;el.addEventListener("input",()=>{const a=getAbr();if(id==="abrCash")a.cash=el.value;if(id==="abrSumup")a.sumup=el.value;if(id==="abrDjBon")a.djBon=parsePrice(el.value)||0;
+    if(id==="abrEndTime")a.endTime=el.value||"";if(id==="abrLight")a.light=el.value;if(id==="abrTip")a.tip=el.value;saveAbr();});});
 $("#abrNote").addEventListener("input",()=>{getAbr().notes=$("#abrNote").value;saveAbr();});
 
 /* SUMMARY */
@@ -1230,7 +1348,22 @@ function exportAllCSV(){const list=filterSessions(sessFilter);if(!list.length){t
 
 
 function downloadExcel(){
-  if(!window.XLSX){toast("Excel library loading — try again");return;}
+  if(!window.XLSX){
+    // Try loading xlsx on demand if CDN failed
+    toast("Loading Excel library...");
+    const s=document.createElement("script");
+    s.src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js";
+    s.onload=()=>{toast("Ready — tap Download Excel again");}
+    s.onerror=()=>{
+      const s2=document.createElement("script");
+      s2.src="https://unpkg.com/xlsx-js-style@1.2.0/dist/xlsx.bundle.js";
+      s2.onload=()=>{toast("Ready — tap Download Excel again");}
+      s2.onerror=()=>{toast("No internet — cannot load Excel library");}
+      document.head.appendChild(s2);
+    };
+    document.head.appendChild(s);
+    return;
+  }
   const s=sess(),XLSX=window.XLSX,ab=s.abrechnung||{};
 
   // ── Color palette ──────────────────────────────────────────────────────────
@@ -1308,6 +1441,12 @@ function downloadExcel(){
     ["Shots (Jameson/Bulleit/Tequila 3,50 €)","2 cl",3.50,0.62],
     ["Cocktails","",10.00,1.20],
   ];
+  // Cross-sheet row references
+  const _custLen=(s.custom||[]).length;
+  const _persCustomLen=(s.customPersonal||[]).length;
+  const CONS_TOTAL=ALL.length+6+(_custLen>0?_custLen+1:0);
+  const PERS_TOTAL=ALL.length+6+(_persCustomLen>0?_persCustomLen+1:0);
+
 
   function matchQty(name,source,counts){
     const i=source.find(x=>x.n===name);return i?counts[i.id]||0:0;
@@ -1409,7 +1548,8 @@ function downloadExcel(){
   }
   function inputRow(row,label,val,note){
     ovWs["B"+row]=tv(label,st(false,C.dark,null));
-    if(note)ovWs["C"+row]=tv(note,st(false,C.faint,null,"left",null,8,true));
+    ovWs["C"+row]=tv(ef((val||0)/1.19),st(false,C.grey,null,"right",M));
+    if(note)ovWs["D"+row]=tv(note,st(false,C.faint,null,"left",null,8,true));
     ovWs["E"+row]=tv(ef(val),st(true,C.blue,C.inputBg,"right",M));
   }
 
@@ -1419,70 +1559,112 @@ function downloadExcel(){
   ovWs["B3"]=tv("Zahlungsart: "+payLabel,st(false,C.gold,null,"left",null,10));
   if(s.guests)ovWs["B4"]=tv("Gäste: "+s.guests+(s.djUsed?" · DJ Tickets: "+s.djUsed+"/"+(s.djOrdered||"?"):""),st(false,C.grey,null,"left",null,9));
   ovWs["B9"]=tv("Position",st(true,C.grey,C.greyBg,"left",null,9));
-  ovWs["E9"]=tv("Betrag",st(true,C.grey,C.greyBg,"right",null,9));
-  const R={rech:10,sumu:11,lspe:12,cash:13,djtk:14,tip:15,sumA:16};
-  inputRow(R.rech,"Einnahmen Getränke-Rechnung  (Pauschale / Flatrate-Rechnung)",rechnung);
-  inputRow(R.sumu,"SumUp-Umsatz",sumup);
-  inputRow(R.lspe,"Lightspeed-Umsatz",light);
-  inputRow(R.cash,"Cash-Umsatz",cash);
-  inputRow(R.djtk,"DJ-Tickets  (→ Tab: Nachverbrauch DJ-Tickets)",s.djTickets||0);
-  inputRow(R.tip,"Trinkgeld via SumUp / Lightspeed  (aus Kasse auszahlen!)",tip,"⚠ Kartentrinkgeld");
-  dataRow(R.sumA,"Summe Einnahmen  (A)","=SUM(E"+R.rech+":E"+(R.sumA-1)+")",M,true,C.green,C.greenBg);
+  ovWs["C9"]=tv("Netto (ohne MwSt)",st(true,C.grey,C.greyBg,"right",null,9));
+  ovWs["E9"]=tv("Brutto (inkl. MwSt)",st(true,C.grey,C.greyBg,"right",null,9));
+  // ── ROW MAP ──────────────────────────────────────────────────────────────
+  const R={rech:10,sumu:11,lspe:12,cash:13,djtk:14,sumA:15};
+  const RB={cons:19,nach:20,wqc:21,wql:22,wqs:23,sumB:24,pers:25,bruc:26,sumC:27};
+  const R_TIP=30; // Trinkgeld row (after GEWINN/VERLUST)
 
-  // ── Wareneinsatzquote (only relevant for Direct Payment) ─────────────────
-  const hasDirect=(ab.types||[]).includes("direct");
-  const R_WEQ=R.sumA+2;
-  if(hasDirect){
-    ovWs["B"+R_WEQ]=tv("Durchschnittliche Wareneinsatzquote (für Direct Payment)",st(false,"555555",null));
-    ovWs["C"+R_WEQ]=tv("Anteil EK (z.B. 19% = 0,19):",st(false,"555555",null,"right",null,8,true));
-    ovWs["E"+R_WEQ]=tv(0.19,st(true,"0000BB","FFFF99","right","0%"));
-  }
+  // ── A: EINNAHMEN ──────────────────────────────────────────────────────────
+  band(8,"A.  EINNAHMEN",C.green,C.greenBg);
+  ovWs["B9"]=tv("Position",st(true,C.grey,C.greyBg,"left",null,9));
+  ovWs["C9"]=tv("Netto (ohne MwSt)",st(true,C.grey,C.greyBg,"right",null,9));
+  ovWs["E9"]=tv("Brutto (inkl. MwSt)",st(true,C.grey,C.greyBg,"right",null,9));
+
+  inputRow(R.rech,"Einnahmen Getränke-Rechnung  (Pauschale / Flatrate-Rechnung)",rechnung);
+  inputRow(R.sumu,"SumUp-Umsatz  (inkl. Trinkgeld)",sumup);
+  inputRow(R.lspe,"Lightspeed-Umsatz  (exkl. Trinkgeld)",light);
+  inputRow(R.cash,"Cash-Umsatz",cash);
+  inputRow(R.djtk,"DJ Bons Verkauf (Einnahmen)",ab.djBon||0);
+  // Summe A = all income excl. Trinkgeld
+  // SumUp includes tip: SumUp net = SumUp - Tip
+  dataRow(R.sumA,"Summe Einnahmen  (A)","=E"+R.rech+"+(E"+R.sumu+"-E39)+E"+R.lspe+"+E"+R.cash+"+E"+R.djtk,M,true,C.green,C.greenBg);
+  ovWs["C"+R.sumA]=tf("=E"+R.sumA+"/1.19",st(false,C.green,C.greenBg,"right",M));
 
   // ── B: KOSTEN ─────────────────────────────────────────────────────────────
-  const _custLen=(s.custom||[]).length;
-  const _persCustomLen=(s.customPersonal||[]).length;
-  const CONS_TOTAL=ALL.length+6+(_custLen>0?_custLen+1:0); // shifts if custom items exist
-  const PERS_TOTAL=ALL.length+6+(_persCustomLen>0?_persCustomLen+1:0); // same for personal
-  band(18,"B.  KOSTEN  (Wareneinsatz)",C.gold,C.goldBg);
-  for(const [c,t,al] of [["B","Position","left"],["C","VK-Wert (€)","right"],["D","VK-Wert Brutto (€)","right"],["E","Wareneinsatz / EK (€)","right"]])
-    ovWs[c+"19"]=tv(t,st(true,C.grey,C.greyBg,al,null,9));
-  const RB={pers:20,bruc:21,cons:22,nach:23,sumB:24,vkg:25};
-  dataRow(RB.pers,"Personal-Getränke  (→ Tab: Personal Getränke)");
-  ovWs["C"+RB.pers]=tf("=IFERROR('Personal Getränke'!F"+PERS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
-  ovWs["E"+RB.pers]=tf("=IFERROR('Personal Getränke'!G"+PERS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
-  dataRow(RB.bruc,"Bruch  (→ Tab: Bruch)");
-  ovWs["C"+RB.bruc]=tf("=IFERROR('Bruch'!F"+PERS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
-  ovWs["E"+RB.bruc]=tf("=IFERROR('Bruch'!G"+PERS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
+  band(17,"B.  KOSTEN",C.gold,"FFF3E0");
+  ovWs["B18"]=tv("Position",st(true,C.grey,C.greyBg,"left",null,9));
+  ovWs["E18"]=tv("EK-Wert (€)",st(true,C.grey,C.greyBg,"right",null,9));
+
+  // Consumed drinks (cross-ref from Verbrauchsliste EK column)
   dataRow(RB.cons,"Verbrauchte Getränke  (→ Tab: Verbrauchsliste)");
-  ovWs["C"+RB.cons]=tf("=IFERROR('Verbrauchsliste'!F"+CONS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
-  ovWs["D"+RB.cons]=tf("=IFERROR('Verbrauchsliste'!F"+CONS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
-  ovWs["E"+RB.cons]=tf("=IFERROR('Verbrauchsliste'!G"+CONS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
-  dataRow(RB.nach,"Nachverbrauch / DJ-Tickets  (→ Tab: Nachverbrauch DJ-Tickets)")
-  // Direct Payment estimated EK
-  if(hasDirect){
-    const RB_DIRECT=RB.nach+1;
-    ovWs["B"+RB_DIRECT]=tv("Geschätzter Wareneinsatz (Einnahmen × Quote) — Direct Payment",st(false,C.gold,null));
-    ovWs["E"+RB_DIRECT]=tf("=IFERROR(E"+R_WEQ+"*E"+R.sumA+",0)",st(false,C.gold,C.goldBg,"right",M));
-    // Update sumB to include direct EK
-    ovWs["B"+RB.sumB]=tv("Summe Wareneinsatz  (B)",st(true,C.gold,C.goldBg,"left",null,11));
-    ovWs["E"+RB.sumB]=tf("=E"+RB.pers+"+E"+RB.bruc+"+E"+RB.cons+"+E"+RB.nach+"+E"+RB_DIRECT,st(true,C.gold,C.goldBg,"right",M));
-  };
-  ovWs["C"+RB.nach]=tf("=IFERROR('Nachverbrauch DJ-Tickets'!F"+CONS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
-  ovWs["E"+RB.nach]=tf("=IFERROR('Nachverbrauch DJ-Tickets'!G"+CONS_TOTAL+",0)","n",st(false,C.green,null,"right",M));
-  dataRow(RB.sumB,"Summe Wareneinsatz  (B)","=E"+RB.pers+"+E"+RB.bruc+"+E"+RB.cons+"+E"+RB.nach,M,true,C.gold,C.goldBg);
-  dataRow(RB.vkg,"Verkaufswert gesamt an Kunden  (inkl. Personal & Bruch)");
-  ovWs["C"+RB.vkg]=tf("=C"+RB.pers+"+C"+RB.bruc+"+C"+RB.cons+"+C"+RB.nach,"n",st(false,C.grey,null,"right",M));
+  ovWs["E"+RB.cons]=tf("=IFERROR(\'Verbrauchsliste\'!G"+CONS_TOTAL+",0)",st(true,C.blue,C.inputBg,"right",M));
 
-  // ── C: GEWINN/VERLUST ─────────────────────────────────────────────────────
-  band(27,"C.  GEWINN / VERLUST",C.red,"FDECEA");
-  dataRow(28,"Summe Einnahmen  (A)","=E"+R.sumA,M,false,C.green);
-  dataRow(29,"abzgl. Summe Wareneinsatz  (B)","=-E"+RB.sumB,M,false,C.red);
-  dataRow(30,"GEWINN / VERLUST","=E28+E29",M,true,C.green,C.greenBg);
+  // DJ ticket consumption
+  dataRow(RB.nach,"Nachverbrauch DJ-Tickets  (→ Tab: Nachverbrauch DJ-Tickets)");
+  ovWs["E"+RB.nach]=tf("=IFERROR(\'Nachverbrauch DJ-Tickets\'!G"+CONS_TOTAL+",0)",st(true,C.blue,C.inputBg,"right",M));
 
-  // ── Cash reconciliation ────────────────────────────────────────────────────
-  band(32,"Kassen-Abrechnung: Trinkgeld",C.orange,C.orangeBg,10);
-  dataRow(33,"Kartentrinkgeld aus Kasse auszahlen:","=E"+R.tip,M,true,C.orange);
-  dataRow(34,"Effektiver Kassenbestand nach Auszahlung:","=E"+R.cash+"-E"+R.tip,M,true,C.green);
+  // WEQ per channel (19%)
+  const WEQ_RATE=0.19;
+  dataRow(RB.wqc,"Wareneinsatz nach Cash-Umsatz ("+Math.round(WEQ_RATE*100)+"%)");
+  ovWs["E"+RB.wqc]=tf("=ROUND(E"+R.cash+"*"+WEQ_RATE+",2)",st(false,C.gold,C.goldBg,"right",M));
+  dataRow(RB.wql,"Wareneinsatz nach Lightspeed-Umsatz ("+Math.round(WEQ_RATE*100)+"%)");
+  ovWs["E"+RB.wql]=tf("=ROUND(E"+R.lspe+"*"+WEQ_RATE+",2)",st(false,C.gold,C.goldBg,"right",M));
+  dataRow(RB.wqs,"Wareneinsatz nach SumUp-Umsatz ("+Math.round(WEQ_RATE*100)+"%)");
+  ovWs["E"+RB.wqs]=tf("=ROUND((E"+R.sumu+"-E39)*"+WEQ_RATE+",2)",st(false,C.gold,C.goldBg,"right",M));
+
+  // Summe Wareneinsatz B
+  dataRow(RB.sumB,"Summe Wareneinsatz  (B)","=E"+RB.cons+"+E"+RB.nach+"+E"+RB.wqc+"+E"+RB.wql+"+E"+RB.wqs,M,true,C.gold,"FFF3E0");
+
+  // Personal & Bruch (informational, not from Verbrauchsliste EK)
+  dataRow(RB.pers,"Personal-Getränke  (→ Tab: Personal Getränke)");
+  ovWs["E"+RB.pers]=tf("=IFERROR(\'Personal Getränke\'!G"+PERS_TOTAL+",0)",st(true,C.blue,C.inputBg,"right",M));
+  dataRow(RB.bruc,"Bruch  (→ Tab: Bruch)");
+  ovWs["E"+RB.bruc]=tf("=IFERROR(\'Bruch\'!G"+PERS_TOTAL+",0)",st(true,C.blue,C.inputBg,"right",M));
+
+  // Summe Kosten C = B + Personal + Bruch
+  dataRow(RB.sumC,"Summe Kosten  (C)","=E"+RB.sumB+"+E"+RB.pers+"+E"+RB.bruc,M,true,C.gold,"FFF3E0");
+
+  // ── Extra info rows ────────────────────────────────────────────────────────
+  ovWs["B29"]=tv("Verkaufswert gesamt an Kunden  (ohne Personal Getränke & Bruch)",st(false,C.dark));
+  ovWs["E29"]=tf("=IFERROR(\'Verbrauchsliste\'!F"+CONS_TOTAL+",0)",st(true,C.blue,C.inputBg,"right",M));
+
+  // Rohertrag (Netto Pauschale - Netto VK)
+  ovWs["B30"]=tv("Rohertrag (aus Pauschale)",st(false,C.dark));
+  ovWs["E30"]=tf("=IFERROR((E"+R.rech+"-\'Verbrauchsliste\'!F"+CONS_TOTAL+")/1.19,0)",st(false,C.green,null,"right",M));
+
+  // ── D: GEWINN / VERLUST ───────────────────────────────────────────────────
+  band(32,"D.  GEWINN / VERLUST",C.red,"FDECEA");
+  // Headers for D
+  ovWs["C33"]=tv("Netto",st(true,C.grey,C.greyBg,"right",null,9));
+  ovWs["E33"]=tv("Brutto",st(true,C.grey,C.greyBg,"right",null,9));
+  ovWs["B34"]=tv("Summe Einnahmen netto  (A)",st(false,C.green));
+  ovWs["C34"]=tf("=C"+R.sumA,st(false,C.green,null,"right",M));
+  ovWs["E34"]=tf("=E"+R.sumA,st(true,C.green,null,"right",M));
+  ovWs["B35"]=tv("abzgl. Summe Kosten  (C)",st(false,C.red));
+  ovWs["C35"]=tf("=-E"+RB.sumC+"/1.19",st(false,C.red,null,"right",M));
+  ovWs["E35"]=tf("=-E"+RB.sumC,st(false,C.red,null,"right",M));
+  ovWs["B36"]=tv("GEWINN / VERLUST",st(true,C.green,C.greenBg,"left",null,11));
+  ovWs["C36"]=tf("=C34+C35",st(true,C.green,C.greenBg,"right",M));
+  ovWs["E36"]=tf("=E34+E35",st(true,C.green,C.greenBg,"right",M));
+
+  // ── Kassen-Abrechnung: Trinkgeld ─────────────────────────────────────────
+  // Add Trinkgeld as a separate input row for cash reconciliation
+  band(38,"Kassen-Abrechnung: Trinkgeld",C.orange,C.orangeBg,10);
+  ovWs["B39"]=tv("Trinkgeld via SumUp / Lightspeed  (aus Kasse auszahlen!)",st(false,C.orange));
+  ovWs["D39"]=tv("⚠ Kartentrinkgeld",st(false,C.faint,null,"left",null,8,true));
+  ovWs["E39"]=tv(ef(tip),st(true,C.blue,C.inputBg,"right",M));
+  dataRow(40,"Kartentrinkgeld aus Kasse auszahlen:","=E39",M,true,C.orange);
+  dataRow(41,"Effektiver Kassenbestand nach Auszahlung:","=E"+R.cash+"-E39",M,true,C.green);
+
+
+  // ── Pauschale Analyse ──────────────────────────────────────────────────────
+  let nextRow=36;
+  if((ab.types||[]).includes("pauschale")&&rechnung>0){
+    band(36,"Pauschale Analyse",C.gold,C.goldBg,10);
+    ovWs["B37"]=tv("Pauschale eingenommen (Flatrate-Rechnung)",st(false,C.dark));
+    ovWs["E37"]=tv(ef(rechnung),st(true,C.blue,C.inputBg,"right",M));
+    ovWs["B38"]=tv("abzgl. Verbrauchsliste VK-Wert (was getrunken wurde)",st(false,C.dark));
+    ovWs["E38"]=tf("=IFERROR(-'Verbrauchsliste'!F"+CONS_TOTAL+",0)",st(false,C.red,null,"right",M));
+    ovWs["B39"]=tv("Pauschale Gewinn / Verlust",st(true,C.green,C.greenBg,"left",null,11));
+    ovWs["E39"]=tf("=E37+E38",st(true,C.green,C.greenBg,"right",M));
+    nextRow=41;
+  }
+
+  // ── Verkaufswert inkl. / ohne MwSt ─────────────────────────────────────
+  band(nextRow,"Verkaufswert gesamt an Kunden",C.grey,"F0EDE4",10);
+  // VK section removed
 
   // Hours
   const sh=s.stunden&&!Array.isArray(s.stunden)?s.stunden:{};
@@ -1550,6 +1732,7 @@ function downloadExcel(){
   const fn="Abrechnung_"+(s.loc||"Event").replace(/[^a-zA-Z0-9]/g,"_")+"_"+(s.date||"").replace(/-/g,"_")+".xlsx";
   XLSX.writeFile(wb,fn);
   toast("Excel downloaded ✓");
+  setTimeout(()=>go("sessions"),300);
 }
 window.downloadExcel=downloadExcel;
 function newSessionFlow(){
@@ -1577,22 +1760,26 @@ $("#dlXlsx")&&($("#dlXlsx").onclick=()=>requirePin("download Excel",downloadExce
 
 
 async function copyStr(text,btn,msg){try{await navigator.clipboard.writeText(text);}catch(e){const ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(_){}ta.remove();}if(btn){btn.classList.add("copied");setTimeout(()=>btn.classList.remove("copied"),1400);}toast(msg);}
-$("#dlCsv").onclick=downloadCSV;
-$("#copyText").onclick=e=>copyStr(summaryText(),e.currentTarget,"Summary copied");
-$("#copyJson").onclick=e=>copyStr(summaryJson(),e.currentTarget,"JSON copied");
+//$("#dlCsv").onclick=downloadCSV;
+//$("#copyText").onclick=e=>copyStr(summaryText(),e.currentTarget,"Summary copied");
+//$("#copyJson").onclick=e=>copyStr(summaryJson(),e.currentTarget,"JSON copied");
 $("#closeSession").onclick=()=>{const s=sess();if(!s.id)return;s.closed=true;s.closedAt=new Date().toISOString();saveAll();debouncedSync();toast(`${s.loc||"Session"} closed`);go("sessions");};
 $("#editSession").onclick=()=>{editMode=true;go("setup");};
-$("#deleteSession").onclick=()=>{const s=sess();if(!s.id)return;const delId=s.id;requirePin("delete this session",()=>{sessions=sessions.filter(x=>x.id!==delId);deleteSessionRemote(delId);currentId=null;saveAll();toast("Session deleted");go("sessions");});};
+$("#deleteSession").onclick=()=>{
+  const s=sess();if(!s||!s.id){toast("No session selected");return;}
+  const delId=s.id;
+  requirePin("delete this session",()=>{
+    try{
+      sessions=sessions.filter(x=>x.id!==delId);
+      currentId=null;
+      saveAll();
+      try{deleteSessionRemote(delId);}catch(e){}
+      toast("Session deleted");
+      go("sessions");
+    }catch(ex){toast("Error deleting: "+ex.message);}
+  });
+};
 
-/* SHARE / QR */
-function encSess(s){try{return btoa(unescape(encodeURIComponent(JSON.stringify(s))));}catch(e){return "";}}
-function decSess(str){try{return JSON.parse(decodeURIComponent(escape(atob(str))));}catch(e){return null;}}
-let _shareLink="";
-function openShare(){const s=sess();if(!s.id){toast("No active session");return;}_shareLink=window.location.origin+window.location.pathname+"?s="+encSess(s);const box=$("#qrbox");box.innerHTML="";$("#modalBg").classList.remove("hidden");try{if(window.QRCode)new window.QRCode(box,{text:_shareLink,width:160,height:160,colorDark:"#111",colorLight:"#ffffff"});else box.innerHTML='<span style="font-size:12px;color:#999;padding:12px;line-height:1.5">QR lib loading…<br>Copy link below</span>';}catch(e){}}
-$("#shareBtn").onclick=openShare;
-$("#closeModal").onclick=()=>$("#modalBg").classList.add("hidden");
-$("#modalBg").addEventListener("click",e=>{if(e.target===$("#modalBg"))$("#modalBg").classList.add("hidden");});
-$("#copyLink").onclick=e=>copyStr(_shareLink,e.currentTarget,"Link copied — send via WhatsApp / Slack");
 
 /* SYNC MODAL */
 function openSyncModal(){const connected=!!fbUrl;$("#syncConnected").classList.toggle("hidden",!connected);$("#syncSetup").classList.toggle("hidden",connected);if(connected){document.querySelectorAll("#fbUrlInputC").forEach(i=>i.value=fbUrl);setSyncDot("on");}else setSyncDot("");$("#syncModal").classList.remove("hidden");}
@@ -1639,7 +1826,7 @@ document.addEventListener("input",function(e){
   if(mode==="decimal"||mode==="numeric")return; // handled individually
   if(el.type==="text"&&el.id&&(
     el.id==="abrCash"||el.id==="abrSumup"||el.id==="abrLight"||
-    el.id==="abrTip"||el.id==="abrPauschaleFee"||el.id==="abrGuests"
+    el.id==="abrDjBon"||el.id==="abrTip"||el.id==="abrPauschaleFee"||el.id==="abrGuests"
   )){
     const p=el.selectionStart,v=el.value;
     if(v.includes(",")&&!v.includes(".")){
@@ -1768,10 +1955,7 @@ function downloadReportExcel(filter){
 }
 
 // Wire report modal
-$("#reportBtn")&&($("#reportBtn").onclick=()=>requirePin("view reports",()=>{
-  const m=$("#reportModal");if(!m)return;
-  m.classList.remove("hidden");m.style.display="flex";
-}));
+// reportBtn now wired via openReports() — see settingsMenu
 $("#reportClose")&&($("#reportClose").onclick=()=>{const m=$("#reportModal");if(m){m.classList.add("hidden");m.style.display="none";}});
 $("#repDownloadMonth")&&($("#repDownloadMonth").onclick=()=>downloadReportExcel("month"));
 $("#repDownloadAll")&&($("#repDownloadAll").onclick=()=>downloadReportExcel("all"));
@@ -1796,7 +1980,7 @@ function go(sc){
   $("#scrSheets").classList.toggle("hidden",sc!=="sheets");
   $("#scrSummary").classList.toggle("hidden",sc!=="summary");
   $("#backBtn").classList.toggle("hidden",sc==="sessions");
-  $("#shareBtn").classList.toggle("hidden",sc==="sessions"||sc==="setup");
+  
   $("#syncBtn").classList.toggle("hidden",sc!=="sessions");
   const subs={sessions:"Sessions",setup:editMode?"Edit Session":"New Session",sheets:sess().loc||"",summary:"Overview"};
   $("#brandSub").textContent=subs[sc]||"";
@@ -1817,28 +2001,385 @@ applyTheme(theme);$("#themeBtn").onclick=()=>{theme=theme==="light"?"dark":"ligh
 /* INIT */
 /* PAYMENT BUTTON INIT — wired once at startup, reliable on all browsers */
 loadAll();loadFBConfig();
-(function loadFromUrl(){try{const p=new URLSearchParams(window.location.search).get("s");if(!p)return;const incoming=decSess(p);if(!incoming||typeof incoming!=="object")return;history.replaceState({},"",window.location.pathname);const existing=sessions.find(s=>s.id===incoming.id);if(existing){if(confirm(`Update received for "${incoming.loc||"unknown"}".\nUpdate session?`)){Object.assign(existing,incoming);saveAll();toast("Session updated");}}else{if(!incoming.id)incoming.id=newSessId();sessions.push(incoming);saveAll();toast(`Session "${incoming.loc||"—"}" received and added`);}}catch(e){}})();
+
 if(fbUrl)startSync();
+
+// ═══════════════════════════════════════════════════════════════
+// DRINK MANAGER — PIN-protected admin screen
+// ═══════════════════════════════════════════════════════════════
+const DM_KEY="vbl.drinkEdits";
+function loadDrinkEdits(){
+  try{return JSON.parse(localStorage.getItem(DM_KEY)||"{}")}catch(e){return{};}
+}
+function saveDrinkEdits(edits){
+  try{localStorage.setItem(DM_KEY,JSON.stringify(edits));}catch(e){}
+}
+function applyDrinkEdits(){
+  const edits=loadDrinkEdits();
+  // Apply name/size/price/ek edits to existing items
+  [ALLV,ALLP].forEach(arr=>{
+    arr.forEach(item=>{
+      const e=edits[item.id];
+      if(e){if(e.n!==undefined)item.n=e.n;if(e.s!==undefined)item.s=e.s;if(e.p!==undefined)item.p=e.p;if(e.ek!==undefined)item.ek=e.ek;}
+    });
+  });
+  // Apply to MENU / PMENU display names too
+  MENU.forEach(c=>c.items.forEach(item=>{
+    const e=edits[item.id];
+    if(e){if(e.n!==undefined)item.n=e.n;if(e.s!==undefined)item.s=e.s;if(e.p!==undefined)item.p=e.p;if(e.ek!==undefined)item.ek=e.ek;}
+  }));
+}
+
+let adminCurrentTab="v";
+function adminTab(t){renderAdminBody();}
+
+function renderAdminBody(){
+  const body=document.getElementById("adminBody");
+  if(!body)return;
+  const edits=loadDrinkEdits();
+  let html="";
+  const menuSrc=MENU; // single shared menu
+  // ── Custom drinks from all sessions (unique by name+size) ──
+  {
+    const seen=new Set();
+    const customDrinks=sessions.flatMap(s=>(s.custom||[]).filter(i=>{
+      const key=i.n+"|"+i.s;
+      if(seen.has(key))return false;
+      seen.add(key);return true;
+    }));
+    if(customDrinks.length){
+      html+=`<div style="margin-bottom:4px"><div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;padding:8px 0 4px">Custom / Unassigned Drinks</div>`;
+      customDrinks.forEach(item=>{
+        const ek=(item.ek||0).toFixed(2).replace(".",",");
+        const vk=(item.p||0).toFixed(2).replace(".",",");
+        const cats=MENU.map(c=>c.c);
+        html+=`<div style="display:grid;grid-template-columns:1fr 64px 64px auto auto;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line2)">
+          <div>
+            <div style="font-size:13px;font-weight:600">${item.n||""}</div>
+            <div style="font-size:11px;color:var(--muted)">${item.s||""}</div>
+          </div>
+          <div style="font-size:11px;text-align:right"><div style="color:var(--muted)">VK</div><div style="font-weight:600">${vk} €</div></div>
+          <div style="font-size:11px;text-align:right"><div style="color:var(--muted)">EK</div><div style="font-weight:600">${ek} €</div></div>
+          <select onchange="addCustomToMenu('${item.id||""}','${(item.n||"").replace(/'/g,"\\'")}','${item.s||""}',${item.p||0},${item.ek||0},this.value)" style="padding:4px 6px;border-radius:7px;border:1px solid var(--line2);background:var(--card);color:var(--txt);font-size:11px;cursor:pointer">
+            <option value="">+ Add to…</option>
+            ${cats.map(c=>`<option value="${c}">${c}</option>`).join("")}
+          </select>
+          <button onclick="openCustomEdit('${item.id||""}','${(item.n||"").replace(/'/g,"\\'")}','${item.s||""}',${item.p||0},${item.ek||0})" style="padding:4px 10px;border-radius:7px;border:1px solid var(--line2);background:transparent;color:var(--txt);font-size:12px;cursor:pointer">Edit</button>
+        </div>`;
+      });
+      html+="</div>";
+    }
+  }
+  menuSrc.forEach(cat=>{
+    html+=`<div style="margin-bottom:4px"><div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;padding:8px 0 4px">${cat.c}</div>`;
+    cat.items.forEach(item=>{
+      const ek=(item.ek||0).toFixed(2).replace(".",",");
+      const vk=(item.p||0).toFixed(2).replace(".",",");
+      html+=`<div style="display:grid;grid-template-columns:1fr 70px 72px 72px auto;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line2)">
+        <div>
+          <div style="font-size:13px;font-weight:600">${item.n||""}</div>
+          <div style="font-size:11px;color:var(--muted)">${item.s||""}</div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);text-align:right">
+          <div>VK</div><div style="font-weight:600;color:var(--txt)">${vk} €</div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);text-align:right">
+          <div>EK</div><div style="font-weight:600;color:var(--txt)">${ek} €</div>
+        </div>
+        <div style="font-size:11px;text-align:right">
+          <div style="color:var(--muted)">Marge</div>
+          <div style="font-weight:600;color:var(--good)">${item.p&&item.ek?Math.round((1-item.ek/item.p)*100)+"%" : "—"}</div>
+        </div>
+        <button onclick="openDrinkEdit('${item.id}')" style="padding:4px 10px;border-radius:7px;border:1px solid var(--line2);background:transparent;color:var(--txt);font-size:12px;cursor:pointer;white-space:nowrap">Edit</button>
+      </div>`;
+    });
+    html+="</div>";
+  });
+  body.innerHTML=html;
+}
+
+function openDrinkEdit(id){
+  const all=[...ALLV,...ALLP];
+  const item=all.find(i=>i.id===id);
+  if(!item)return;
+  const modal=document.getElementById("drinkEditModal");
+  if(!modal)return;
+  document.getElementById("deId").value=id;
+  document.getElementById("deName").value=item.n||"";
+  document.getElementById("deSize").value=item.s||"";
+  document.getElementById("deVK").value=(item.p||0).toString().replace(".",",");
+  document.getElementById("deEK").value=(item.ek||0).toString().replace(".",",");
+  modal.style.display="flex";modal.classList.remove("hidden");
+}
+
+function saveDrinkEdit(){
+  const id=document.getElementById("deId").value;
+  const n=document.getElementById("deName").value.trim();
+  const s=document.getElementById("deSize").value.trim();
+  const p=parsePrice(document.getElementById("deVK").value)||0;
+  const ek=parsePrice(document.getElementById("deEK").value)||0;
+  const edits=loadDrinkEdits();
+  edits[id]={n,s,p,ek};
+  saveDrinkEdits(edits);
+  // Apply immediately
+  const all=[...ALLV,...ALLP,...MENU.flatMap(c=>c.items),...PMENU.flatMap(c=>c.items)];
+  all.filter(i=>i.id===id).forEach(i=>{i.n=n;i.s=s;i.p=p;i.ek=ek;});
+  closeDrinkEdit();
+  renderAdminBody();
+  toast("Saved ✓");
+}
+
+function addCustomToMenu(id,n,s,p,ek,cat){
+  if(!cat)return;
+  const target=MENU.find(c=>c.c===cat);
+  if(!target)return;
+  // Check not already in menu
+  if(target.items.some(i=>i.n===n&&i.s===s)){toast("Already in "+cat);return;}
+  let idc2=ALLV.length;
+  const newId="v_c"+(++idc2)+"_"+Date.now();
+  const newItem={id:newId,n,s,p:p||0,ek:ek||0};
+  target.items.push(newItem);
+  ALLV.push(newItem);
+  // Persist to localStorage
+  const saved=JSON.parse(localStorage.getItem("vbl.addedItems")||"[]");
+  saved.push({cat,id:newId,n,s,p:p||0,ek:ek||0});
+  localStorage.setItem("vbl.addedItems",JSON.stringify(saved));
+  toast(n+" added to "+cat+" ✓");
+  renderAdminBody();
+}
+window.addCustomToMenu=addCustomToMenu;
+
+function openCustomEdit(id,n,s,p,ek){
+  const modal=document.getElementById("drinkEditModal");
+  if(!modal)return;
+  document.getElementById("deId").value=id||"custom_"+Date.now();
+  document.getElementById("deName").value=n||"";
+  document.getElementById("deSize").value=s||"";
+  document.getElementById("deVK").value=(p||0).toString().replace(".",",");
+  document.getElementById("deEK").value=(ek||0).toString().replace(".",",");
+  modal.style.display="flex";modal.classList.remove("hidden");
+}
+window.openCustomEdit=openCustomEdit;
+
+function closeDrinkEdit(){
+  const m=document.getElementById("drinkEditModal");
+  if(m){m.style.display="none";m.classList.add("hidden");}
+}
+
+function openAdmin(){
+  const m=document.getElementById("adminModal");
+  if(!m)return;
+  m.style.display="flex";m.classList.remove("hidden");
+  adminTab("v");
+}
+
+
+function toggleSettingsMenu(){
+  const m=document.getElementById("settingsMenu");
+  if(!m)return;
+  const open=m.style.display==="block";
+  m.style.display=open?"none":"block";
+  if(!open){
+    // Close on outside click
+    setTimeout(()=>{
+      document.addEventListener("click",function closeMenu(e){
+        if(!document.getElementById("settingsBtn").contains(e.target)&&
+           !document.getElementById("settingsMenu").contains(e.target)){
+          const sm=document.getElementById("settingsMenu");
+          if(sm)sm.style.display="none";
+        }
+        document.removeEventListener("click",closeMenu);
+      });
+    },0);
+  }
+}
+function openReports(){
+  const sm=document.getElementById("settingsMenu");if(sm)sm.style.display="none";
+  requirePin("view reports",()=>{
+    const m=document.getElementById("reportModal");
+    if(m){m.classList.remove("hidden");m.style.display="flex";}
+  });
+}
+function openDrinkManager(){
+  const sm=document.getElementById("settingsMenu");if(sm)sm.style.display="none";
+  requirePin("manage drinks",openAdmin);
+}
+function closeReportModal(){
+  const m=document.getElementById("reportModal");
+  if(m){m.style.display="none";m.classList.add("hidden");}
+}
+window.closeReportModal=closeReportModal;
+window.toggleSettingsMenu=toggleSettingsMenu;
+window.downloadReportExcel=downloadReportExcel;
+window.openReports=openReports;
+window.openDrinkManager=openDrinkManager;
+
+
+// ── CONSUMPTION PHASES ────────────────────────────────────────────────────
+function getPhaseLabel(ph){return ph.name||(ph.startTime||ph.endTime?((ph.startTime||"")+"–"+(ph.endTime||"")):"Period "+(ph.idx+1));}
+
+function addPhase(){
+  const s=sess();
+  if(!Array.isArray(s.phases))s.phases=[];
+  const newPhase={id:"ph"+Date.now(),name:"",startTime:"",endTime:"",payType:"verbrauch",counts:{},custom:[]};
+  s.phases.push(newPhase);
+  s.activePhase=s.phases.length-1;
+  touchSess();renderV();
+}
+window.addPhase=addPhase;
+
+function setActivePhase(idx){
+  const s=sess();
+  s.activePhase=idx;
+  touchSess();renderV();
+}
+window.setActivePhase=setActivePhase;
+
+function deletePhase(idx){
+  const s=sess();
+  if(!s.phases)return;
+  s.phases.splice(idx,1);
+  if(s.activePhase>=s.phases.length)s.activePhase=s.phases.length-1;
+  touchSess();renderV();
+}
+window.deletePhase=deletePhase;
+
+function savePhaseSettings(){
+  const s=sess();
+  const ph=s.activePhase!==null?s.activePhase:0;
+  if(!s.phases||s.phases[ph]===undefined)return;
+  const p=s.phases[ph];
+  const nameEl=document.getElementById("phName"),stEl=document.getElementById("phStart"),enEl=document.getElementById("phEnd");
+  const ptEl=document.getElementById("phPayType"),budEl=document.getElementById("phBudget");
+  if(nameEl)p.name=nameEl.value.trim();
+  if(stEl)p.startTime=stEl.value;
+  if(enEl)p.endTime=enEl.value;
+  if(ptEl)p.payType=ptEl.value;
+  if(budEl)p.budget=parseFloat(budEl.value.replace(",","."))||null;
+  // Flat rate subtype
+  const ptypeEl=document.getElementById("phPauschalenType");
+  if(ptypeEl)p.pauschalenType=ptypeEl.value||"basic";
+  // Addons
+  ["spritz","cremant","shots"].forEach(k=>{
+    const el=document.getElementById("phAddon_"+k);
+    if(el)p.addons[k]=el.classList.contains("sel");
+  });
+  // Show/hide budget field
+  const bWrap=document.getElementById("phBudgetWrap");
+  if(bWrap)bWrap.style.display=p.payType==="verbrauch"?"block":"none";
+  const frWrap2=document.getElementById("phFlatRateWrap");
+  if(frWrap2)frWrap2.style.display=p.payType==="pauschale"?"block":"none";
+  const awrap2=document.getElementById("phAddonsWrap");
+  if(awrap2)awrap2.style.display=p.payType==="pauschale"?"block":"none";
+  touchSess();renderV();
+}
+window.savePhaseSettings=savePhaseSettings;
+function togglePhAddon(k){
+  const el=document.getElementById("phAddon_"+k);
+  if(!el)return;
+  const isOn=!el.classList.contains("sel");
+  el.classList.toggle("sel",isOn);
+  el.style.background=isOn?"var(--accent)":"transparent";
+  el.style.color=isOn?"var(--accent-txt)":"var(--txt)";
+  savePhaseSettings();
+}
+window.togglePhAddon=togglePhAddon;
+
+// Override bumpV and setV to use active phase counts
+const _origBumpV=bumpV,_origSetV=setV;
+function getActiveCounts(){
+  const s=sess();
+  const ph=s.activePhase;
+  // No phases or phase index out of range → use main counts
+  if(!Array.isArray(s.phases)||s.phases.length===0||ph===undefined||ph===null||!s.phases[ph]){
+    return djMode?s.djCounts:s.counts;
+  }
+  const phase=s.phases[ph];
+  if(!phase.counts)phase.counts={};
+  return phase.counts;
+}
+function getPhaseCustom(){
+  const s=sess();
+  const ph=s.activePhase;
+  if(!Array.isArray(s.phases)||!s.phases[ph])return s.custom||[];
+  if(!s.phases[ph].custom)s.phases[ph].custom=[];
+  return s.phases[ph].custom;
+}
+
+window.adminTab=adminTab;
+window.openDrinkEdit=openDrinkEdit;
+window.saveDrinkEdit=saveDrinkEdit;
+window.closeDrinkEdit=closeDrinkEdit;
+window.openAdmin=openAdmin;
+
+// Wire admin close
+$("#adminClose")&&($("#adminClose").onclick=()=>{
+  const m=$("#adminModal");if(m){m.style.display="none";m.classList.add("hidden");}
+});
+
+// Apply any saved edits on startup
+// Load previously promoted custom drinks
+try{
+  const added=JSON.parse(localStorage.getItem("vbl.addedItems")||"[]");
+  added.forEach(item=>{
+    const cat=MENU.find(c=>c.c===item.cat);
+    if(cat&&!cat.items.some(i=>i.id===item.id)){
+      cat.items.push({id:item.id,n:item.n,s:item.s,p:item.p||0,ek:item.ek||0});
+      ALLV.push({id:item.id,n:item.n,s:item.s,p:item.p||0,ek:item.ek||0});
+    }
+  });
+}catch(e){}
+applyDrinkEdits();
+
 go("sessions");
 })();
 </script>
-<!-- Monthly Report Modal -->
-<div class="modal-bg hidden" id="reportModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0">
+<!-- Monthly/All-time Report Modal -->
+<div class="modal-bg hidden" id="reportModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0">
   <div style="background:var(--bg);border-radius:18px;padding:0;width:min(600px,96vw);box-shadow:0 8px 40px rgba(0,0,0,0.3);margin:auto">
     <div style="padding:20px 24px 14px;border-bottom:1px solid var(--line2);display:flex;justify-content:space-between;align-items:center">
       <span style="font-weight:700;font-size:16px">Event Reports</span>
-      <button id="reportClose" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer">✕</button>
+      <button id="reportClose" onclick="closeReportModal()" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer">✕</button>
     </div>
     <div style="padding:24px">
       <p style="color:var(--muted);font-size:13px;margin-bottom:20px;line-height:1.5">Download an Excel summary of all events for a given period. Each row = one event with date, location, payment type, income, costs and profit.</p>
       <div style="display:flex;flex-direction:column;gap:12px">
-        <button id="repDownloadMonth" style="display:block;width:100%;height:52px;border-radius:13px;border:none;background:var(--good);color:#06241c;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:0">
-          ⬇ This Month — Download Excel
-        </button>
-        <button id="repDownloadAll" style="display:block;width:100%;height:52px;border-radius:13px;border:2px solid var(--line);background:transparent;color:var(--txt);font-size:15px;font-weight:600;cursor:pointer;margin-bottom:0">
-          ⬇ All Time — Download Excel
-        </button>
+        <button id="repDownloadMonth" onclick="downloadReportExcel('month')" style="display:block;width:100%;height:52px;border-radius:13px;border:none;background:var(--good);color:#06241c;font-size:15px;font-weight:700;cursor:pointer">⬇ This Month — Download Excel</button>
+        <button id="repDownloadAll" onclick="downloadReportExcel('all')" style="display:block;width:100%;height:52px;border-radius:13px;border:2px solid var(--line);background:transparent;color:var(--txt);font-size:15px;font-weight:600;cursor:pointer">⬇ All Time — Download Excel</button>
       </div>
+    </div>
+  </div>
+</div>
+<div class="modal-bg hidden" id="adminModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:400;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:16px 0">
+  <div style="background:var(--bg);border-radius:18px;width:min(640px,98vw);margin:auto;overflow:hidden">
+    <div style="padding:16px 20px 12px;border-bottom:1px solid var(--line2);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--bg);z-index:1">
+      <span style="font-weight:700;font-size:16px">Drink Manager</span>
+      <button id="adminClose" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer">✕</button>
+    </div>
+    <div id="adminBody" style="padding:12px 20px 24px;max-height:70vh;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- Drink Edit Modal -->
+<div class="modal-bg hidden" id="drinkEditModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;display:none;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--bg);border-radius:16px;padding:0;width:min(400px,96vw);box-shadow:0 8px 40px rgba(0,0,0,0.4)">
+    <div style="padding:16px 20px 12px;border-bottom:1px solid var(--line2);display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700;font-size:15px">Edit Drink</span>
+      <button onclick="closeDrinkEdit()" style="background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer">✕</button>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+      <input type="hidden" id="deId"/>
+      <div><p style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px">Name</p>
+        <input id="deName" type="text" style="width:100%;box-sizing:border-box;padding:10px;border-radius:9px;border:1px solid var(--line2);background:var(--card);color:var(--txt);font-size:14px"/></div>
+      <div><p style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px">Size</p>
+        <input id="deSize" type="text" placeholder="e.g. 0,33 l" style="width:100%;box-sizing:border-box;padding:10px;border-radius:9px;border:1px solid var(--line2);background:var(--card);color:var(--txt);font-size:14px"/></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><p style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px">VK-Preis (€)</p>
+          <input id="deVK" type="text" inputmode="decimal" placeholder="0,00" style="width:100%;box-sizing:border-box;padding:10px;border-radius:9px;border:1px solid var(--line2);background:var(--card);color:var(--txt);font-size:14px"/></div>
+        <div><p style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px">EK-Preis (€)</p>
+          <input id="deEK" type="text" inputmode="decimal" placeholder="0,00" style="width:100%;box-sizing:border-box;padding:10px;border-radius:9px;border:1px solid var(--line2);background:var(--card);color:var(--txt);font-size:14px"/></div>
+      </div>
+      <button onclick="saveDrinkEdit()" style="width:100%;height:46px;border-radius:11px;border:none;background:var(--accent);color:var(--accent-txt);font-weight:700;font-size:15px;cursor:pointer;margin-top:4px">Save Changes</button>
     </div>
   </div>
 </div>
