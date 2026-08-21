@@ -299,9 +299,15 @@ input,select,textarea{font-family:inherit;font-size:16px}
                 <option value="advanced">Open Bar Advanced</option>
               </select>
             </div>
-            <div id="phBudgetWrap" style="width:120px;display:none">
-              <p style="font-size:11px;color:var(--muted);margin:0 0 4px">Budget (€)</p>
-              <input id="phBudget" type="text" inputmode="decimal" placeholder="e.g. 2000" onchange="savePhaseSettings()" style="width:100%;box-sizing:border-box;padding:9px 11px;border-radius:9px;border:1px solid var(--line2);background:var(--bg);color:var(--txt);font-size:13px"/>
+            <div id="phBudgetWrap" style="display:none;flex-direction:column;gap:4px;width:140px">
+              <p style="font-size:11px;color:var(--muted);margin:0">Budget</p>
+              <div style="display:flex;gap:4px">
+                <input id="phBudget" type="text" inputmode="decimal" placeholder="e.g. 2000" onchange="savePhaseSettings()" style="flex:1;min-width:0;padding:9px 8px;border-radius:9px;border:1px solid var(--line2);background:var(--bg);color:var(--txt);font-size:13px"/>
+                <select id="phBudgetType" onchange="savePhaseSettings()" style="padding:9px 6px;border-radius:9px;border:1px solid var(--line2);background:var(--bg);color:var(--txt);font-size:12px;cursor:pointer">
+                  <option value="brutto">Brutto</option>
+                  <option value="netto">Netto</option>
+                </select>
+              </div>
             </div>
           </div>
           <div id="phAddonsWrap" style="margin-top:8px">
@@ -396,9 +402,7 @@ input,select,textarea{font-family:inherit;font-size:16px}
           </div>
         </div>
         <div id="verbrauchWrap" class="hidden" style="margin-bottom:14px">
-          <div class="warn" style="border-color:var(--line2);background:var(--card2);color:var(--muted)">
-            <span style="flex:0 0 auto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
-          </div>
+          
           <p class="label" style="margin-top:10px">Budget Limit <span style="font-size:10px;font-weight:400;color:var(--faint)">(optional)</span></p>
           <p style="font-size:12px;color:var(--faint);margin-bottom:8px">Organizer covers up to this amount — guests pay above it directly.</p>
           <div class="cur-input"><input type="text" inputmode="decimal" id="abrPauschaleFee" inputmode="decimal" placeholder="e.g. 1500" step="1" min="0"/><span class="cur-lbl">€</span></div>
@@ -722,6 +726,7 @@ function normalizeSess(s){
     if(!p.custom)p.custom=[];
     if(!p.payType)p.payType="pauschale";
     if(p.budget===undefined)p.budget=null;
+    if(!p.budgetType)p.budgetType="brutto";
     if(!p.pauschalenType)p.pauschalenType="basic";
     if(!p.addons||typeof p.addons!=="object")p.addons={};
   });
@@ -962,56 +967,33 @@ function defaultMode(id){
   const ldOrShot=item.n.startsWith("LD ")||item.n.startsWith("Shots");
   return ldOrShot?"v":"p";
 }
-function bumpV(id,d){const s=sess();const ac=getActiveCounts();let v=Math.max(0,Math.min(9999,Math.round((ac[id]||0)+d)));if(v===0){delete ac[id];}else{ac[id]=v;}touchSess();}
-function setV(id,val){const s=sess();const ac=getActiveCounts();const nv=Math.max(0,parseNum(val)||0);if(!nv)delete ac[id];else ac[id]=nv;touchSess();}
+function bumpV(id,d){const s=sess();const ac=getActiveCounts();let v=Math.max(0,Math.round(((ac[id]||0)+d)*1000)/1000);if(v===0){delete ac[id];}else{ac[id]=v;}touchSess();}
+function setV(id,val){const s=sess();const ac=getActiveCounts();const nv=Math.max(0,parseFloat(String(val).replace(",","."))||0);if(!nv)delete ac[id];else ac[id]=Math.round(nv*1000)/1000;touchSess();}
 const SYNONYMS_DEFAULT={
-
   "wasser":"water","water":"wasser",
   "bier":"beer","beer":"bier",
   "wein":"wine","wine":"wein",
   "sekt":"sparkling","sparkling":"sekt","prosecco":"sekt",
-  "schnaps":"shot","shot":"schnaps","shots":"schnaps",
+  "schnaps":"shot","shot":"schnaps",
   "vodka":"wodka","wodka":"vodka",
-  "rum":"rum",
-  "gin":"gin",
-  "whisky":"whiskey","whiskey":"whisky",
+  "gin":"gin","rum":"rum","whisky":"whiskey","whiskey":"whisky",
   "cola":"coke","coke":"cola",
   "saft":"juice","juice":"saft",
-  "tonic":"tonic water",
-  "bitters":"bitter",
-  "aperol":"aperol spritz",
-  "campari":"campari spritz",
-  "cremant":"crémant","crémant":"cremant",
+  "schorle":"spritzer","spritzer":"schorle",
   "kaffee":"coffee","coffee":"kaffee",
   "tee":"tea","tea":"tee",
   "mate":"club mate",
-  "schorle":"spritzer","spritzer":"schorle",
+  "tonic":"tonic water",
   "longdrink":"long drink","long drink":"longdrink",
   "flasche":"bottle","bottle":"flasche",
-  "glas":"glass","glass":"glas"
+  "glas":"glass","glass":"glas",
+  "apfel":"apple","apple":"apfel",
+  "orange":"orange","grapefruit":"grapefruit",
+  "milch":"milk","milk":"milch"
 };
 let SYNONYMS=Object.assign({},SYNONYMS_DEFAULT);
 try{const _s=JSON.parse(localStorage.getItem("vbl.synonyms")||"null");if(_s&&typeof _s==="object")SYNONYMS=_s;}catch(e){}
 function saveSynonyms(){try{localStorage.setItem("vbl.synonyms",JSON.stringify(SYNONYMS));}catch(e){}}
-function addSynonym(){
-  const a=document.getElementById("synA"),b=document.getElementById("synB");
-  if(!a||!b)return;
-  const ka=a.value.trim().toLowerCase(),kb=b.value.trim().toLowerCase();
-  if(!ka||!kb)return toast("Enter both words");
-  SYNONYMS[ka]=kb;SYNONYMS[kb]=ka;
-  saveSynonyms();a.value="";b.value="";
-  renderAdminBody();
-}
-function deleteSynonym(a,b){
-  delete SYNONYMS[a];delete SYNONYMS[b];
-  saveSynonyms();renderAdminBody();
-}
-function resetSynonyms(){
-  if(!confirm("Reset synonyms to defaults?"))return;
-  SYNONYMS=Object.assign({},SYNONYMS_DEFAULT);
-  saveSynonyms();renderAdminBody();
-}
-window.addSynonym=addSynonym;window.deleteSynonym=deleteSynonym;window.resetSynonyms=resetSynonyms;
 function expandSearch(q){
   const lo=q.toLowerCase();
   const terms=[lo];
@@ -1038,7 +1020,7 @@ function renderResults(){
   });
   matches=matches.slice(0,18);
   let html="";
-  matches.forEach(i=>{const qty=(getActiveCounts())[i.id]||0;const szp=i.s?`<span class="szpill">${i.s}</span>`:"";const qtyCtrl=qty>0?`<div class="stepper" style="flex:0 0 auto"><button class="minus" data-sub="${i.id}">−</button><input class="num" inputmode="numeric" data-qty="${i.id}" value="${qty}" style="width:38px"/><button class="plus" data-plus="${i.id}">+</button></div>`:`<button class="padd" data-add="${i.id}" aria-label="add">+</button>`;html+=`<div class="res-row" data-add="${i.id}"><div class="body"><div class="nm">${esc(i.n)}${szp}</div><div class="sub num">${eur(i.p)}${i.custom?" · custom":""}</div></div>${qtyCtrl}</div>`;});
+  matches.forEach(i=>{const qty=(getActiveCounts())[i.id]||0;const szp=i.s?`<span class="szpill">${i.s}</span>`:"";const qtyCtrl=qty>0?`<div class="stepper" style="flex:0 0 auto"><button class="minus" data-sub="${i.id}">−</button><input class="num" inputmode="decimal" data-qty="${i.id}" value="${qty}" style="width:38px"/><button class="plus" data-plus="${i.id}">+</button></div>`:`<button class="padd" data-add="${i.id}" aria-label="add">+</button>`;html+=`<div class="res-row" data-add="${i.id}"><div class="body"><div class="nm">${esc(i.n)}${szp}</div><div class="sub num">${eur(i.p)}${i.custom?" · custom":""}</div></div>${qtyCtrl}</div>`;});
   const exact=poolV().some(i=>i.n.toLowerCase()===q.toLowerCase());
   if(!exact)html+=`<button class="addnew-trigger" id="anTrigger"><span>+</span> Add "${esc(q)}" as a new drink</button>`;
   box.innerHTML=html;
@@ -1066,7 +1048,7 @@ function renderOrder(){
   const cm=s.countMode||{};
   groups.forEach(cat=>{const items=cat.items.filter(i=>(activeCounts[i.id]||0)>0);if(!items.length)return;any=true;const sec=document.createElement("div");sec.className="cat";const cq=items.reduce((t,i)=>t+(activeCounts[i.id]||0),0),cs=items.reduce((t,i)=>t+(activeCounts[i.id]||0)*i.p,0);sec.innerHTML=`<div class="cat-h${cat.cust?" cust":""}"><span>${cat.cust?"⚠ ":""}${cat.c}</span><span class="cc num">${cq} · ${eur(cs)}</span></div>`;items.forEach(it=>{const qty=activeCounts[it.id];const row=document.createElement("div");row.className="item has";const mode=cm[it.id]||"p";
       const badge=isCombMode?`<div class="mode-seg"><button class="seg-p${mode==="p"?" on":""}" data-mode="${it.id}" data-val="p">Flat Rate</button><div class="seg-div"></div><button class="seg-nv${mode==="v"?" on":""}" data-mode="${it.id}" data-val="v">Per Drink</button></div>`:"";
-      row.innerHTML=`<div class="body" data-add="${it.id}"><div class="nm">${esc(it.n)}${it.s?`<span class="szpill">${it.s}</span>`:""}${it.custom?'<span class="bdg">custom</span>':""}</div><div class="sub"><span class="num">${eur(it.p)}</span><span class="lt num">${eur(qty*it.p)}</span></div></div>${badge}<div class="stepper"><button class="minus" data-sub="${it.id}">−</button><input class="num" inputmode="numeric" data-qty="${it.id}" value="${qty}"/><button class="plus" data-plus="${it.id}">+</button></div>`;sec.appendChild(row);});host.appendChild(sec);});
+      row.innerHTML=`<div class="body" data-add="${it.id}"><div class="nm">${esc(it.n)}${it.s?`<span class="szpill">${it.s}</span>`:""}${it.custom?'<span class="bdg">custom</span>':""}</div><div class="sub"><span class="num">${eur(it.p)}</span><span class="lt num">${eur(qty*it.p)}</span></div></div>${badge}<div class="stepper"><button class="minus" data-sub="${it.id}">−</button><input class="num" inputmode="decimal" data-qty="${it.id}" value="${qty}"/><button class="plus" data-plus="${it.id}">+</button></div>`;sec.appendChild(row);});host.appendChild(sec);});
   if(!any)host.innerHTML=`<div class="empty">Nothing entered yet.<br>Search for a drink above.</div>`;
 }
 function renderWarn(){const cs=activeCustom();$("#vWarn").innerHTML=cs.length?`<div class="warn"><span>⚠</span><span><b>${cs.length} custom-added drink${cs.length>1?"s":""}.</b> Custom prices — flagged in PDF/export.</span></div>`:""; }
@@ -1090,13 +1072,10 @@ function renderV(){
   const _ps=sess();
   if(phasesBar){
     const hasPhases=Array.isArray(_ps.phases)&&s5.phases.length>0;
-    phasesBar.style.display="block"; // always show the + button
-    const phaseTabs=document.getElementById("phaseTabs");
-    const phSet=document.getElementById("phaseSettings");
-    // Hide tabs and settings when no phases — show only + button
-    if(phaseTabs)phaseTabs.style.display=hasPhases?"flex":"none";
-    if(phSet&&!hasPhases)phSet.style.display="none";
+    phasesBar.style.display="block"; // always show
     if(hasPhases){
+      const phaseTabs=document.getElementById("phaseTabs");
+      const phSet=document.getElementById("phaseSettings");
       if(phaseTabs){
         const activeIdx=_ps.activePhase||0;
         const allPeriods=(_ps.phases||[]);
@@ -1104,7 +1083,9 @@ function renderV(){
           const lbl=getPhaseLabel({...ph,idx:i});
           const active=i===activeIdx;
           const ptBadge=ph.payType==="verbrauch"?"Konsumation":ph.payType==="direct"?"Direkt":"Flat Rate";
-          const budSpent=ph.payType==="verbrauch"&&ph.budget?ALLV.concat(ph.custom||[]).reduce((t,x)=>t+(ph.counts[x.id]||0)*x.p,0):0;
+          const budSpent=ph.payType==="verbrauch"&&ph.budget?ALLV.concat(ph.custom||[]).reduce((t,x)=>{
+            const vk=ph.budgetType==="netto"?x.p/1.19:x.p;
+            return t+(ph.counts[x.id]||0)*vk;},0):0;
           const budRem=ph.budget?ph.budget-budSpent:null;
           const remStr=budRem!==null?(budRem<0?" ⋅ €"+Math.abs(budRem).toFixed(0)+" over":" ⋅ €"+budRem.toFixed(0)+" left"):"";
           return "<button onclick=\"setActivePhase("+i+")\" style=\"padding:5px 10px;border-radius:8px;border:"+(active?"none":"1px solid var(--line2)")+";background:"+(active?"var(--accent)":"transparent")+";color:"+(active?"var(--accent-txt)":"var(--muted)")+";font-size:12px;font-weight:600;cursor:pointer\">"+lbl+" <span style=\"font-size:10px;opacity:.7\">"+ptBadge+remStr+"<\/span> <span onclick=\"event.stopPropagation();deletePhase("+i+")\" style=\"margin-left:4px;opacity:.6\">\xd7<\/span><\/button>";
@@ -1121,6 +1102,8 @@ function renderV(){
           if(ptEl2&&document.activeElement!==ptEl2)ptEl2.value=curPh.payType||"pauschale";
           const budEl2=document.getElementById("phBudget");
           if(budEl2&&document.activeElement!==budEl2)budEl2.value=curPh.budget||"";
+          const btEl2=document.getElementById("phBudgetType");
+          if(btEl2)btEl2.value=curPh.budgetType||"brutto";
           const bWrap2=document.getElementById("phBudgetWrap");
           if(bWrap2)bWrap2.style.display=curPh.payType==="verbrauch"?"block":"none";
           // Flat rate wrap
@@ -1139,7 +1122,9 @@ function renderV(){
           const budInfo=document.getElementById("phBudgetInfo");
           if(budInfo){
             if(curPh.payType==="verbrauch"&&curPh.budget){
-              const spent=ALLV.concat(curPh.custom||[]).reduce((t,i)=>t+(curPh.counts[i.id]||0)*i.p,0);
+              const spent=ALLV.concat(curPh.custom||[]).reduce((t,i)=>{
+                const vk=curPh.budgetType==="netto"?i.p/1.19:i.p;
+                return t+(curPh.counts[i.id]||0)*vk;},0);
               const rem=curPh.budget-spent;
               budInfo.textContent="Spent: "+eur(spent)+" — Remaining: "+eur(rem);
               budInfo.style.color=rem<0?"var(--red)":"var(--good)";
@@ -1182,8 +1167,8 @@ $("#vResults").addEventListener("click",e=>{
   if(sub){bumpV(sub.dataset.sub,-1);renderResults();return;}
   if(add&&!e.target.closest("[data-qty]")){bumpV(add.dataset.add,1);renderResults();return;}
 });
-$("#vResults").addEventListener("change",e=>{const inp=e.target.closest("[data-qty]");if(!inp)return;setV(inp.dataset.qty,parseInt(inp.value)||0);renderResults();});
-$("#vResults").addEventListener("input",e=>{const inp=e.target.closest("[data-qty]");if(!inp)return;const v=parseInt(inp.value);if(!isNaN(v)&&v>=0){setV(inp.dataset.qty,v);}});
+$("#vResults").addEventListener("change",e=>{const inp=e.target.closest("[data-qty]");if(!inp)return;setV(inp.dataset.qty,parseFloat(inp.value.replace(",","."))||0);renderResults();});
+$("#vResults").addEventListener("input",e=>{const inp=e.target.closest("[data-qty]");if(!inp)return;const raw=inp.value.replace(",",".");if(raw===""||raw.endsWith(".")||raw==="0")return;const v=parseFloat(raw);if(!isNaN(v)&&v>0){setV(inp.dataset.qty,v);}});
 $("#vOrder").addEventListener("click",e=>{
   const tog=e.target.closest("[data-mode]");
   if(tog){const id=tog.dataset.mode,val=tog.dataset.val;if(!val)return;const s=sess();if(!s.countMode)s.countMode={};
@@ -1191,7 +1176,7 @@ $("#vOrder").addEventListener("click",e=>{
 $("#vOrder").addEventListener("change",e=>{const inp=e.target.closest("[data-qty]");if(!inp)return;setV(inp.dataset.qty,parseInt(inp.value,10));renderV();});
 
 /* STAFF DRINKS */
-function pbump(id,d){const s=sess();let v=Math.max(0,Math.min(9999,Math.round((s.personal[id]||0)+d)));if(v===0)delete s.personal[id];else s.personal[id]=v;touchSess();}
+function pbump(id,d){const s=sess();let v=Math.max(0,Math.round(((s.personal[id]||0)+d)*1000)/1000);if(v===0)delete s.personal[id];else s.personal[id]=v;touchSess();}
 function pset(id,val){const s=sess();let v=Math.max(0,Math.min(9999,Math.round(val||0)));if(v===0)delete s.personal[id];else s.personal[id]=v;touchSess();}
 function renderPResults(){
   const q=$("#searchP").value.trim();$("#clrP").classList.toggle("hidden",!q);
@@ -1213,7 +1198,7 @@ function renderPOrder(){
   const any=ALLP.some(i=>(s.personal[i.id]||0)>0)||cpItems.length>0;
   if(!any){host.innerHTML=`<div class="empty">Nothing entered yet.<br>Search for a drink above.</div>`;return;}
   PMENU.forEach(cat=>{const items=cat.items.filter(i=>(s.personal[i.id]||0)>0);if(!items.length)return;const sec=document.createElement("div");sec.className="cat";const cq=items.reduce((t,i)=>t+s.personal[i.id],0);sec.innerHTML=`<div class="cat-h"><span>${cat.c}</span><span class="cc num">${cq}×</span></div>`;items.forEach(it=>{const qty=s.personal[it.id];const row=document.createElement("div");row.className="item has";const pp=getPersPrice(it);
-      row.innerHTML=`<div class="body" data-padd="${it.id}"><div class="nm">${esc(it.n)}${it.s?`<span class="szpill">${it.s}</span>`:""}</div>${pp>0?`<div class="sub"><span class="num">${eur(pp)}</span><span class="lt num">${eur(qty*pp)}</span></div>`:""}</div><div class="stepper"><button class="minus" data-psub="${it.id}">−</button><input class="num" inputmode="numeric" data-pqty="${it.id}" value="${qty}"/><button class="plus" data-pplus="${it.id}">+</button></div>`;sec.appendChild(row);});host.appendChild(sec);});
+      row.innerHTML=`<div class="body" data-padd="${it.id}"><div class="nm">${esc(it.n)}${it.s?`<span class="szpill">${it.s}</span>`:""}</div>${pp>0?`<div class="sub"><span class="num">${eur(pp)}</span><span class="lt num">${eur(qty*pp)}</span></div>`:""}</div><div class="stepper"><button class="minus" data-psub="${it.id}">−</button><input class="num" inputmode="decimal" data-pqty="${it.id}" value="${qty}"/><button class="plus" data-pplus="${it.id}">+</button></div>`;sec.appendChild(row);});host.appendChild(sec);});
 }
 function renderP(){renderPResults();renderPOrder();renderTabs();renderBar();}
 $("#searchP").addEventListener("input",renderP);
@@ -1336,7 +1321,7 @@ function renderAbrechnung(){
   const bw=$("#basicAddonsWrap");if(bw)bw.classList.toggle("hidden",subType!=="basic");
   const aw=$("#advancedAddonsWrap");if(aw)aw.classList.toggle("hidden",subType!=="advanced");
   // add-on buttons
-  [["ao-spritz","spritz"],["ao-cremant","cremant"],["ao-shots","shots"]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.classList.toggle("sel",(a.addons||{})[p[1]]===true);});
+  [["ao-spritz","spritz"],["ao-cremant","cremant"],["ao-shots","shots"],["ao-shots-basic","shots"]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.classList.toggle("sel",(a.addons||{})[p[1]]===true);});
   [["pft-netto","netto"],["pft-brutto","brutto"]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.classList.toggle("sel",(a.pauschale_fee_type||"netto")===p[1]);});
   [["tip-cash","cash"],["tip-payout","payout"]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.classList.toggle("sel",a.tipSource===p[1]);});
   const pfi=$("#abrPauschaleFee");if(pfi&&document.activeElement!==pfi)pfi.value=a.pauschale_fee||"";
@@ -2203,7 +2188,7 @@ function renderAdminBody(){
         const ek=(item.ek||0).toFixed(2).replace(".",",");
         const vk=(item.p||0).toFixed(2).replace(".",",");
         const cats=MENU.map(c=>c.c);
-        html+=`<div style="display:grid;grid-template-columns:1fr 64px 64px auto auto;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line2)">
+        html+=`<div style="display:grid;grid-template-columns:1fr 64px 64px auto auto auto auto;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line2)">
           <div>
             <div style="font-size:13px;font-weight:600">${item.n||""}</div>
             <div style="font-size:11px;color:var(--muted)">${item.s||""}</div>
@@ -2215,6 +2200,8 @@ function renderAdminBody(){
             ${cats.map(c=>`<option value="${c}">${c}</option>`).join("")}
           </select>
           <button onclick="openCustomEdit('${item.id||""}','${(item.n||"").replace(/'/g,"\\'")}','${item.s||""}',${item.p||0},${item.ek||0})" style="padding:4px 10px;border-radius:7px;border:1px solid var(--line2);background:transparent;color:var(--txt);font-size:12px;cursor:pointer">Edit</button>
+          <button onclick="window._dmId='${item.id||''}';assignCustomToExisting(window._dmId)" style="padding:4px 8px;border-radius:7px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-size:11px;cursor:pointer">Merge →</button>
+          <button onclick="window._dmId='${item.id||''}';deleteCustomDrink(window._dmId)" style="padding:4px 6px;border-radius:7px;border:none;background:none;color:var(--muted);font-size:16px;cursor:pointer">×</button>
         </div>`;
       });
       html+="</div>";
@@ -2241,6 +2228,7 @@ function renderAdminBody(){
           <div style="font-weight:600;color:var(--good)">${item.p&&item.ek?Math.round((1-item.ek/item.p)*100)+"%" : "—"}</div>
         </div>
         <button onclick="openDrinkEdit('${item.id}')" style="padding:4px 10px;border-radius:7px;border:1px solid var(--line2);background:transparent;color:var(--txt);font-size:12px;cursor:pointer;white-space:nowrap">Edit</button>
+          
       </div>`;
     });
     html+="</div>";
@@ -2249,8 +2237,7 @@ function renderAdminBody(){
   html+='<div style="margin:20px 0 8px;padding-top:16px;border-top:1px solid var(--line2)">';
   html+='<p style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Search Synonyms</p>';
   html+='<p style="font-size:12px;color:var(--faint);margin-bottom:10px;line-height:1.4">Typing one word also matches the other. Both directions added automatically.</p>';
-  const synPairs=Object.entries(SYNONYMS).filter(([a,b])=>a<b);
-  synPairs.forEach(([a,b])=>{
+  Object.entries(SYNONYMS).filter(([a,b])=>a<b).forEach(([a,b])=>{
     html+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">`
     +`<span style="flex:1;font-size:13px;padding:7px 10px;background:var(--card2);border-radius:8px">${a}</span>`
     +`<span style="color:var(--muted);font-size:11px">↔</span>`
@@ -2268,6 +2255,25 @@ function renderAdminBody(){
   html+='</div>';
   body.innerHTML=html;
 }
+function addSynonym(){
+  const a=document.getElementById("synA"),b=document.getElementById("synB");
+  if(!a||!b)return;
+  const ka=a.value.trim().toLowerCase(),kb=b.value.trim().toLowerCase();
+  if(!ka||!kb)return toast("Enter both words");
+  SYNONYMS[ka]=kb;SYNONYMS[kb]=ka;
+  saveSynonyms();a.value="";b.value="";
+  renderAdminBody();
+}
+function deleteSynonym(a,b){
+  delete SYNONYMS[a];delete SYNONYMS[b];
+  saveSynonyms();renderAdminBody();
+}
+function resetSynonyms(){
+  if(!confirm("Reset synonyms to defaults?"))return;
+  SYNONYMS=Object.assign({},SYNONYMS_DEFAULT);
+  saveSynonyms();renderAdminBody();
+}
+window.addSynonym=addSynonym;window.deleteSynonym=deleteSynonym;window.resetSynonyms=resetSynonyms;
 
 function openDrinkEdit(id){
   const all=[...ALLV,...ALLP];
@@ -2331,6 +2337,36 @@ function openCustomEdit(id,n,s,p,ek){
   modal.style.display="flex";modal.classList.remove("hidden");
 }
 window.openCustomEdit=openCustomEdit;
+function deleteCustomDrink(id){
+  if(!confirm("Delete this custom drink from all sessions?"))return;
+  sessions.forEach(s=>{
+    s.custom=(s.custom||[]).filter(i=>i.id!==id);
+    delete (s.counts||{})[id];delete (s.bruchCounts||{})[id];delete (s.personal||{})[id];
+    (s.phases||[]).forEach(p=>{delete (p.counts||{})[id];p.custom=(p.custom||[]).filter(i=>i.id!==id);});
+  });
+  saveAll();debouncedSync();renderAdminBody();toast("Deleted");
+}
+window.deleteCustomDrink=deleteCustomDrink;
+function assignCustomToExisting(customId){
+  const items=ALLV.filter(i=>!i.custom);
+  const opts=items.map((i,idx)=>`${idx+1}. ${i.n}${i.s?" ("+i.s+")":""}`).join("\n");
+  const raw=prompt("Merge into (enter number):\n\n"+opts);
+  if(!raw)return;
+  const idx=parseInt(raw)-1;
+  if(isNaN(idx)||idx<0||idx>=items.length)return toast("Invalid");
+  const tgt=items[idx];
+  if(!confirm("Merge into \""+tgt.n+"\" across ALL sessions?"))return;
+  sessions.forEach(s=>{
+    if((s.counts||{})[customId]){s.counts[tgt.id]=(s.counts[tgt.id]||0)+s.counts[customId];delete s.counts[customId];}
+    if((s.personal||{})[customId]){s.personal[tgt.id]=(s.personal[tgt.id]||0)+s.personal[customId];delete s.personal[customId];}
+    if((s.bruchCounts||{})[customId]){s.bruchCounts[tgt.id]=(parseFloat(s.bruchCounts[tgt.id])||0)+parseFloat(s.bruchCounts[customId]);delete s.bruchCounts[customId];}
+    (s.phases||[]).forEach(p=>{if((p.counts||{})[customId]){p.counts[tgt.id]=(p.counts[tgt.id]||0)+p.counts[customId];delete p.counts[customId];}});
+    s.custom=(s.custom||[]).filter(i=>i.id!==customId);
+  });
+  saveAll();debouncedSync();renderAdminBody();toast("Merged into "+tgt.n);
+}
+window.assignCustomToExisting=assignCustomToExisting;
+
 
 function closeDrinkEdit(){
   const m=document.getElementById("drinkEditModal");
@@ -2392,7 +2428,13 @@ function getPhaseLabel(ph){return ph.name||(ph.startTime||ph.endTime?((ph.startT
 function addPhase(){
   const s=sess();
   if(!Array.isArray(s.phases))s.phases=[];
-  const newPhase={id:"ph"+Date.now(),name:"",startTime:"",endTime:"",payType:"verbrauch",counts:{},custom:[]};
+  const newPhase={id:"ph"+Date.now(),name:"",startTime:"",endTime:"",payType:"verbrauch",budget:null,budgetType:"brutto",counts:{},custom:[]};
+  const hasMain=Object.keys(s.counts||{}).length>0;
+  if(hasMain&&confirm("Transfer current drink counts to this new period?")){
+    newPhase.counts=Object.assign({},s.counts);
+    newPhase.custom=[...(s.custom||[])];
+    s.counts={};
+  }
   s.phases.push(newPhase);
   s.activePhase=s.phases.length-1;
   touchSess();renderV();
@@ -2408,7 +2450,14 @@ window.setActivePhase=setActivePhase;
 
 function deletePhase(idx){
   const s=sess();
-  if(!s.phases)return;
+  if(!s.phases||!s.phases[idx])return;
+  const ph=s.phases[idx];
+  const hasCounts=Object.keys(ph.counts||{}).length>0;
+  if(hasCounts){
+    const choice=prompt("What to do with drinks in this period?\n1 = Move to main list\n2 = Delete completely\nEnter 1 or 2:");
+    if(choice==="1"){Object.keys(ph.counts).forEach(k=>s.counts[k]=(s.counts[k]||0)+ph.counts[k]);}
+    else if(choice!=="2"){return;}
+  }
   s.phases.splice(idx,1);
   if(s.phases.length===0){s.activePhase=null;}
   else if(s.activePhase===null||s.activePhase>=s.phases.length){s.activePhase=s.phases.length-1;}
@@ -2427,6 +2476,8 @@ function savePhaseSettings(){
   if(stEl)p.startTime=stEl.value;
   if(enEl)p.endTime=enEl.value;
   if(ptEl)p.payType=ptEl.value;
+  const btEl=document.getElementById("phBudgetType");
+  if(btEl)p.budgetType=btEl.value;
   if(budEl)p.budget=parseFloat(budEl.value.replace(",","."))||null;
   // Flat rate subtype
   const ptypeEl=document.getElementById("phPauschalenType");
